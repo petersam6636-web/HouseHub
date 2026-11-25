@@ -50,14 +50,16 @@ export default function Header() {
   const [loginUser, setLoginUser] = useState<LoginUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState("");
+  const [mobilePopup, setMobilePopup] = useState<string | null>(null);
 
-  // Get the current route without using React Router
+  // Track the current route.
   useEffect(() => {
     setCurrentPath(window.location.pathname);
 
     function handleRouteChange() {
       setCurrentPath(window.location.pathname);
       setProfileOpen(false);
+      setMobilePopup(null);
     }
 
     window.addEventListener("popstate", handleRouteChange);
@@ -67,11 +69,20 @@ export default function Header() {
     };
   }, []);
 
-  // Fetch the logged-in Supabase user
+  // Fetch and listen for the logged-in Supabase user.
   useEffect(() => {
     let mounted = true;
 
-    function formatUser(user: any): LoginUser {
+    function formatUser(user: {
+      id: string;
+      email?: string;
+      user_metadata?: {
+        full_name?: string;
+        name?: string;
+        avatar_url?: string;
+        picture?: string;
+      };
+    }): LoginUser {
       return {
         id: user.id,
         name:
@@ -138,7 +149,10 @@ export default function Header() {
       return currentPath === "/home";
     }
 
-    return currentPath === path || currentPath.startsWith(`${path}/`);
+    return (
+      currentPath === path ||
+      currentPath.startsWith(`${path}/`)
+    );
   }
 
   async function handleSignOut() {
@@ -148,31 +162,122 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#05070D]/95 shadow-[0_8px_35px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-      {/* Full-width outer container */}
-      <div className="w-full px-3 sm:px-5 lg:px-8">
-        {/* Centered inner container */}
+      <div className="w-full px-2 sm:px-4 lg:px-8">
         <div className="mx-auto w-full max-w-[1440px]">
-          {/* Main header row */}
-          <div className="flex h-[68px] items-center justify-between gap-3 sm:h-[76px]">
+          {/* Main responsive header */}
+          <div className="flex h-14 items-center justify-between gap-2 sm:h-[68px] sm:gap-4 md:h-[76px]">
             {/* LEFT: HouseHub brand */}
             <Link
               href="/home"
-              className="flex shrink-0 items-center gap-2.5"
+              onClick={() => {
+                setCurrentPath("/home");
+                setMobilePopup(null);
+              }}
+              className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2.5"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-[0_4px_20px_rgba(37,99,235,0.35)]">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 shadow-[0_4px_16px_rgba(37,99,235,0.35)] transition-transform duration-300 hover:scale-105 sm:h-10 sm:w-10 sm:rounded-xl">
                 <House
-                  size={21}
+                  size={18}
                   strokeWidth={2.4}
-                  className="text-white"
+                  className="text-white sm:h-[21px] sm:w-[21px]"
                 />
               </div>
 
-              <span className="text-lg font-bold tracking-tight text-white sm:text-xl">
+              <span className="truncate text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                 House<span className="text-blue-400">Hub</span>
               </span>
             </Link>
 
-            {/* DESKTOP: Center navigation */}
+            {/* RIGHT: Small mobile navigation */}
+            <nav className="flex shrink-0 items-center gap-0.5 sm:hidden">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+                const popupOpen = mobilePopup === item.name;
+
+                return (
+                  <div
+                    key={item.name}
+                    className="relative"
+                  >
+                    <Link
+                      href={item.path}
+                      aria-label={item.name}
+                      aria-expanded={popupOpen}
+                      onClick={() => {
+                        setCurrentPath(item.path);
+                        setMobilePopup(item.name);
+                      }}
+                      className={`group relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300 active:scale-90 ${
+                        active
+                          ? "bg-blue-500/15 text-blue-400 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.2)]"
+                          : "text-slate-500 hover:bg-white/[0.05] hover:text-slate-200"
+                      }`}
+                    >
+                      <Icon
+                        size={19}
+                        strokeWidth={active ? 2.5 : 2}
+                        className={`transition-all duration-300 ${
+                          active
+                            ? "-translate-y-0.5 scale-110 animate-pulse"
+                            : "group-hover:scale-110"
+                        }`}
+                      />
+
+                      {/* Active indicator */}
+                      {active && (
+                        <span className="absolute bottom-0.5 h-1 w-1 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                      )}
+                    </Link>
+
+                    {/* Small navigation popup */}
+                    {popupOpen && (
+                      <div className="absolute right-0 top-[calc(100%+10px)] z-[60] w-36 origin-top-right animate-in fade-in zoom-in-95 duration-150">
+                        <div className="flex items-center gap-2.5 rounded-xl border border-blue-500/20 bg-[#101827] px-3 py-2.5 shadow-[0_12px_35px_rgba(0,0,0,0.55)]">
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 text-blue-400">
+                            <Icon size={16} strokeWidth={2.3} />
+                          </div>
+
+                          <span className="truncate text-xs font-semibold text-slate-100">
+                            {item.name}
+                          </span>
+                        </div>
+
+                        {/* Popup arrow */}
+                        <div className="absolute -top-1 right-3 h-2 w-2 rotate-45 border-l border-t border-blue-500/20 bg-[#101827]" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </nav>
+
+            {/* RIGHT: Text-only navigation from sm to md */}
+            <nav className="hidden shrink-0 items-center gap-1 sm:flex md:hidden">
+              {navigation.map((item) => {
+                const active = isActive(item.path);
+
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.path}
+                    onClick={() => {
+                      setCurrentPath(item.path);
+                      setMobilePopup(null);
+                    }}
+                    className={`cursor-pointer whitespace-nowrap rounded-lg px-2 py-2 text-xs font-medium transition-all duration-200 ${
+                      active
+                        ? "bg-blue-600/15 text-blue-400"
+                        : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* CENTER: Full desktop navigation */}
             <nav className="hidden items-center gap-1 rounded-2xl border border-white/[0.06] bg-[#0B1220] p-1.5 shadow-inner md:flex">
               {navigation.map((item) => {
                 const Icon = item.icon;
@@ -182,7 +287,10 @@ export default function Header() {
                   <Link
                     key={item.name}
                     href={item.path}
-                    onClick={() => setCurrentPath(item.path)}
+                    onClick={() => {
+                      setCurrentPath(item.path);
+                      setMobilePopup(null);
+                    }}
                     className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200 lg:px-4 ${
                       active
                         ? "bg-blue-600/15 text-blue-400 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.15)]"
@@ -228,7 +336,7 @@ export default function Header() {
 
                 <ChevronDown
                   size={16}
-                  className={`text-slate-500 transition-transform ${
+                  className={`text-slate-500 transition-transform duration-200 ${
                     profileOpen ? "rotate-180" : ""
                   }`}
                 />
@@ -286,33 +394,6 @@ export default function Header() {
               )}
             </div>
           </div>
-
-          {/* MOBILE: Four navigation links */}
-          <nav className="grid grid-cols-4 gap-1 pb-3 md:hidden">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-
-              return (
-                <Link
-                  key={item.name}
-                  href={item.path}
-                  onClick={() => setCurrentPath(item.path)}
-                  className={`flex min-w-0 flex-col items-center justify-center gap-1.5 rounded-xl py-2 transition-all duration-200 ${
-                    active
-                      ? "bg-blue-600/15 text-blue-400"
-                      : "text-slate-500 hover:bg-white/[0.04] hover:text-slate-200"
-                  }`}
-                >
-                  <Icon size={19} strokeWidth={2} />
-
-                  <span className="text-[11px] font-medium sm:text-xs">
-                    {item.name}
-                  </span>
-                </Link>
-              );
-            })}
-          </nav>
         </div>
       </div>
     </header>

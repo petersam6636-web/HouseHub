@@ -36,7 +36,7 @@ export default function RegisterPage() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `https://househubb.vercel.app/home` },
+        options: { redirectTo: new URL("/home", window.location.origin).toString() },
       });
 
       if (error) setError(error.message);
