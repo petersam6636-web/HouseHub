@@ -78,17 +78,17 @@ export default function TestimonialSection() {
         </div>
 
         {/* Testimonial cards */}
-        <div className="grid grid-cols-1 items-stretch gap-5 sm:gap-6 lg:grid-cols-3 lg:gap-7">
+        <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-3 sm:gap-4 lg:gap-7">
           {testimonials.map((testimonial, index) => {
             const isFeatured = index === 1;
 
             return (
               <article
                 key={testimonial.name}
-                className={`group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.75rem] border p-6 transition-all duration-500 sm:p-8 ${
+                className={`group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.75rem] border p-5 transition-all duration-500 sm:p-5 lg:p-8 ${
                   isFeatured
-                    ? "border-blue-400/25 bg-gradient-to-b from-[#101D32] via-[#0B1424] to-[#080D17] shadow-[0_25px_80px_rgba(37,99,235,0.13)] lg:-translate-y-7 lg:scale-[1.025]"
-                    : "border-white/[0.07] bg-[#0A0F19]/80 shadow-[0_20px_60px_rgba(0,0,0,0.18)] lg:translate-y-7"
+                    ? "border-blue-400/25 bg-gradient-to-b from-[#101D32] via-[#0B1424] to-[#080D17] shadow-[0_25px_80px_rgba(37,99,235,0.13)] sm:-translate-y-5 sm:scale-[1.025] lg:-translate-y-7"
+                    : "border-blue-400/25 bg-gradient-to-b from-[#101D32] via-[#0B1424] to-[#080D17] shadow-[0_20px_60px_rgba(0,0,0,0.18)] sm:translate-y-5 lg:translate-y-9 lg:border-white/[0.07] lg:bg-[#0A0F19]/80"
                 } hover:border-blue-400/25 hover:shadow-[0_25px_70px_rgba(37,99,235,0.10)]`}
               >
                 {/* Card glow */}
@@ -116,7 +116,7 @@ export default function TestimonialSection() {
                     className={`flex h-10 w-10 items-center justify-center rounded-xl border ${
                       isFeatured
                         ? "border-blue-400/20 bg-blue-500/10 text-blue-300"
-                        : "border-white/[0.06] bg-white/[0.03] text-slate-500"
+                        : "border-white/[0.06] bg-white/[0.03] text-slate-500 lg:border-white/[0.06] lg:bg-white/[0.03] lg:text-slate-500"
                     }`}
                   >
                     <Quote size={18} />
@@ -129,7 +129,7 @@ export default function TestimonialSection() {
                     className={`inline-flex rounded-full px-3 py-1.5 text-[10px] font-semibold tracking-wide ${
                       isFeatured
                         ? "border border-blue-400/15 bg-blue-500/[0.08] text-blue-200"
-                        : "border border-white/[0.06] bg-white/[0.025] text-slate-400"
+                        : "border border-blue-400/15 bg-blue-500/[0.08] text-blue-200 lg:border-white/[0.06] lg:bg-white/[0.025] lg:text-slate-400"
                     }`}
                   >
                     {testimonial.highlight}
@@ -139,10 +139,10 @@ export default function TestimonialSection() {
                 {/* Testimonial */}
                 <blockquote className="relative mt-5 flex-1">
                   <p
-                    className={`text-sm leading-7 sm:text-[15px] sm:leading-8 ${
+                    className={`text-sm leading-7 sm:text-[13px] sm:leading-6 lg:text-[15px] lg:leading-8 ${
                       isFeatured
                         ? "text-slate-200"
-                        : "text-slate-400"
+                        : "text-slate-200 lg:text-slate-400"
                     }`}
                   >
                     “{testimonial.quote}”
@@ -159,7 +159,7 @@ export default function TestimonialSection() {
                       className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xs font-bold ${
                         isFeatured
                           ? "border border-blue-400/20 bg-gradient-to-br from-blue-500/20 to-blue-700/10 text-blue-200"
-                          : "border border-white/[0.07] bg-white/[0.04] text-slate-300"
+                          : "border border-blue-400/20 bg-gradient-to-br from-blue-500/20 to-blue-700/10 text-blue-200 lg:border-white/[0.07] lg:bg-white/[0.04] lg:text-slate-300"
                       }`}
                     >
                       {testimonial.initials}
@@ -180,7 +180,7 @@ export default function TestimonialSection() {
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${
                       isFeatured
                         ? "bg-blue-500/10 text-blue-300"
-                        : "bg-white/[0.03] text-slate-500 group-hover:text-blue-400"
+                        : "bg-blue-500/10 text-blue-300 lg:bg-white/[0.03] lg:text-slate-500 lg:group-hover:text-blue-400"
                     }`}
                   >
                     <ArrowUpRight size={16} />
