@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, Geist_Mono } from "next/font/google";
 import ContextFile from "@/lib/ContextFile";
-import GoogleSignInPrompt from "@/component/GoogleSignInPrompt";
 
 import "./globals.css";
 
@@ -31,7 +30,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col ">
         <ContextFile>
           {children}
-          <GoogleSignInPrompt />
         </ContextFile>
       </body>
     </html>
