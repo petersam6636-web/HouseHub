@@ -196,7 +196,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 h-[72px] w-full border-b border-white/[0.06] bg-[#05070D]/95 shadow-[0_8px_35px_rgba(0,0,0,0.45)] backdrop-blur-xl">
       <div className="h-full w-full px-2 sm:px-4 lg:px-8">
-        <div className="mx-auto h-full w-full max-w-[1440px]">
+        <div className="mx-auto h-full w-full max-w-6xl">
           {/* Same header height on every device */}
           <div className="flex h-full items-center justify-between gap-1.5 sm:gap-3 md:gap-5">
             {/* LEFT: HouseHub brand */}

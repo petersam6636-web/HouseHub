@@ -29,7 +29,7 @@ export default function AboutHouseHub() {
       </div>
 
       <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-12 lg:gap-16">
+        <div className="grid items-start gap-10 md:grid-cols-2 md:gap-8 lg:gap-12">
           {/* LEFT: Abstract school dashboard */}
           <div className="relative mx-auto w-full max-w-[460px] md:order-1">
             <div className="absolute inset-8 rounded-[2rem] bg-blue-600/[0.15] blur-[70px]" />
@@ -129,7 +129,7 @@ export default function AboutHouseHub() {
           </div>
 
           {/* RIGHT: About text */}
-          <div className="w-full max-w-[480px] md:order-2">
+          <div className="w-full max-w-[460px] md:order-2">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-3 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
 
