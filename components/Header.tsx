@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   House,
@@ -52,7 +52,40 @@ export default function Header() {
   const [currentPath, setCurrentPath] = useState("");
   const [mobilePopup, setMobilePopup] = useState<string | null>(null);
 
-  // Track the current route.
+  const popupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear the popup timer.
+  function clearPopupTimer() {
+    if (popupTimer.current) {
+      clearTimeout(popupTimer.current);
+      popupTimer.current = null;
+    }
+  }
+
+  // Show the mobile navigation popup.
+  function showMobilePopup(name: string) {
+    clearPopupTimer();
+    setMobilePopup(name);
+  }
+
+  // Hide the popup after one second.
+  function schedulePopupClose() {
+    clearPopupTimer();
+
+    popupTimer.current = setTimeout(() => {
+      setMobilePopup(null);
+      popupTimer.current = null;
+    }, 1000);
+  }
+
+  // Close popup when component unmounts.
+  useEffect(() => {
+    return () => {
+      clearPopupTimer();
+    };
+  }, []);
+
+  // Track browser navigation.
   useEffect(() => {
     setCurrentPath(window.location.pathname);
 
@@ -161,34 +194,35 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#05070D]/95 shadow-[0_8px_35px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-      <div className="w-full px-2 sm:px-4 lg:px-8">
-        <div className="mx-auto w-full max-w-[1440px]">
-          {/* Main responsive header */}
-          <div className="flex h-14 items-center justify-between gap-2 sm:h-[68px] sm:gap-4 md:h-[76px]">
+    <header className="sticky top-0 z-50 h-[72px] w-full border-b border-white/[0.06] bg-[#05070D]/95 shadow-[0_8px_35px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+      <div className="h-full w-full px-2 sm:px-4 lg:px-8">
+        <div className="mx-auto h-full w-full max-w-[1440px]">
+          {/* Same header height on every device */}
+          <div className="flex h-full items-center justify-between gap-1.5 sm:gap-3 md:gap-5">
             {/* LEFT: HouseHub brand */}
             <Link
               href="/home"
               onClick={() => {
                 setCurrentPath("/home");
                 setMobilePopup(null);
+                clearPopupTimer();
               }}
               className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2.5"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 shadow-[0_4px_16px_rgba(37,99,235,0.35)] transition-transform duration-300 hover:scale-105 sm:h-10 sm:w-10 sm:rounded-xl">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 shadow-[0_4px_16px_rgba(37,99,235,0.3)] transition-transform duration-300 hover:scale-105 sm:h-10 sm:w-10 sm:rounded-xl">
                 <House
-                  size={18}
+                  size={19}
                   strokeWidth={2.4}
-                  className="text-white sm:h-[21px] sm:w-[21px]"
+                  className="text-white"
                 />
               </div>
 
-              <span className="truncate text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
+              <span className="whitespace-nowrap text-[15px] font-bold tracking-tight text-white sm:text-lg md:text-xl">
                 House<span className="text-blue-400">Hub</span>
               </span>
             </Link>
 
-            {/* RIGHT: Small mobile navigation */}
+            {/* MOBILE: Icons only below sm */}
             <nav className="flex shrink-0 items-center gap-0.5 sm:hidden">
               {navigation.map((item) => {
                 const Icon = item.icon;
@@ -199,6 +233,8 @@ export default function Header() {
                   <div
                     key={item.name}
                     className="relative"
+                    onMouseEnter={() => showMobilePopup(item.name)}
+                    onMouseLeave={schedulePopupClose}
                   >
                     <Link
                       href={item.path}
@@ -206,54 +242,58 @@ export default function Header() {
                       aria-expanded={popupOpen}
                       onClick={() => {
                         setCurrentPath(item.path);
-                        setMobilePopup(item.name);
+                        showMobilePopup(item.name);
+                        schedulePopupClose();
                       }}
-                      className={`group relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300 active:scale-90 ${
+                      className={`group relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200 active:scale-90 ${
                         active
-                          ? "bg-blue-500/15 text-blue-400 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.2)]"
+                          ? "bg-blue-500/15 text-blue-400"
                           : "text-slate-500 hover:bg-white/[0.05] hover:text-slate-200"
                       }`}
                     >
                       <Icon
                         size={19}
                         strokeWidth={active ? 2.5 : 2}
-                        className={`transition-all duration-300 ${
+                        className={`transition-transform duration-200 ${
                           active
-                            ? "-translate-y-0.5 scale-110 animate-pulse"
+                            ? "scale-110"
                             : "group-hover:scale-110"
                         }`}
                       />
 
-                      {/* Active indicator */}
                       {active && (
-                        <span className="absolute bottom-0.5 h-1 w-1 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                        <span className="absolute bottom-1 h-1 w-1 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
                       )}
                     </Link>
 
-                    {/* Small navigation popup */}
-                    {popupOpen && (
-                      <div className="absolute right-0 top-[calc(100%+10px)] z-[60] w-36 origin-top-right animate-in fade-in zoom-in-95 duration-150">
-                        <div className="flex items-center gap-2.5 rounded-xl border border-blue-500/20 bg-[#101827] px-3 py-2.5 shadow-[0_12px_35px_rgba(0,0,0,0.55)]">
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 text-blue-400">
-                            <Icon size={16} strokeWidth={2.3} />
-                          </div>
-
-                          <span className="truncate text-xs font-semibold text-slate-100">
-                            {item.name}
-                          </span>
+                    {/* Compact icon + name popup */}
+                    <div
+                      className={`pointer-events-none absolute right-0 top-[calc(100%+8px)] z-[60] w-32 origin-top-right transition-all duration-150 ${
+                        popupOpen
+                          ? "visible translate-y-0 scale-100 opacity-100"
+                          : "invisible -translate-y-1 scale-95 opacity-0"
+                      }`}
+                    >
+                      <div className="relative flex items-center gap-2.5 rounded-xl border border-blue-500/20 bg-[#101827] px-3 py-2.5 shadow-[0_12px_35px_rgba(0,0,0,0.55)]">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 text-blue-400">
+                          <Icon size={16} strokeWidth={2.3} />
                         </div>
 
+                        <span className="truncate text-xs font-semibold text-slate-100">
+                          {item.name}
+                        </span>
+
                         {/* Popup arrow */}
-                        <div className="absolute -top-1 right-3 h-2 w-2 rotate-45 border-l border-t border-blue-500/20 bg-[#101827]" />
+                        <span className="absolute -top-1 right-3 h-2 w-2 rotate-45 border-l border-t border-blue-500/20 bg-[#101827]" />
                       </div>
-                    )}
+                    </div>
                   </div>
                 );
               })}
             </nav>
 
-            {/* RIGHT: Text-only navigation from sm to md */}
-            <nav className="hidden shrink-0 items-center gap-1 sm:flex md:hidden">
+            {/* sm to md: Text-only navigation */}
+            <nav className="hidden shrink-0 items-center gap-0.5 sm:flex md:hidden">
               {navigation.map((item) => {
                 const active = isActive(item.path);
 
@@ -264,8 +304,9 @@ export default function Header() {
                     onClick={() => {
                       setCurrentPath(item.path);
                       setMobilePopup(null);
+                      clearPopupTimer();
                     }}
-                    className={`cursor-pointer whitespace-nowrap rounded-lg px-2 py-2 text-xs font-medium transition-all duration-200 ${
+                    className={`cursor-pointer whitespace-nowrap rounded-lg px-2 py-2 text-[11px] font-semibold transition-colors duration-200 sm:px-2.5 sm:text-xs ${
                       active
                         ? "bg-blue-600/15 text-blue-400"
                         : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
@@ -277,8 +318,8 @@ export default function Header() {
               })}
             </nav>
 
-            {/* CENTER: Full desktop navigation */}
-            <nav className="hidden items-center gap-1 rounded-2xl border border-white/[0.06] bg-[#0B1220] p-1.5 shadow-inner md:flex">
+            {/* md and above: Full desktop navigation */}
+            <nav className="hidden items-center gap-1 rounded-2xl border border-white/[0.06] bg-[#0B1220] p-1 md:flex">
               {navigation.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
@@ -290,14 +331,15 @@ export default function Header() {
                     onClick={() => {
                       setCurrentPath(item.path);
                       setMobilePopup(null);
+                      clearPopupTimer();
                     }}
-                    className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200 lg:px-4 ${
+                    className={`flex items-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-medium transition-all duration-200 lg:gap-2 lg:px-4 lg:py-2.5 lg:text-sm ${
                       active
-                        ? "bg-blue-600/15 text-blue-400 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.15)]"
+                        ? "bg-blue-600/15 text-blue-400"
                         : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
                     }`}
                   >
-                    <Icon size={17} strokeWidth={2} />
+                    <Icon size={16} strokeWidth={2} />
                     <span>{item.name}</span>
                   </Link>
                 );
@@ -309,22 +351,22 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => setProfileOpen((open) => !open)}
-                className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#0B1220] p-1.5 pr-3 transition-all hover:border-blue-500/40 hover:bg-[#111B2C]"
+                className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-[#0B1220] p-1.5 pr-2.5 transition-all hover:border-blue-500/40 hover:bg-[#111B2C] lg:gap-3 lg:rounded-2xl lg:pr-3"
               >
                 {loginUser?.avatar ? (
                   <img
                     src={loginUser.avatar}
                     alt={loginUser.name}
                     referrerPolicy="no-referrer"
-                    className="h-9 w-9 rounded-xl object-cover ring-1 ring-blue-500/30"
+                    className="h-8 w-8 rounded-lg object-cover ring-1 ring-blue-500/30 lg:h-9 lg:w-9 lg:rounded-xl"
                   />
                 ) : (
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-sm font-bold text-blue-400 ring-1 ring-blue-500/20">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15 text-xs font-bold text-blue-400 ring-1 ring-blue-500/20 lg:h-9 lg:w-9 lg:rounded-xl lg:text-sm">
                     {initials}
                   </div>
                 )}
 
-                <div className="max-w-[150px] text-left">
+                <div className="hidden max-w-[120px] text-left lg:block">
                   <p className="truncate text-sm font-semibold text-slate-100">
                     {loginUser?.name || "Loading profile..."}
                   </p>
@@ -335,7 +377,7 @@ export default function Header() {
                 </div>
 
                 <ChevronDown
-                  size={16}
+                  size={15}
                   className={`text-slate-500 transition-transform duration-200 ${
                     profileOpen ? "rotate-180" : ""
                   }`}
@@ -352,7 +394,7 @@ export default function Header() {
                     className="fixed inset-0 z-40 cursor-default"
                   />
 
-                  <div className="absolute right-0 top-[calc(100%+12px)] z-50 w-64 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101827] p-2 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+                  <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-64 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101827] p-2 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
                     <div className="border-b border-white/[0.06] px-3 py-3">
                       <p className="truncate text-sm font-semibold text-white">
                         {loginUser?.name || "HouseHub User"}
