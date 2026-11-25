@@ -31,10 +31,10 @@ export default function AboutHouseHub() {
       <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <div className="grid items-start gap-10 md:grid-cols-2 md:gap-8 lg:gap-12">
           {/* LEFT: Abstract school dashboard */}
-          <div className="relative mx-auto w-full max-w-[460px] md:order-1">
+          <div className="order-2 relative mx-auto w-full max-w-[460px] md:order-1">
             <div className="absolute inset-8 rounded-[2rem] bg-blue-600/[0.15] blur-[70px]" />
 
-            <div className="relative overflow-hidden rounded-3xl border border-blue-400/[0.15] bg-gradient-to-br from-[#111D31] via-[#0B1220] to-[#080D16] p-4 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:p-5">
+            <div className="relative overflow-hidden rounded-3xl border border-blue-400/[0.15] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-4 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:p-5">
               {/* Dashboard header */}
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -129,7 +129,7 @@ export default function AboutHouseHub() {
           </div>
 
           {/* RIGHT: About text */}
-          <div className="w-full max-w-[460px] md:order-2">
+          <div className="order-1 w-full max-w-[460px] text-center md:order-2 md:text-left">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-3 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
 
@@ -172,7 +172,7 @@ export default function AboutHouseHub() {
               })}
             </div>
 
-            <div className="mt-6 flex items-center gap-2 text-[11px] font-medium text-slate-500">
+            <div className="mt-6 flex items-center justify-center gap-2 text-[11px] font-medium text-slate-500 md:justify-start">
               <Check size={14} className="text-blue-400" />
               Designed to make school management simpler
             </div>
