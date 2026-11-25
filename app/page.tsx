@@ -1,3 +1,4 @@
+import RegisterPage from "./register/RegisterPage";
 export default function page(){
-  return <p>The page is working</p>
+  return <RegisterPage />
 }
