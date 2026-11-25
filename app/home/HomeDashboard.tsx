@@ -1,3 +1,4 @@
+import Header from "@/components/Header"
 export default function HomePage(){
-  return <p> rrr </p>
+  return <Header />
 }
