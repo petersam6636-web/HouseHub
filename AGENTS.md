@@ -1914,11 +1914,11 @@ The visual identity must remain consistent across every page.
 
 Permanent brand identity
 
+<<<<<<< HEAD
 
 PRIMARY: VIOLET — #8B5CF6
 
 SECOND: AMBER GOLD — #F59E0B
-
 LIGHT BACKGROUND: #F5F8F7
 
 DARK BACKGROUND: #0B1220
