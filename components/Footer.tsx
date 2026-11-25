@@ -23,6 +23,8 @@ const footerLinks = {
   ],
 };
 
+const copyrightYear = new Date().getFullYear();
+
 export default function Footer() {
   return (
     <footer className="relative isolate overflow-hidden border-t border-white/[0.06] bg-[#05070D] text-white">
@@ -209,7 +211,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col items-center justify-between gap-4 py-6 text-center sm:flex-row sm:text-left">
           <p className="text-xs text-slate-600">
-            © {new Date().getFullYear()} HouseHub. All rights reserved.
+            © {copyrightYear} HouseHub. All rights reserved.
           </p>
 
           <p className="flex items-center gap-2 text-xs text-slate-600">
