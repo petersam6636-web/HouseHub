@@ -2,9 +2,26 @@
 
 :root {
   color-scheme: light;
-  --background: #fff;
+  --background: #f8fafc;
+  --surface: #ffffff;
   --foreground: #17211d;
-  --emerald: #047857;
+  --muted: #64716a;
+  --border: #dce5df;
+  --accent: #047857;
+  --accent-hover: #065f46;
+  --focus-ring: rgb(4 120 87 / 20%);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0b1120;
+  --surface: #111827;
+  --foreground: #f8fafc;
+  --muted: #a4afbd;
+  --border: #344154;
+  --accent: #34d399;
+  --accent-hover: #6ee7b7;
+  --focus-ring: rgb(52 211 153 / 24%);
 }
 
 @theme inline {
@@ -30,40 +47,39 @@ body {
   font-family: var(--font-geist-sans), Arial, sans-serif;
 }
 
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a {
+  cursor: pointer;
+}
+
 .register-page {
-  position: relative;
-  isolation: isolate;
   display: flex;
   min-height: 100svh;
   align-items: center;
   justify-content: center;
   padding: 28px 20px;
-}
-
-.register-page::before {
-  position: fixed;
-  z-index: -1;
-  inset: 0;
-  background:
-    linear-gradient(rgb(0 0 0 / 70%), rgb(0 0 0 / 70%)),
-    url("/househub_background.png") center / cover no-repeat;
-  content: "";
+  background: var(--background);
 }
 
 .register-card {
   width: min(100%, 430px);
   padding: 32px 36px 28px;
-  border: 1px solid rgb(255 255 255 / 62%);
+  border: 1px solid var(--border);
   border-radius: 24px;
-  background: rgb(255 255 255 / 96%);
-  box-shadow: 0 28px 80px rgb(0 0 0 / 30%);
+  background: var(--surface);
+  box-shadow: 0 24px 64px rgb(15 23 42 / 9%);
 }
 
 .register-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #17211d;
+  color: var(--foreground);
   font-size: 15px;
   font-weight: 750;
   letter-spacing: -0.3px;
@@ -81,7 +97,7 @@ body {
 
 .form-eyebrow {
   margin: 0 0 8px;
-  color: var(--emerald);
+  color: var(--accent);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 1.8px;
@@ -89,7 +105,7 @@ body {
 
 .form-heading h1 {
   margin: 0;
-  color: #17211d;
+  color: var(--foreground);
   font-size: clamp(24px, 6vw, 29px);
   font-weight: 700;
   letter-spacing: -1.1px;
@@ -97,12 +113,12 @@ body {
 }
 
 .form-heading h1 span {
-  color: var(--emerald);
+  color: var(--accent);
 }
 
 .form-heading > p:last-child {
   margin: 9px 0 0;
-  color: #66716b;
+  color: var(--muted);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -119,24 +135,43 @@ body {
   font: inherit;
   font-size: 13px;
   font-weight: 650;
-  cursor: pointer;
-  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .google-button {
-  border: 1px solid #dce3df;
-  background: #fff;
-  color: #27312c;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground);
 }
 
 .google-button:hover:not(:disabled) {
-  border-color: #9ab9aa;
-  background: #f8fbf9;
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  box-shadow: 0 6px 16px rgb(15 23 42 / 8%);
+}
+
+.google-button:focus-visible,
+.submit-button:focus-visible,
+.auth-switch button:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .google-icon {
   width: 17px;
   height: 17px;
+}
+
+.google-feedback {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .form-separator {
@@ -149,12 +184,12 @@ body {
 .form-separator span {
   height: 1px;
   flex: 1;
-  background: #e8ece9;
+  background: var(--border);
 }
 
 .form-separator p {
   margin: 0;
-  color: #8a948e;
+  color: var(--muted);
   font-size: 9px;
   font-weight: 650;
   letter-spacing: 0.9px;
@@ -174,7 +209,7 @@ body {
 }
 
 .form-field label {
-  color: #34413a;
+  color: var(--foreground);
   font-size: 12px;
   font-weight: 650;
 }
@@ -183,27 +218,27 @@ body {
   width: 100%;
   height: 44px;
   padding: 0 12px;
-  border: 1px solid #dce3df;
+  border: 1px solid var(--border);
   border-radius: 10px;
   outline: none;
-  background: #fff;
-  color: #17211d;
+  background: var(--surface);
+  color: var(--foreground);
   font: inherit;
   font-size: 13px;
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .form-field input::placeholder {
-  color: #9aa39e;
+  color: var(--muted);
 }
 
 .form-field input:focus {
-  border-color: #10a477;
-  box-shadow: 0 0 0 3px rgb(16 164 119 / 13%);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .form-field input:disabled {
-  background: #f7f9f8;
+  opacity: 0.7;
 }
 
 .auth-feedback {
@@ -231,13 +266,14 @@ body {
   min-height: 46px;
   margin-top: 2px;
   border: 0;
-  background: #047857;
+  background: var(--accent);
   color: #fff;
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #066448;
   transform: translateY(-1px);
+  background: var(--accent-hover);
+  box-shadow: 0 6px 16px rgb(4 120 87 / 18%);
 }
 
 .google-button:disabled,
@@ -253,7 +289,7 @@ body {
   justify-content: center;
   gap: 4px;
   margin: 19px 0 0;
-  color: #68736d;
+  color: var(--muted);
   font-size: 12px;
 }
 
@@ -261,21 +297,20 @@ body {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--emerald);
+  color: var(--accent);
   font: inherit;
   font-weight: 700;
-  cursor: pointer;
 }
 
 .auth-switch button:hover:not(:disabled) {
-  color: #065f46;
+  color: var(--accent-hover);
   text-decoration: underline;
 }
 
 .home-page {
   min-height: 100svh;
-  background: #f7faf8;
-  color: #17211d;
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .home-header {
@@ -284,8 +319,8 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 clamp(20px, 6vw, 80px);
-  border-bottom: 1px solid #e8eeea;
-  background: #fff;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .home-brand {
@@ -304,18 +339,17 @@ body {
 
 .home-signout {
   padding: 9px 13px;
-  border: 1px solid #dce5df;
+  border: 1px solid var(--border);
   border-radius: 9px;
-  background: #fff;
-  color: #34413a;
+  background: var(--surface);
+  color: var(--foreground);
   font: inherit;
   font-size: 12px;
   font-weight: 650;
-  cursor: pointer;
 }
 
-.home-signout:hover {
-  background: #f3f8f5;
+.home-signout:hover:not(:disabled) {
+  background: var(--background);
 }
 
 .home-content {
@@ -330,7 +364,7 @@ body {
 
 .home-content h1 {
   margin: 0;
-  color: #17211d;
+  color: var(--foreground);
   font-size: clamp(32px, 6vw, 52px);
   font-weight: 700;
   letter-spacing: -2px;
@@ -339,7 +373,7 @@ body {
 
 .home-content > p {
   margin: 16px 0 0;
-  color: #65726a;
+  color: var(--muted);
   font-size: 15px;
 }
 
@@ -347,21 +381,21 @@ body {
   max-width: 680px;
   margin-top: 42px;
   padding: 25px;
-  border: 1px solid #e1eae4;
+  border: 1px solid var(--border);
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 10px 30px rgb(30 70 48 / 5%);
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgb(15 23 42 / 5%);
 }
 
 .home-welcome-card h2 {
   margin: 0;
-  color: #20342a;
+  color: var(--foreground);
   font-size: 17px;
 }
 
 .home-welcome-card p {
   margin: 8px 0 0;
-  color: #68766e;
+  color: var(--muted);
   font-size: 13px;
   line-height: 1.6;
 }

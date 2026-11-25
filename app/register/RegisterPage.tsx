@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
-
+import { useRef, useState, type FormEvent } from "react";
+import gsap from 'gsap'
+import {useGSAP} from '@gsap/react';
 import { supabase } from "@/lib/supabase-client";
 
 type AuthMode = "signin" | "signup";
@@ -11,12 +12,15 @@ type PendingAction = "google" | "email" | null;
 
 export default function RegisterPage() {
   const router = useRouter();
+  const pageRef = useRef<HTMLElement>(null);
   const [mode, setMode] = useState<AuthMode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [feedback, setFeedback] = useState("");
   const [feedbackType, setFeedbackType] = useState<"error" | "success">("error");
+
+
 
   const setError = (message: string) => {
     setFeedbackType("error");
@@ -92,8 +96,16 @@ export default function RegisterPage() {
 
   const isPending = pendingAction !== null;
 
+  useGSAP(() => {
+    gsap.from(".register-card", {
+      scale: 0,
+      opacity: 0,
+      duration: 0.2
+    });
+  }, { scope: pageRef, dependencies: [mode] });
+
   return (
-    <main className="register-page">
+    <main ref={pageRef} className="register-page">
       <section className="register-card" aria-labelledby="auth-heading">
         <div className="register-brand">
           <Image
@@ -124,6 +136,7 @@ export default function RegisterPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isPending}
+          aria-busy={pendingAction === "google"}
         >
           <svg aria-hidden="true" viewBox="0 0 20 20" className="google-icon">
             <path
@@ -143,8 +156,13 @@ export default function RegisterPage() {
               d="M10 3.99c1.47 0 2.79.5 3.82 1.5l2.86-2.86C14.96.99 12.7 0 10 0a10 10 0 0 0-8.92 5.57l3.33 2.55C5.2 5.75 7.4 3.99 10 3.99Z"
             />
           </svg>
-          {pendingAction === "google" ? "Connecting to Google..." : "Continue with Google"}
+          {pendingAction === "google" ? "Opening Google sign-in..." : "Sign in with Google"}
         </button>
+        {pendingAction === "google" && (
+          <p className="google-feedback" role="status" aria-live="polite">
+            Redirecting to Google to complete sign-in...
+          </p>
+        )}
 
         <div className="form-separator" aria-hidden="true">
           <span />
