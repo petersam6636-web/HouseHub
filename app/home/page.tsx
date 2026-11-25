@@ -1,9 +1,18 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import HomeDashboard from "./HomeDashboard";
 
-export default async function HomePage() {
+export default function HomePage() {
+  return (
+    <Suspense fallback={<HomeLoading />}>
+      <AuthenticatedHomePage />
+    </Suspense>
+  );
+}
+
+async function AuthenticatedHomePage() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -19,4 +28,15 @@ export default async function HomePage() {
   }
 
   return <HomeDashboard email={user.email ?? ""} />;
+}
+
+function HomeLoading() {
+  return (
+    <main className="home-page">
+      <section className="home-content">
+        <p className="form-eyebrow">YOUR HOUSEHUB</p>
+        <h1>Loading your home...</h1>
+      </section>
+    </main>
+  );
 }
