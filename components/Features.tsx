@@ -277,7 +277,7 @@ export default function FeaturesHouseHub() {
       <div className="mx-auto w-full max-w-[1440px] px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <div className="mx-auto w-full max-w-7xl">
           {/* Section heading */}
-          <div className="mb-9 flex flex-col gap-3 sm:mb-12">
+          <div className="mb-9 flex flex-col items-center gap-3 text-center sm:mb-12 sm:items-start ">
             <div className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-400/15 bg-blue-500/[0.06] px-3 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
 

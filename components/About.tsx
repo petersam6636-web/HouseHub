@@ -1,4 +1,3 @@
-
 import {
   ArrowUpRight,
   Building2,
@@ -28,11 +27,13 @@ export default function AboutHouseHub() {
         <div className="absolute right-[-8rem] top-0 h-72 w-72 rounded-full bg-blue-500/[0.07] blur-[100px]" />
       </div>
 
+      {/* Same max width and horizontal spacing as HeroSection */}
       <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <div className="grid items-start gap-10 md:grid-cols-2 md:gap-8 lg:gap-12">
           {/* LEFT: Abstract school dashboard */}
           <div className="order-2 relative mx-auto w-full max-w-[460px] md:order-1">
-            <div className="absolute inset-8 rounded-[2rem] bg-blue-600/[0.15] blur-[70px]" />
+            {/* Same blue gradient glow behind the dashboard */}
+            <div className="pointer-events-none absolute inset-4 rounded-[2.5rem] bg-blue-600/[0.20] blur-[65px]" />
 
             <div className="relative overflow-hidden rounded-3xl border border-blue-400/[0.15] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-4 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:p-5">
               {/* Dashboard header */}
