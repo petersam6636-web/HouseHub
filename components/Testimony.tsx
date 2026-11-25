@@ -6,6 +6,7 @@ import {
   Quote,
   Star,
   Sparkles,
+  CheckCircle2,
 } from "lucide-react";
 
 const testimonials = [
@@ -13,25 +14,40 @@ const testimonials = [
     name: "Sarah Mitchell",
     role: "Homeowner",
     initials: "SM",
-    quote:
-      "HouseHub has made managing our home feel so much easier. Everything is finally organized in one place, and the whole family knows what needs to be done.",
     highlight: "A more organized home",
+    quote:
+      "HouseHub has made managing our home feel so much easier. Before, we were constantly trying to remember who was responsible for what, and important tasks sometimes slipped through the cracks. Now, everything is organized in one place, and everyone in the family has a clearer understanding of what needs to be done. It has helped us create better routines, communicate more effectively, and spend less time worrying about household responsibilities.",
+    details: [
+      "Clearer household responsibilities",
+      "Better daily routines",
+      "Less confusion for the family",
+    ],
   },
   {
     name: "Daniel Brooks",
     role: "Household Manager",
     initials: "DB",
-    quote:
-      "I used to spend so much time keeping track of household responsibilities. HouseHub brings everything together in a way that feels simple, clear, and effortless.",
     highlight: "Everything in one place",
+    quote:
+      "I used to spend so much time keeping track of household responsibilities, checking what had been completed, and reminding people about upcoming tasks. HouseHub brings everything together in a way that feels simple, clear, and effortless. I can stay organized without constantly switching between notes and messages. It gives me a better overview of what is happening at home and makes managing the little details feel much more manageable.",
+    details: [
+      "A clearer overview of tasks",
+      "Less time spent coordinating",
+      "More consistent follow-through",
+    ],
   },
   {
     name: "Olivia Carter",
     role: "Family Organizer",
     initials: "OC",
-    quote:
-      "What I love most is how easy it is to stay on top of everyday things. It gives our household a better sense of structure without making things complicated.",
     highlight: "Made for everyday life",
+    quote:
+      "What I love most about HouseHub is how naturally it fits into our everyday life. It helps us stay on top of the things that matter without making our home feel like another complicated project to manage. From remembering regular responsibilities to keeping everyone informed, it gives our household a better sense of structure. We feel more prepared, more connected, and less overwhelmed by the small things that add up.",
+    details: [
+      "Simple everyday organization",
+      "A more connected household",
+      "Less stress from small tasks",
+    ],
   },
 ];
 
@@ -52,10 +68,7 @@ export default function TestimonialSection() {
         {/* Section heading */}
         <div className="mx-auto mb-16 max-w-3xl text-center sm:mb-20">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-400/15 bg-blue-500/[0.06] px-3.5 py-2">
-            <Sparkles
-              size={14}
-              className="text-blue-400"
-            />
+            <Sparkles size={14} className="text-blue-400" />
 
             <span className="text-[11px] font-semibold tracking-wide text-blue-200 sm:text-xs">
               The HouseHub experience
@@ -78,17 +91,17 @@ export default function TestimonialSection() {
         </div>
 
         {/* Testimonial cards */}
-        <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-3 sm:gap-4 lg:gap-7">
+        <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-3 sm:gap-4 lg:gap-7">
           {testimonials.map((testimonial, index) => {
             const isFeatured = index === 1;
 
             return (
               <article
                 key={testimonial.name}
-                className={`group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.75rem] border p-5 transition-all duration-500 sm:p-5 lg:p-8 ${
+                className={`group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.75rem] border p-6 transition-all duration-500 sm:p-5 lg:p-8 ${
                   isFeatured
                     ? "border-blue-400/25 bg-gradient-to-b from-[#101D32] via-[#0B1424] to-[#080D17] shadow-[0_25px_80px_rgba(37,99,235,0.13)] sm:-translate-y-5 sm:scale-[1.025] lg:-translate-y-7"
-                    : "border-blue-400/25 bg-gradient-to-b from-[#101D32] via-[#0B1424] to-[#080D17] shadow-[0_20px_60px_rgba(0,0,0,0.18)] sm:translate-y-5 lg:translate-y-9 lg:border-white/[0.07] lg:bg-[#0A0F19]/80"
+                    : "border-blue-400/25 bg-gradient-to-b from-[#101D32] via-[#0B1424] to-[#080D17] shadow-[0_20px_60px_rgba(0,0,0,0.18)] sm:translate-y-5 lg:translate-y-12 lg:border-white/[0.07] lg:bg-none lg:bg-[#0A0F19]/80"
                 } hover:border-blue-400/25 hover:shadow-[0_25px_70px_rgba(37,99,235,0.10)]`}
               >
                 {/* Card glow */}
@@ -148,6 +161,35 @@ export default function TestimonialSection() {
                     “{testimonial.quote}”
                   </p>
                 </blockquote>
+
+                {/* Added supporting details */}
+                <div className="relative mt-6 space-y-3">
+                  {testimonial.details.map((detail) => (
+                    <div
+                      key={detail}
+                      className="flex items-center gap-2.5"
+                    >
+                      <CheckCircle2
+                        size={15}
+                        className={`shrink-0 ${
+                          isFeatured
+                            ? "text-blue-300"
+                            : "text-blue-300 lg:text-slate-500"
+                        }`}
+                      />
+
+                      <span
+                        className={`text-xs leading-5 ${
+                          isFeatured
+                            ? "text-slate-300"
+                            : "text-slate-300 lg:text-slate-500"
+                        }`}
+                      >
+                        {detail}
+                      </span>
+                    </div>
+                  ))}
+                </div>
 
                 {/* Divider */}
                 <div className="relative my-7 h-px w-full bg-gradient-to-r from-white/[0.08] via-white/[0.04] to-transparent" />
