@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import gsap from 'gsap'
@@ -109,14 +110,16 @@ export default function RegisterPage() {
     <main ref={pageRef} className="register-page">
       <section className="register-card" aria-labelledby="auth-heading">
         <div className="register-brand">
-          <Image
-            src="/househub_logo.png"
-            alt="HouseHub"
-            width={48}
-            height={48}
-            priority
-          />
-          <span>HouseHub</span>
+          <Link href="/" className="register-brand-link" aria-label="HouseHub home">
+            <Image
+              src="/househub_logo.png"
+              alt=""
+              width={48}
+              height={48}
+              priority
+            />
+            <span>HouseHub</span>
+          </Link>
         </div>
 
         <header className="form-heading">

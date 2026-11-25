@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Inspect Header bytes and status",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"git status --short && node -e \"const fs=require('fs');const b=fs.readFileSync('components/Header.tsx');console.log(JSON.stringify({bytes:b.length,nuls:[...b].filter(x=>x===0).length,prefix:b.subarray(0,128).toString('hex'),utf8:b.toString('utf8').slice(0,300)}))\""
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
