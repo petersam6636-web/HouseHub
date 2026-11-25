@@ -1,43 +1,35 @@
+"use client";
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
-  House,
-  Wallet,
-  ClipboardCheck,
-  MessageCircle,
   ChevronDown,
+  ClipboardCheck,
+  House,
+  MessageCircle,
+  Wallet,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase-client";
 
 const navigation = [
-  {
-    name: "Home",
-    path: "/home",
-    icon: House,
-  },
-  {
-    name: "Amount",
-    path: "/home/amount",
-    icon: Wallet,
-  },
-  {
-    name: "Duties",
-    path: "/home/duties",
-    icon: ClipboardCheck,
-  },
-  {
-    name: "Chat",
-    path: "/home/chat",
-    icon: MessageCircle,
-  },
+  { name: "Home", path: "/home", icon: House },
+  { name: "Amount", path: "/home/amount", icon: Wallet },
+  { name: "Duties", path: "/home/duties", icon: ClipboardCheck },
+  { name: "Chat", path: "/home/chat", icon: MessageCircle },
 ];
 
+type LoginUser = {
+  name: string;
+  email: string;
+  avatar: string;
+};
+
 export default function Header() {
-  const [loginUser, setLoginUser] = useState(null);
+  const pathname = usePathname();
+  const [loginUser, setLoginUser] = useState<LoginUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
 
-  // Fetch the currently authenticated user from Supabase
   useEffect(() => {
     async function getLoginUser() {
       const {
@@ -51,7 +43,6 @@ export default function Header() {
       }
 
       setLoginUser({
-        id: user.id,
         name:
           user.user_metadata?.full_name ||
           user.user_metadata?.name ||
@@ -65,9 +56,8 @@ export default function Header() {
       });
     }
 
-    getLoginUser();
+    void getLoginUser();
 
-    // Update profile when authentication changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -79,7 +69,6 @@ export default function Header() {
       }
 
       setLoginUser({
-        id: user.id,
         name:
           user.user_metadata?.full_name ||
           user.user_metadata?.name ||
@@ -98,7 +87,7 @@ export default function Header() {
 
   const initials =
     loginUser?.name
-      ?.split(" ")
+      .split(" ")
       .filter(Boolean)
       .slice(0, 2)
       .map((word) => word[0])
@@ -107,46 +96,38 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-700/40 bg-[#0B1220] shadow-[0_8px_30px_rgba(0,0,0,0.28)]">
-      {/* Full-width outer header */}
       <div className="w-full px-3 sm:px-5">
-        {/* Centered inner content */}
         <div className="mx-auto flex h-[76px] w-full max-w-[1440px] items-center justify-between gap-4">
-
-          {/* LEFT: Brand */}
           <Link
             href="/home"
             className="flex shrink-0 items-center gap-3"
+            aria-label="HouseHub home"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 shadow-lg shadow-emerald-500/20">
-              <House
-                size={21}
-                strokeWidth={2.5}
-                className="text-white"
-              />
+              <House size={21} strokeWidth={2.5} className="text-white" />
             </div>
-
             <span className="text-xl font-bold tracking-tight text-white">
               House<span className="text-emerald-400">Hub</span>
             </span>
           </Link>
 
-          {/* CENTER: Navigation */}
           <nav className="hidden items-center gap-1 rounded-2xl border border-slate-700/50 bg-[#101A2A] p-1.5 shadow-inner md:flex">
             {navigation.map((item) => {
               const Icon = item.icon;
+              const isActive =
+                pathname === item.path ||
+                (item.path !== "/home" && pathname.startsWith(`${item.path}/`));
 
               return (
                 <Link
                   key={item.name}
-                  hr={item.path}
-                  end={item.path === "/home"}
-                  className={({ isActive }) =>
-                    `relative flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-emerald-500/15 text-emerald-400 shadow-sm"
-                        : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-100"
-                    }`
-                  }
+                  href={item.path}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`relative flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-emerald-500/15 text-emerald-400 shadow-sm"
+                      : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-100"
+                  }`}
                 >
                   <Icon size={17} strokeWidth={2} />
                   <span>{item.name}</span>
@@ -155,11 +136,12 @@ export default function Header() {
             })}
           </nav>
 
-          {/* RIGHT: Logged-in user profile */}
           <div className="relative flex shrink-0 items-center">
             <button
               type="button"
               onClick={() => setProfileOpen((open) => !open)}
+              aria-expanded={profileOpen}
+              aria-label="Toggle profile menu"
               className="flex items-center gap-2 rounded-2xl border border-slate-700/50 bg-[#101A2A] p-1.5 pr-2.5 transition hover:border-emerald-500/40 hover:bg-[#151F30] sm:gap-3 sm:pr-3"
             >
               {loginUser?.avatar ? (
@@ -192,7 +174,6 @@ export default function Header() {
               />
             </button>
 
-            {/* Profile dropdown */}
             {profileOpen && (
               <div className="absolute right-0 top-[calc(100%+12px)] w-64 overflow-hidden rounded-2xl border border-slate-700/60 bg-[#151F30] p-2 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
                 <div className="border-b border-slate-700/60 px-3 py-3">
@@ -205,7 +186,7 @@ export default function Header() {
                 </div>
 
                 <Link
-                  to="/home/settings"
+                  href="/home/settings"
                   onClick={() => setProfileOpen(false)}
                   className="mt-2 flex items-center rounded-xl px-3 py-2.5 text-sm text-slate-300 transition hover:bg-slate-800 hover:text-white"
                 >
