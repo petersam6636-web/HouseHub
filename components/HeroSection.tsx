@@ -37,7 +37,7 @@ export default function HeroSection() {
       <div className="mx-auto w-full max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-10 md:flex-row md:justify-between md:gap-8 lg:gap-12">
           {/* LEFT: Compact hero content */}
-          <div className="w-full max-w-[460px] text-center md:flex-1 md:text-left">
+          <div className="w-full max-w-[460px] -mt-2 text-center md:flex-1 md:text-left">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/[0.08] px-3 py-1.5">
               <Sparkles size={12} className="text-blue-300" />
 
