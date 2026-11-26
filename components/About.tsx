@@ -29,7 +29,7 @@ export default function AboutHouseHub() {
 
       {/* Same max width and horizontal spacing as HeroSection */}
       <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <div className="grid items-start gap-10 md:grid-cols-2 md:gap-8 lg:gap-12">
+        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-8 lg:gap-12">
           {/* LEFT: Abstract school dashboard */}
           <div className="order-2 relative mx-auto w-full max-w-[460px] md:order-1">
             {/* Same blue gradient glow behind the dashboard */}
@@ -130,8 +130,8 @@ export default function AboutHouseHub() {
           </div>
 
           {/* RIGHT: About text */}
-          <div className="order-1 w-full max-w-[460px] text-center md:order-2 md:text-left">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-3 py-1.5">
+          <div className="order-1 mx-auto w-full max-w-[460px] text-center md:order-2">
+            <div className="mx-auto mb-4 flex w-fit items-center gap-2 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-3 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
 
               <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-blue-300">
@@ -173,7 +173,7 @@ export default function AboutHouseHub() {
               })}
             </div>
 
-            <div className="mt-6 flex items-center justify-center gap-2 text-[11px] font-medium text-slate-500 md:justify-start">
+            <div className="mt-6 flex items-center justify-center gap-2 text-[11px] font-medium text-slate-500">
               <Check size={14} className="text-blue-400" />
               Designed to make school management simpler
             </div>

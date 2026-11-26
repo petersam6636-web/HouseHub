@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useApp from "@/lib/useApp";
 import {
+  AlertCircle,
   ArrowUpRight,
   CalendarDays,
   CheckCircle2,
@@ -13,14 +14,56 @@ import {
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import Loading from "@/components/Loading";
+import { fetchProjectsForUser } from "@/lib/projectService";
 
 type TaskFilter = "all" | "active" | "empty";
 
 export default function ProjectPage() {
-  const { projects } = useApp();
+  const { projects, setProjects, authenticatedId } = useApp();
 
   const [search, setSearch] = useState("");
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProjects() {
+      if (!authenticatedId) {
+        setProjects([]);
+        setLoadError(null);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setLoadError(null);
+
+      try {
+        const userProjects = await fetchProjectsForUser(authenticatedId);
+        if (!cancelled) setProjects(userProjects);
+      } catch (error) {
+        console.error("Unable to load projects.", error);
+        if (!cancelled) {
+          setLoadError(
+            error instanceof Error
+              ? error.message
+              : "Unable to load projects. Please try again."
+          );
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+
+    void loadProjects();
+    return () => {
+      cancelled = true;
+    };
+  }, [authenticatedId, reloadKey, setProjects]);
 
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
@@ -60,8 +103,27 @@ export default function ProjectPage() {
     <main className="w-full py-4 text-white sm:py-6">
       <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <section>
-          {/* Empty state */}
-          {projects.length === 0 ? (
+          {isLoading ? (
+            <Loading />
+          ) : loadError ? (
+            <div className="flex min-h-[330px] flex-col items-center justify-center px-5 py-14 text-center">
+              <AlertCircle size={24} className="text-red-400" />
+              <p className="mt-4 text-sm font-semibold text-slate-200">
+                Projects couldn&apos;t be loaded
+              </p>
+              <p className="mt-2 max-w-md text-xs leading-5 text-slate-500">
+                {loadError}
+              </p>
+              <button
+                type="button"
+                onClick={() => setReloadKey((current) => current + 1)}
+                className="mt-5 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-blue-500"
+              >
+                Try again
+              </button>
+            </div>
+          ) : projects.length === 0 ? (
+            /* Empty state */
             <div className="relative flex min-h-[390px] flex-col items-center justify-center px-5 py-16 text-center">
               <div className="relative">
                 <div className="relative mx-auto mb-5 flex h-[76px] w-[76px] items-center justify-center rounded-[1.6rem] border border-blue-400/20 bg-gradient-to-br from-blue-500/[0.16] to-blue-600/[0.04] shadow-[0_0_45px_rgba(37,99,235,0.12)]">
@@ -284,7 +346,7 @@ export default function ProjectPage() {
           )}
 
           {/* Table footer */}
-          {filteredProjects.length > 0 && (
+          {!isLoading && !loadError && filteredProjects.length > 0 && (
             <div className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <p className="text-[10px] text-slate-500">
                 Showing{" "}

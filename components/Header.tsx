@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase-client";
+import useApp from "@/lib/useApp";
 
 type LoginUser = {
   id: string;
@@ -47,6 +48,7 @@ const navigation = [
 ];
 
 export default function Header() {
+  const { authenticatedId } = useApp();
   const [loginUser, setLoginUser] = useState<LoginUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState("");
@@ -131,24 +133,6 @@ export default function Header() {
       };
     }
 
-    async function fetchLoginUser() {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
-      if (!mounted) return;
-
-      if (error || !user) {
-        setLoginUser(null);
-        return;
-      }
-
-      setLoginUser(formatUser(user));
-    }
-
-    fetchLoginUser();
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -168,8 +152,11 @@ export default function Header() {
     };
   }, []);
 
+  const currentLoginUser =
+    loginUser?.id === authenticatedId ? loginUser : null;
+
   const initials =
-    loginUser?.name
+    currentLoginUser?.name
       .split(" ")
       .filter(Boolean)
       .slice(0, 2)
@@ -353,10 +340,10 @@ export default function Header() {
                 onClick={() => setProfileOpen((open) => !open)}
                 className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-[#0B1220] p-1.5 pr-2.5 transition-all hover:border-blue-500/40 hover:bg-[#111B2C] lg:gap-3 lg:rounded-2xl lg:pr-3"
               >
-                {loginUser?.avatar ? (
+                {currentLoginUser?.avatar ? (
                   <img
-                    src={loginUser.avatar}
-                    alt={loginUser.name}
+                    src={currentLoginUser.avatar}
+                    alt={currentLoginUser.name}
                     referrerPolicy="no-referrer"
                     className="h-8 w-8 rounded-lg object-cover ring-1 ring-blue-500/30 lg:h-9 lg:w-9 lg:rounded-xl"
                   />
@@ -368,11 +355,11 @@ export default function Header() {
 
                 <div className="hidden max-w-[120px] text-left lg:block">
                   <p className="truncate text-sm font-semibold text-slate-100">
-                    {loginUser?.name || "Loading profile..."}
+                    {currentLoginUser?.name || "Loading profile..."}
                   </p>
 
                   <p className="truncate text-xs text-slate-500">
-                    {loginUser?.email || "HouseHub account"}
+                    {currentLoginUser?.email || "HouseHub account"}
                   </p>
                 </div>
 
@@ -397,11 +384,11 @@ export default function Header() {
                   <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-64 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101827] p-2 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
                     <div className="border-b border-white/[0.06] px-3 py-3">
                       <p className="truncate text-sm font-semibold text-white">
-                        {loginUser?.name || "HouseHub User"}
+                        {currentLoginUser?.name || "HouseHub User"}
                       </p>
 
                       <p className="mt-1 truncate text-xs text-slate-500">
-                        {loginUser?.email}
+                        {currentLoginUser?.email}
                       </p>
                     </div>
 

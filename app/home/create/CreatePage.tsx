@@ -27,6 +27,8 @@ import {
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { supabase } from "@/lib/supabase-client";
+import useApp from "@/lib/useApp";
+import { fetchProjectsForUser } from "@/lib/projectService";
 
 type Toast = {
   type: "success" | "error";
@@ -63,6 +65,7 @@ const inputClass =
 
 export default function CreateProject() {
   const router = useRouter();
+  const { authenticatedId, setProjects } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const formContentRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -219,13 +222,10 @@ export default function CreateProject() {
     let uploadedLogoPath: string | null = null;
 
     try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError) throw userError;
-      if (!user) throw new Error("Sign in before creating a house.");
+      if (!authenticatedId) {
+        throw new Error("Sign in before creating a house.");
+      }
+      const userId = authenticatedId;
 
       let logoUrl: string | null = null;
       if (formData.logo_image) {
@@ -234,7 +234,7 @@ export default function CreateProject() {
           .pop()
           ?.match(/^[a-z0-9]{1,10}$/i)?.[0]
           .toLowerCase();
-        const logoPath = `${user.id}/${crypto.randomUUID()}${extension ? `.${extension}` : ""}`;
+        const logoPath = `${userId}/${crypto.randomUUID()}${extension ? `.${extension}` : ""}`;
 
         const { error: uploadError } = await supabase.storage
           .from("logos")
@@ -261,12 +261,20 @@ export default function CreateProject() {
         logo_image: logoUrl,
         start_date: formData.start_date,
         academic_year: formData.academic_year.trim(),
-        user_id: user.id,
+        user_id: userId,
       });
 
       if (error) throw error;
 
       uploadedLogoPath = null;
+      void fetchProjectsForUser(userId)
+        .then(setProjects)
+        .catch((refreshError: unknown) => {
+          console.error(
+            "The house was created, but the project cache could not be refreshed.",
+            refreshError
+          );
+        });
       setIsSubmitting(false);
       setToast({
         type: "success",
@@ -415,7 +423,7 @@ export default function CreateProject() {
                       {/* Location */}
                       <div>
                         <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          House location
+                           location
                         </label>
 
                         <div className="relative">
