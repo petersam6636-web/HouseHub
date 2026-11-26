@@ -182,631 +182,543 @@ export default function CreateProject() {
       </div>
 
       <div className="mx-auto w-full max-w-[1200px]">
-        {/* Main shared card */}
-        <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl">
-          <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px]" />
+        {/* Shared form and illustration card */}
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl md:grid md:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
+          <div className="pointer-events-none absolute -right-32 -top-32 hidden h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px] md:block" />
 
-          {/* FULL-WIDTH CENTERED HEADER */}
-          <header className="relative mx-auto w-full max-w-3xl px-5 pb-6 pt-7 text-center sm:px-8 sm:pb-8 sm:pt-9 lg:pb-9">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
-              <Sparkles size={12} className="text-blue-400" />
+          {/* LEFT: Form */}
+          <section className="relative min-w-0 p-4 sm:p-6 lg:p-6">
+            <div className="mb-5 w-full text-center md:mb-6">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
+                <Sparkles size={12} className="text-blue-400" />
+                <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+                  HouseHub setup
+                </span>
+              </div>
 
-              <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-300">
-                HouseHub setup
-              </span>
+              <h1 className="text-2xl font-bold tracking-[-0.05em] text-white sm:text-3xl lg:text-[30px]">
+                Set up your house
+                <span className="text-blue-400">.</span>
+              </h1>
+
+              <p className="mx-auto mt-2 w-full text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6">
+                Organize your house, manage responsibilities, and keep
+                house-related issues in one place.
+              </p>
             </div>
 
-            <h1 className="text-2xl font-bold tracking-[-0.05em] text-white sm:text-3xl lg:text-[34px]">
-              Set up your house
-              <span className="text-blue-400">.</span>
-            </h1>
+            {/* Form card */}
+            <div className="min-w-0 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
+              <form onSubmit={handleSubmit}>
+                <div
+                  ref={formContentRef}
+                  className="px-4 py-5 sm:px-5 sm:py-6"
+                >
+                  {step === 0 ? (
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
+                          Tell us about your house
+                        </h3>
 
-            <p className="mx-auto mt-2 max-w-xl text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6">
-              Organize your house, manage responsibilities, and keep
-              house-related issues in one place.
-            </p>
-          </header>
+                        <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
+                          Give your house or residence a name and location.
+                        </p>
+                      </div>
 
-          {/* FORM AND ILLUSTRATION SECTIONS */}
-          <div className="relative grid items-stretch border-t border-white/[0.05] md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-            {/* LEFT: FORM */}
-            <section className="relative min-w-0 p-4 sm:p-6 lg:p-7">
-              <div className="mx-auto w-full max-w-[520px]">
-                {/* Form card */}
-                <div className="min-w-0 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
-                  <form onSubmit={handleSubmit}>
-                    <div
-                      ref={formContentRef}
-                      className="px-4 py-6 sm:px-6 sm:py-7 lg:px-7 lg:py-8"
-                    >
-                      {step === 0 ? (
-                        <div className="space-y-5">
-                          <div>
-                            <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
-                              Tell us about your house
-                            </h3>
+                      {/* House title */}
+                      <div>
+                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                          House name
+                        </label>
 
-                            <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
-                              Give your house or residence a name and
-                              location.
-                            </p>
-                          </div>
+                        <div className="relative">
+                          <Building2
+                            size={15}
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                          />
 
-                          {/* House title */}
-                          <div>
-                            <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                              House name
-                            </label>
-
-                            <div className="relative">
-                              <Building2
-                                size={15}
-                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                              />
-
-                              <input
-                                required
-                                value={formData.title}
-                                onChange={(e) =>
-                                  updateField("title", e.target.value)
-                                }
-                                placeholder="e.g. My House"
-                                className={inputClass}
-                              />
-                            </div>
-                          </div>
-
-                          {/* School / house name */}
-                          <div>
-                            <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                              Institution or property name
-                            </label>
-
-                            <div className="relative">
-                              <School
-                                size={15}
-                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                              />
-
-                              <input
-                                required
-                                value={formData.school_name}
-                                onChange={(e) =>
-                                  updateField("school_name", e.target.value)
-                                }
-                                placeholder="e.g. House, hostel or school"
-                                className={inputClass}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Location */}
-                          <div>
-                            <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                              House location
-                            </label>
-
-                            <div className="relative">
-                              <MapPin
-                                size={15}
-                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                              />
-
-                              <input
-                                required
-                                value={formData.location}
-                                onChange={(e) =>
-                                  updateField("location", e.target.value)
-                                }
-                                placeholder="e.g. Accra, Ghana"
-                                className={inputClass}
-                              />
-                            </div>
-                          </div>
+                          <input
+                            required
+                            value={formData.title}
+                            onChange={(e) =>
+                              updateField("title", e.target.value)
+                            }
+                            placeholder="e.g. My House"
+                            className={inputClass}
+                          />
                         </div>
-                      ) : (
-                        <div className="space-y-5">
-                          <div>
-                            <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
-                              House details
-                            </h3>
+                      </div>
 
-                            <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
-                              Add a logo and the date you want to start
-                              managing your house.
-                            </p>
-                          </div>
+                      {/* School / house name */}
+                      <div>
+                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                          Institution or property name
+                        </label>
 
-                          {/* Logo upload */}
-                          <div>
-                            <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                              House logo
-                              <span className="ml-1 text-slate-600">
-                                (optional)
-                              </span>
-                            </label>
+                        <div className="relative">
+                          <School
+                            size={15}
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                          />
 
-                            <input
-                              ref={fileInputRef}
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) =>
-                                handleLogo(e.target.files?.[0])
-                              }
+                          <input
+                            required
+                            value={formData.school_name}
+                            onChange={(e) =>
+                              updateField("school_name", e.target.value)
+                            }
+                            placeholder="e.g. House, hostel or school"
+                            className={inputClass}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Location */}
+                      <div>
+                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                          House location
+                        </label>
+
+                        <div className="relative">
+                          <MapPin
+                            size={15}
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                          />
+
+                          <input
+                            required
+                            value={formData.location}
+                            onChange={(e) =>
+                              updateField("location", e.target.value)
+                            }
+                            placeholder="e.g. Accra, Ghana"
+                            className={inputClass}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
+                          House details
+                        </h3>
+
+                        <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
+                          Add a logo and the date you want to start managing
+                          your house.
+                        </p>
+                      </div>
+
+                      {/* Logo upload */}
+                      <div>
+                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                          House logo
+                          <span className="ml-1 text-slate-600">
+                            (optional)
+                          </span>
+                        </label>
+
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleLogo(e.target.files?.[0])}
+                        />
+
+                        {logoPreview ? (
+                          <div className="flex items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/[0.05] p-3">
+                            <img
+                              src={logoPreview}
+                              alt="House logo preview"
+                              className="h-12 w-12 rounded-lg border border-white/[0.08] object-cover"
                             />
 
-                            {logoPreview ? (
-                              <div className="flex items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/[0.05] p-3">
-                                <img
-                                  src={logoPreview}
-                                  alt="House logo preview"
-                                  className="h-12 w-12 rounded-lg border border-white/[0.08] object-cover"
-                                />
-
-                                <div className="min-w-0 flex-1">
-                                  <p className="truncate text-xs font-medium text-white">
-                                    {formData.logo_image?.name}
-                                  </p>
-
-                                  <p className="mt-1 text-[10px] text-blue-300">
-                                    Logo selected
-                                  </p>
-                                </div>
-
-                                <button
-                                  type="button"
-                                  onClick={removeLogo}
-                                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white/[0.06] hover:text-white"
-                                  aria-label="Remove logo"
-                                >
-                                  <X size={15} />
-                                </button>
-                              </div>
-                            ) : (
-                              <div
-                                onClick={() =>
-                                  fileInputRef.current?.click()
-                                }
-                                onDragOver={(e) => {
-                                  e.preventDefault();
-                                  setIsDragging(true);
-                                }}
-                                onDragLeave={() => setIsDragging(false)}
-                                onDrop={handleDrop}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => {
-                                  if (
-                                    e.key === "Enter" ||
-                                    e.key === " "
-                                  ) {
-                                    e.preventDefault();
-                                    fileInputRef.current?.click();
-                                  }
-                                }}
-                                className={`group relative flex min-h-[105px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed px-4 py-4 transition-all duration-300 ${
-                                  isDragging
-                                    ? "border-blue-400 bg-blue-500/[0.1] shadow-[0_0_30px_rgba(59,130,246,0.1)]"
-                                    : "border-white/[0.12] bg-[#070C14] hover:border-blue-400/35 hover:bg-blue-500/[0.035]"
-                                }`}
-                              >
-                                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.04] via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                                <div className="relative mb-2 flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.09] text-blue-300 transition-transform duration-300 group-hover:-translate-y-0.5">
-                                  <Upload size={16} />
-                                </div>
-
-                                <span className="relative text-[11px] font-semibold text-slate-200">
-                                  Drop your house logo here
-                                </span>
-
-                                <span className="relative mt-1 text-[9px] text-slate-500">
-                                  or click to browse · PNG, JPG, WEBP
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Start date */}
-                          <div>
-                            <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                              Start date
-                            </label>
-
-                            <div className="relative">
-                              <CalendarDays
-                                size={15}
-                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                              />
-
-                              <input
-                                required
-                                type="date"
-                                value={formData.start_date}
-                                onChange={(e) =>
-                                  updateField("start_date", e.target.value)
-                                }
-                                className={`${inputClass} [color-scheme:dark]`}
-                              />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-xs font-medium text-white">
+                                {formData.logo_image?.name}
+                              </p>
+                              <p className="mt-1 text-[10px] text-blue-300">
+                                Logo selected
+                              </p>
                             </div>
+
+                            <button
+                              type="button"
+                              onClick={removeLogo}
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white/[0.06] hover:text-white"
+                              aria-label="Remove logo"
+                            >
+                              <X size={15} />
+                            </button>
                           </div>
+                        ) : (
+                          <div
+                            onClick={() => fileInputRef.current?.click()}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              setIsDragging(true);
+                            }}
+                            onDragLeave={() => setIsDragging(false)}
+                            onDrop={handleDrop}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                fileInputRef.current?.click();
+                              }
+                            }}
+                            className={`group relative flex min-h-[105px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed px-4 py-4 transition-all duration-300 ${
+                              isDragging
+                                ? "border-blue-400 bg-blue-500/[0.1] shadow-[0_0_30px_rgba(59,130,246,0.1)]"
+                                : "border-white/[0.12] bg-[#070C14] hover:border-blue-400/35 hover:bg-blue-500/[0.035]"
+                            }`}
+                          >
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.04] via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-                          {/* Academic year */}
-                          <div>
-                            <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                              Academic year
-                            </label>
-
-                            <div className="relative">
-                              <CalendarDays
-                                size={15}
-                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                              />
-
-                              <input
-                                required
-                                value={formData.academic_year}
-                                onChange={(e) =>
-                                  updateField(
-                                    "academic_year",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="e.g. 2026/2027"
-                                className={inputClass}
-                              />
+                            <div className="relative mb-2 flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.09] text-blue-300 transition-transform duration-300 group-hover:-translate-y-0.5">
+                              <Upload size={16} />
                             </div>
+
+                            <span className="relative text-[11px] font-semibold text-slate-200">
+                              Drop your house logo here
+                            </span>
+
+                            <span className="relative mt-1 text-[9px] text-slate-500">
+                              or click to browse · PNG, JPG, WEBP
+                            </span>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
 
-                    {/* Form actions */}
-                    <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.012] px-4 py-3.5 sm:px-6 lg:px-7">
-                      {step === 0 ? (
-                        <span className="text-[9px] text-slate-600 sm:text-[10px]">
-                          A better-managed house starts here.
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={previousStep}
-                          className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] px-3 text-[11px] font-medium text-slate-400 transition hover:border-white/[0.15] hover:text-white sm:px-4"
-                        >
-                          <ArrowLeft size={13} />
-                          Back
-                        </button>
-                      )}
+                      {/* Start date */}
+                      <div>
+                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                          Start date
+                        </label>
 
-                      {step === 0 ? (
-                        <button
-                          type="button"
-                          onClick={nextStep}
-                          disabled={!isIdentityValid}
-                          className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-5"
-                        >
-                          Continue
-                          <ArrowRight
-                            size={14}
-                            className="transition-transform duration-300 group-hover:translate-x-1"
+                        <div className="relative">
+                          <CalendarDays
+                            size={15}
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
                           />
-                        </button>
-                      ) : (
-                        <button
-                          type="submit"
-                          disabled={!isAcademicValid}
-                          className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-5"
-                        >
-                          <Check size={14} />
-                          Create house
-                        </button>
-                      )}
+
+                          <input
+                            required
+                            type="date"
+                            value={formData.start_date}
+                            onChange={(e) =>
+                              updateField("start_date", e.target.value)
+                            }
+                            className={`${inputClass} [color-scheme:dark]`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Academic year */}
+                      <div>
+                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                          Academic year
+                        </label>
+
+                        <div className="relative">
+                          <CalendarDays
+                            size={15}
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                          />
+
+                          <input
+                            required
+                            value={formData.academic_year}
+                            onChange={(e) =>
+                              updateField("academic_year", e.target.value)
+                            }
+                            placeholder="e.g. 2026/2027"
+                            className={inputClass}
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </form>
+                  )}
                 </div>
-              </div>
-            </section>
 
-            {/* RIGHT: Wireframe illustration */}
-            <aside className="relative hidden min-w-0 items-center justify-center border-l border-white/[0.05] px-5 py-7 md:flex lg:px-8 lg:py-8">
-              <div className="pointer-events-none absolute inset-4 rounded-[2.5rem] bg-blue-600/[0.13] blur-[65px]" />
+                {/* Form actions */}
+                <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.012] px-4 py-3.5 sm:px-5">
+                  {step === 0 ? (
+                    <span className="text-[9px] text-slate-600 sm:text-[10px]">
+                      A better-managed house starts here.
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={previousStep}
+                      className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] px-3 text-[11px] font-medium text-slate-400 transition hover:border-white/[0.15] hover:text-white sm:px-4"
+                    >
+                      <ArrowLeft size={13} />
+                      Back
+                    </button>
+                  )}
 
-              <div ref={previewRef} className="relative w-full max-w-[460px]">
-                <div className="relative overflow-hidden rounded-3xl border border-blue-400/[0.15] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-4 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:p-5">
-                  {/* Glow effects */}
-                  <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/[0.12] blur-[70px]" />
-                  <div className="pointer-events-none absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-sky-500/[0.08] blur-[65px]" />
+                  {step === 0 ? (
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      disabled={!isIdentityValid}
+                      className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-5"
+                    >
+                      Continue
+                      <ArrowRight
+                        size={14}
+                        className="transition-transform duration-300 group-hover:translate-x-1"
+                      />
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={!isAcademicValid}
+                      className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-5"
+                    >
+                      <Check size={14} />
+                      Create house
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+          </section>
 
-                  {/* Subtle wireframe grid */}
-                  <div
-                    className="pointer-events-none absolute inset-0 opacity-[0.045]"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(rgba(96,165,250,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(96,165,250,0.7) 1px, transparent 1px)",
-                      backgroundSize: "24px 24px",
-                    }}
-                  />
+          {/* RIGHT: House management illustration */}
+          <aside className="relative hidden min-w-0 items-center justify-center px-5 py-5 md:flex lg:px-7 lg:py-6">
+            <div className="pointer-events-none absolute inset-4 rounded-[2.5rem] bg-blue-600/[0.13] blur-[65px]" />
 
-                  {/* Dashboard header */}
-                  <div className="relative mb-5 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/25 bg-blue-500/[0.08]">
-                        <House size={17} className="text-blue-300" />
-                        <div className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border border-[#111E33] bg-blue-400" />
+            <div ref={previewRef} className="relative w-full max-w-[430px]">
+              <div className="relative overflow-hidden rounded-3xl border border-blue-400/[0.15] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-3.5 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:p-4">
+                {/* Illustration glows */}
+                <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/[0.12] blur-[70px]" />
+                <div className="pointer-events-none absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-sky-500/[0.08] blur-[65px]" />
+
+                {/* HouseHub mini header */}
+                <div className="relative mb-5 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/10">
+                      <House size={17} className="text-blue-300" />
+                    </div>
+
+                    <div>
+                      <p className="text-[11px] font-bold tracking-wide text-slate-100">
+                        HOUSEHUB
+                      </p>
+                      <p className="mt-1 text-[9px] text-slate-500">
+                        Your house, organized
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-2.5 py-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                    <span className="text-[9px] font-medium text-blue-300">
+                      House space
+                    </span>
+                  </div>
+                </div>
+
+                {/* House illustration */}
+                <div className="relative mb-3 overflow-hidden rounded-2xl border border-blue-400/[0.10] bg-[#080F1B]/80 p-4">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.07] via-transparent to-transparent" />
+
+                  <div className="relative flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[9px] font-medium uppercase tracking-[0.13em] text-slate-500">
+                        Your home
+                      </p>
+                      <h3 className="mt-1.5 text-base font-bold text-white">
+                        Manage your house
+                      </h3>
+                      <p className="mt-1 max-w-[150px] text-[10px] leading-4 text-slate-500">
+                        Keep your household running smoothly.
+                      </p>
+                    </div>
+
+                    <div className="relative flex h-[92px] w-[100px] shrink-0 items-center justify-center">
+                      <div className="absolute bottom-1 h-3 w-20 rounded-full bg-blue-500/10 blur-md" />
+
+                      <svg
+                        viewBox="0 0 120 100"
+                        className="relative h-full w-full"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M15 48L60 12L105 48"
+                          stroke="#60A5FA"
+                          strokeWidth="5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M25 43V88H95V43"
+                          fill="#1D4ED8"
+                          fillOpacity="0.14"
+                          stroke="#3B82F6"
+                          strokeOpacity="0.7"
+                          strokeWidth="2"
+                        />
+                        <rect
+                          x="48"
+                          y="58"
+                          width="24"
+                          height="30"
+                          rx="4"
+                          fill="#2563EB"
+                          fillOpacity="0.28"
+                          stroke="#60A5FA"
+                          strokeOpacity="0.65"
+                          strokeWidth="1.5"
+                        />
+                        <rect
+                          x="32"
+                          y="52"
+                          width="12"
+                          height="13"
+                          rx="2"
+                          fill="#60A5FA"
+                          fillOpacity="0.35"
+                        />
+                        <rect
+                          x="76"
+                          y="52"
+                          width="12"
+                          height="13"
+                          rx="2"
+                          fill="#60A5FA"
+                          fillOpacity="0.35"
+                        />
+                        <path
+                          d="M60 12V4"
+                          stroke="#93C5FD"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <circle cx="60" cy="3" r="3" fill="#60A5FA" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* House management features */}
+                <div className="relative grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl border border-blue-400/[0.10] bg-[#080F1B]/80 p-3.5">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
+                        <Users size={14} className="text-blue-300" />
+                      </div>
+                      <span className="text-[9px] text-slate-500">
+                        Household
+                      </span>
+                    </div>
+
+                    <p className="text-xs font-semibold text-slate-200">
+                      Residents
+                    </p>
+                    <p className="mt-1 text-[9px] text-slate-500">
+                      Keep everyone connected
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/[0.05] bg-[#080F1B]/80 p-3.5">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
+                        <Wrench size={14} className="text-blue-300" />
+                      </div>
+                      <span className="text-[9px] text-slate-500">
+                        Maintenance
+                      </span>
+                    </div>
+
+                    <p className="text-xs font-semibold text-slate-200">
+                      House issues
+                    </p>
+                    <p className="mt-1 text-[9px] text-slate-500">
+                      Track repairs and problems
+                    </p>
+                  </div>
+                </div>
+
+                {/* Example house issue */}
+                <div className="relative mt-3 rounded-2xl border border-white/[0.06] bg-[#080F1B]/80 p-3.5">
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-blue-400/10 bg-blue-500/[0.08]">
+                        <ClipboardCheck
+                          size={14}
+                          className="text-blue-300"
+                        />
                       </div>
 
                       <div>
-                        <p className="text-[11px] font-bold tracking-wide text-slate-100">
-                          HOUSEHUB
+                        <p className="text-[10px] font-semibold text-slate-200">
+                          House issue
                         </p>
-                        <div className="mt-1 h-1.5 w-20 rounded-full bg-slate-500/20">
-                          <div className="h-full w-12 rounded-full bg-blue-400/50" />
-                        </div>
+                        <p className="mt-0.5 text-[9px] text-slate-500">
+                          Maintenance request
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-2.5 py-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-                      <span className="text-[9px] font-medium text-blue-300">
-                        Dashboard
-                      </span>
-                    </div>
+                    <span className="rounded-full border border-blue-400/15 bg-blue-500/[0.08] px-2 py-1 text-[8px] font-medium text-blue-300">
+                      Resolved
+                    </span>
                   </div>
 
-                  {/* Main wireframe panel */}
-                  <div className="relative mb-3 overflow-hidden rounded-2xl border border-blue-400/[0.14] bg-[#080F1B]/80 p-4">
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.07] via-transparent to-transparent" />
-
-                    <div className="relative flex items-center justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-2 h-1.5 w-16 rounded-full bg-blue-300/40" />
-                        <div className="h-3 w-32 max-w-full rounded-full bg-slate-300/[0.13]" />
-                        <div className="mt-2 h-1.5 w-24 rounded-full bg-slate-500/[0.17]" />
-                        <div className="mt-1.5 h-1.5 w-20 rounded-full bg-slate-500/[0.12]" />
-
-                        <div className="mt-4 flex items-center gap-2">
-                          <div className="h-5 w-16 rounded-md border border-blue-400/20 bg-blue-500/[0.08]" />
-                          <div className="h-1.5 w-12 rounded-full bg-slate-500/[0.18]" />
-                        </div>
-                      </div>
-
-                      {/* Abstract wireframe structure */}
-                      <div className="relative flex h-[104px] w-[112px] shrink-0 items-center justify-center">
-                        <div className="absolute bottom-2 h-4 w-20 rounded-full bg-blue-500/[0.12] blur-md" />
-
-                        <svg
-                          viewBox="0 0 120 110"
-                          className="relative h-full w-full"
-                          fill="none"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M13 72L60 94L107 72L60 50L13 72Z"
-                            stroke="#60A5FA"
-                            strokeOpacity="0.45"
-                            strokeWidth="1.2"
-                          />
-
-                          <path
-                            d="M25 43L60 25L95 43V77L60 95L25 77V43Z"
-                            stroke="#60A5FA"
-                            strokeWidth="1.5"
-                            strokeOpacity="0.85"
-                          />
-
-                          <path
-                            d="M25 43L60 62L95 43M60 62V95"
-                            stroke="#93C5FD"
-                            strokeWidth="1.5"
-                            strokeOpacity="0.8"
-                          />
-
-                          <path
-                            d="M42 34V85M78 34V85"
-                            stroke="#60A5FA"
-                            strokeWidth="1"
-                            strokeOpacity="0.35"
-                            strokeDasharray="3 4"
-                          />
-
-                          <path
-                            d="M60 25V12M95 43L108 34M25 43L12 34"
-                            stroke="#93C5FD"
-                            strokeWidth="1.2"
-                            strokeOpacity="0.7"
-                          />
-
-                          <circle cx="60" cy="10" r="3" fill="#60A5FA" />
-                          <circle cx="110" cy="32" r="3" fill="#60A5FA" />
-                          <circle cx="10" cy="32" r="3" fill="#60A5FA" />
-
-                          <path
-                            d="M34 49L49 57V69L34 61V49Z"
-                            stroke="#60A5FA"
-                            strokeOpacity="0.6"
-                          />
-
-                          <path
-                            d="M71 57L86 49V61L71 69V57Z"
-                            stroke="#60A5FA"
-                            strokeOpacity="0.6"
-                          />
-
-                          <path
-                            d="M52 67H68V86H52V67Z"
-                            stroke="#93C5FD"
-                            strokeOpacity="0.75"
-                            strokeWidth="1.2"
-                          />
-
-                          <path
-                            d="M56 72H64M56 77H64M56 82H64"
-                            stroke="#60A5FA"
-                            strokeOpacity="0.55"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Bottom wireframe indicators */}
-                    <div className="relative mt-4 flex items-center gap-2 border-t border-blue-400/[0.08] pt-3">
-                      <div className="h-1.5 w-1.5 rounded-full bg-blue-400/70" />
-                      <div className="h-1.5 w-16 rounded-full bg-slate-500/[0.18]" />
-
-                      <div className="ml-auto flex gap-1">
-                        <div className="h-1.5 w-5 rounded-full bg-blue-400/40" />
-                        <div className="h-1.5 w-5 rounded-full bg-blue-400/20" />
-                        <div className="h-1.5 w-5 rounded-full bg-blue-400/10" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Wireframe stat cards */}
-                  <div className="relative grid grid-cols-2 gap-3">
-                    {/* Residents */}
-                    <div className="relative overflow-hidden rounded-2xl border border-blue-400/[0.12] bg-[#080F1B]/80 p-3.5">
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.05] to-transparent" />
-
-                      <div className="relative mb-3 flex items-center justify-between">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-blue-400/20 bg-blue-500/[0.08]">
-                          <Users size={14} className="text-blue-300" />
-                        </div>
-
-                        <div className="h-1.5 w-10 rounded-full bg-slate-500/[0.18]" />
-                      </div>
-
-                      <div className="relative h-2 w-16 rounded-full bg-slate-300/[0.16]" />
-
-                      <div className="relative mt-2 flex items-end justify-between">
-                        <div className="h-5 w-8 rounded-md border border-blue-400/20 bg-blue-500/[0.08]" />
-
-                        <div className="flex items-end gap-1">
-                          <div className="h-3 w-1.5 rounded-t-sm bg-blue-400/25" />
-                          <div className="h-5 w-1.5 rounded-t-sm bg-blue-400/40" />
-                          <div className="h-4 w-1.5 rounded-t-sm bg-blue-400/30" />
-                          <div className="h-7 w-1.5 rounded-t-sm bg-blue-400/60" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Responsibilities */}
-                    <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#080F1B]/80 p-3.5">
-                      <div className="relative mb-3 flex items-center justify-between">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-blue-400/20 bg-blue-500/[0.08]">
-                          <ClipboardCheck
-                            size={14}
-                            className="text-blue-300"
-                          />
-                        </div>
-
-                        <div className="h-1.5 w-12 rounded-full bg-slate-500/[0.18]" />
-                      </div>
-
-                      <div className="relative h-2 w-20 rounded-full bg-slate-300/[0.16]" />
-
-                      <div className="relative mt-3 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className="h-3 w-3 rounded-[3px] border border-blue-400/40 bg-blue-500/[0.12]" />
-                          <div className="h-1.5 w-14 rounded-full bg-slate-500/[0.2]" />
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <div className="h-3 w-3 rounded-[3px] border border-blue-400/25" />
-                          <div className="h-1.5 w-10 rounded-full bg-slate-500/[0.14]" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* House issues wireframe */}
-                  <div className="relative mt-3 overflow-hidden rounded-2xl border border-blue-400/[0.12] bg-[#080F1B]/80 p-3.5">
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.04] via-transparent to-transparent" />
-
-                    <div className="relative mb-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-blue-400/20 bg-blue-500/[0.08]">
-                          <Wrench size={14} className="text-blue-300" />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <div className="h-2 w-20 rounded-full bg-slate-300/[0.16]" />
-                          <div className="h-1.5 w-14 rounded-full bg-slate-500/[0.18]" />
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-2 py-1">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-400/80" />
-                        <div className="h-1.5 w-10 rounded-full bg-blue-300/35" />
-                      </div>
-                    </div>
-
-                    {/* Issue row one */}
-                    <div className="relative mb-2.5 flex items-center gap-2.5 rounded-xl border border-white/[0.05] bg-white/[0.02] p-2.5">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-400/15 bg-blue-500/[0.07]">
-                        <Wrench size={13} className="text-blue-300/80" />
-                      </div>
-
-                      <div className="min-w-0 flex-1 space-y-2">
-                        <div className="h-1.5 w-24 max-w-full rounded-full bg-slate-300/[0.16]" />
-                        <div className="h-1.5 w-16 rounded-full bg-slate-500/[0.18]" />
-                      </div>
-
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-blue-400/20 bg-blue-500/[0.08]">
-                        <Check size={10} className="text-blue-300" />
-                      </div>
-                    </div>
-
-                    {/* Issue row two */}
-                    <div className="relative flex items-center gap-2.5 rounded-xl border border-white/[0.05] bg-white/[0.02] p-2.5">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-400/15 bg-blue-500/[0.07]">
-                        <Building2 size={13} className="text-blue-300/80" />
-                      </div>
-
-                      <div className="min-w-0 flex-1 space-y-2">
-                        <div className="h-1.5 w-20 max-w-full rounded-full bg-slate-300/[0.14]" />
-                        <div className="h-1.5 w-12 rounded-full bg-slate-500/[0.16]" />
-                      </div>
-
-                      <div className="h-5 w-5 shrink-0 rounded-full border border-blue-400/20 bg-blue-500/[0.04]" />
-                    </div>
-                  </div>
-
-                  {/* Bottom wireframe navigation */}
-                  <div className="relative mt-3 flex items-center justify-between rounded-xl border border-white/[0.05] bg-white/[0.025] px-3 py-2.5">
+                  <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-lg border border-blue-400/20 bg-blue-500/[0.08]">
-                        <Building2 size={12} className="text-blue-300" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/[0.10]">
+                        <Wrench size={14} className="text-blue-300" />
                       </div>
 
-                      <div className="space-y-1.5">
-                        <div className="h-1.5 w-20 rounded-full bg-slate-300/[0.15]" />
-                        <div className="h-1.5 w-12 rounded-full bg-slate-500/[0.17]" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-medium text-slate-300">
+                          Repair house light
+                        </p>
+                        <p className="mt-1 text-[9px] text-slate-500">
+                          Issue reported and handled
+                        </p>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <div className="h-1.5 w-1.5 rounded-full bg-blue-400/70" />
-                      <div className="h-1.5 w-1.5 rounded-full bg-blue-400/35" />
-                      <div className="h-1.5 w-1.5 rounded-full bg-blue-400/20" />
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/15">
+                        <Check size={11} className="text-blue-300" />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Floating wireframe status */}
-                <div className="absolute -bottom-3 right-5 hidden items-center gap-2 rounded-xl border border-blue-400/[0.15] bg-[#101B2B] px-3 py-2 shadow-xl lg:flex">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-md border border-blue-400/20 bg-blue-500/[0.08]">
-                    <Check size={11} className="text-blue-300" />
+                {/* Bottom feature strip */}
+                <div className="relative mt-3 flex items-center justify-between rounded-xl border border-white/[0.05] bg-white/[0.025] px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <House size={13} className="text-blue-400" />
+                    <span className="text-[9px] font-medium text-slate-400">
+                      A better-managed home
+                    </span>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <div className="h-1.5 w-20 rounded-full bg-slate-300/[0.18]" />
-                    <div className="h-1.5 w-12 rounded-full bg-blue-300/30" />
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/10">
+                    <Check size={11} className="text-blue-300" />
                   </div>
                 </div>
               </div>
-            </aside>
-          </div>
+
+              {/* Floating detail */}
+              <div className="absolute -bottom-3 right-5 hidden items-center gap-2 rounded-xl border border-white/[0.08] bg-[#101B2B] px-3 py-2 shadow-xl lg:flex">
+                <Check size={13} className="text-blue-300" />
+                <span className="text-[9px] font-medium text-slate-300">
+                  House issues organized
+                </span>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </main>
