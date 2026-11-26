@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import type { DragEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -16,7 +16,6 @@ import {
   ClipboardCheck,
   CircleHelp,
   House,
-  ImagePlus,
   LoaderCircle,
   MapPin,
   MessageCircle,
@@ -73,6 +72,7 @@ export default function CreateProject() {
   const formContentRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const cancelConfirmationRef = useRef<HTMLButtonElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState(0);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -82,6 +82,7 @@ export default function CreateProject() {
     useState<ProjectFormData>(initialFormData);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isLogoDragging, setIsLogoDragging] = useState(false);
 
   useEffect(() => {
     if (!toast) return;
@@ -216,6 +217,12 @@ export default function CreateProject() {
 
     setToast(null);
     setLogoFile(file);
+  };
+
+  const handleLogoDrop = (event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setIsLogoDragging(false);
+    handleLogoChange(event.dataTransfer.files[0]);
   };
 
   const handleConfirmCreate = async () => {
@@ -465,64 +472,91 @@ export default function CreateProject() {
 
                       <div>
                         <div className="mb-2 flex items-center justify-between">
-                          <label
-                            htmlFor="house-logo"
-                            className="text-[11px] font-medium text-slate-300"
-                          >
+                          <label className="text-[11px] font-medium text-slate-300">
                             House logo
                             <span className="ml-1.5 text-[10px] text-slate-500">
-                              Optional · max 5 MB
+                              Optional
                             </span>
                           </label>
                         </div>
-                        <div className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-[#070C14] p-3">
-                          <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.03]">
-                            {logoPreview ? (
-                              <Image
-                                src={logoPreview}
-                                alt="Selected house logo preview"
-                                width={56}
-                                height={56}
-                                unoptimized
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <ImagePlus
-                                size={20}
-                                className="text-slate-500"
-                                aria-hidden="true"
-                              />
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <label
-                              htmlFor="house-logo"
-                              className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-white/[0.1] px-3 text-[11px] font-semibold text-slate-200 transition hover:border-emerald-400/40 hover:bg-emerald-400/[0.06]"
-                            >
-                              <Upload size={13} />
-                              {logoFile ? "Change image" : "Choose image"}
-                            </label>
-                            <p className="mt-1.5 truncate text-[10px] text-slate-500">
-                              {logoFile?.name ?? "PNG, JPG, WEBP or another image"}
-                            </p>
-                            <input
-                              id="house-logo"
-                              type="file"
-                              accept="image/png,image/jpeg,image/webp"
-                              className="sr-only"
-                              onChange={(event) =>
-                                handleLogoChange(event.currentTarget.files?.[0])
+                        <div className="relative">
+                          <button
+                            type="button"
+                            aria-label="Choose a house logo, or drag and drop an image"
+                            onClick={() => logoInputRef.current?.click()}
+                            onDragEnter={(event) => {
+                              event.preventDefault();
+                              setIsLogoDragging(true);
+                            }}
+                            onDragOver={(event) => {
+                              event.preventDefault();
+                              event.dataTransfer.dropEffect = "copy";
+                              setIsLogoDragging(true);
+                            }}
+                            onDragLeave={(event) => {
+                              const nextTarget = event.relatedTarget;
+                              if (
+                                !(nextTarget instanceof Node) ||
+                                !event.currentTarget.contains(nextTarget)
+                              ) {
+                                setIsLogoDragging(false);
                               }
-                            />
-                          </div>
+                            }}
+                            onDrop={handleLogoDrop}
+                            className={`group flex min-h-36 w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-4 py-5 text-center outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                              isLogoDragging
+                                ? "scale-[1.01] border-blue-400 bg-blue-500/[0.12] shadow-[0_0_36px_rgba(59,130,246,0.16)]"
+                                : "border-white/[0.1] bg-[#070C14]/70 hover:border-blue-400/60 hover:bg-blue-500/[0.05] hover:shadow-[0_0_30px_rgba(59,130,246,0.08)]"
+                            }`}
+                          >
+                            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-blue-400/20 bg-blue-500/[0.1] text-blue-300 transition duration-200 group-hover:-translate-y-0.5 group-hover:bg-blue-500/[0.16]">
+                              {logoPreview ? (
+                                <Image
+                                  src={logoPreview}
+                                  alt=""
+                                  width={48}
+                                  height={48}
+                                  unoptimized
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <Upload size={20} aria-hidden="true" />
+                              )}
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block truncate text-xs font-semibold text-slate-100">
+                                {isLogoDragging
+                                  ? "Drop your logo to upload"
+                                  : logoFile
+                                    ? logoFile.name
+                                    : "Drag and drop your logo"}
+                              </span>
+                              <span className="mt-1 block text-[10px] text-slate-400">
+                                {logoFile
+                                  ? "Click or drop another image to replace it"
+                                  : "or click to browse · PNG, JPG, WEBP · max 5 MB"}
+                              </span>
+                            </span>
+                          </button>
+                          <input
+                            ref={logoInputRef}
+                            id="house-logo"
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            className="sr-only"
+                            onChange={(event) => {
+                              handleLogoChange(event.currentTarget.files?.[0]);
+                              event.currentTarget.value = "";
+                            }}
+                          />
                           {logoFile && (
                             <button
                               type="button"
                               aria-label="Remove selected logo"
                               onClick={() => setLogoFile(null)}
-                              className="rounded-lg p-2 text-slate-400 transition hover:bg-white/[0.06] hover:text-white"
+                              className="absolute right-2 top-2 z-10 rounded-lg border border-white/10 bg-[#0B1220]/90 p-2 text-slate-300 shadow-lg transition hover:border-red-400/30 hover:bg-red-500/15 hover:text-red-200"
                             >
-                              <X size={15} />
+                              <X size={14} />
                             </button>
                           )}
                         </div>

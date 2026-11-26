@@ -78,8 +78,10 @@ export type StudentSemesterJob = {
   created_at: string;
 };
 
+
 export type PartTimeJob = {
   id: string;
+  project_id: string;
 
   job_name: string;
   description: string | null;
@@ -87,6 +89,7 @@ export type PartTimeJob = {
   level: string;
   semester: string;
   job_day: string;
+
   start_time: string | null;
   end_time: string | null;
 
@@ -95,6 +98,7 @@ export type PartTimeJob = {
 
 export type DailyJob = {
   id: string;
+  project_id: string;
 
   job_name: string;
   description: string | null;
@@ -107,6 +111,7 @@ export type DailyJob = {
 
   created_at: string;
 };
+
 
 export type StudentFeedback = {
   id: string;
