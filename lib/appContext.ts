@@ -1,5 +1,6 @@
 "use client";
 
+import { ProjectWithRelations } from "@/types";
 import {
   createContext,
   type Dispatch,
@@ -9,7 +10,7 @@ import {
 
 
 export type AppContextType =  {
-projecs: ProjectWithRelations[];
+  projects: ProjectWithRelations[];
   setProjects: Dispatch<SetStateAction<ProjectWithRelations[]>>;
 
 };

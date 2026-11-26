@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-
+import { ProjectWithRelations } from "@/types";
 import { appContext } from "./appContext";
 
 export default function ContextFile({
@@ -9,12 +9,13 @@ export default function ContextFile({
 }: {
   children: ReactNode;
 }) {
-  const [userInfo, setUserInfo] = useState<string>("");
+  const [projects, setProjects] = useState<ProjectWithRelations[]>([]);
+
   return (
     <appContext.Provider
       value={{
-        userInfo,
-        setUserInfo,
+        projects,
+        setProjects,
       }}
     >
       {children}
