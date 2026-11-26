@@ -1,4 +1,10 @@
-import CreateProject from './CreatePage';;
+import CreateProject from './CreatePage';;;
+import Header from '@/components/Header';
 export default function page() {
-    return <CreateProject />;
+    return (
+        <>
+            <Header />
+            <CreateProject />
+        </>
+    );
 }

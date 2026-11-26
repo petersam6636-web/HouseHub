@@ -15,6 +15,7 @@ import {
   MapPin,
   School,
   Sparkles,
+  Upload,
   Users,
   X,
 } from "lucide-react";
