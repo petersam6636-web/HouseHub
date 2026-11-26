@@ -64,7 +64,7 @@ export default function ProjectPage() {
           {projects.length === 0 ? (
             <div className="relative flex min-h-[390px] flex-col items-center justify-center px-5 py-16 text-center">
               <div className="relative">
-                <div className="relative mx-auto mb-5 flex h-[76px] w-[76px] items-center justify-center">
+                <div className="relative mx-auto mb-5 flex h-[76px] w-[76px] items-center justify-center rounded-[1.6rem] border border-blue-400/20 bg-gradient-to-br from-blue-500/[0.16] to-blue-600/[0.04] shadow-[0_0_45px_rgba(37,99,235,0.12)]">
                   <GraduationCap
                     size={32}
                     strokeWidth={1.5}
