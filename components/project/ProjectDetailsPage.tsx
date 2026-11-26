@@ -198,7 +198,7 @@ export default function ProjectDetailsPage({
       <Header />
 
       <main className="min-h-[calc(100vh-72px)] w-full px-3 py-6 text-white sm:px-5 sm:py-8 lg:px-8">
-        <div className="mx-auto w-full max-w-[1500px]">
+        <div className="mx-auto w-full max-w-6xl">
           <Link
             href="/home/project"
             className="group inline-flex items-center gap-2 text-xs font-medium text-slate-400 transition hover:text-white"

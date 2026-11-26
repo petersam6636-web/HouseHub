@@ -326,7 +326,7 @@ export default function ProjectDashboardBento({ project }: Props) {
       </div>
 
       {/* Primary metrics */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
         <Metric
           label="Total students"
           value={number(students.length)}
@@ -359,7 +359,7 @@ export default function ProjectDashboardBento({ project }: Props) {
       </div>
 
       {/* Main Bento layout */}
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
         {/* Student analytics */}
         <Card className="lg:col-span-7">
           <CardHeading
