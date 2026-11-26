@@ -15,6 +15,7 @@ import {
   ClipboardCheck,
   CircleHelp,
   House,
+  LoaderCircle,
   MapPin,
   MessageCircle,
   School,
@@ -266,6 +267,12 @@ export default function CreateProject() {
       if (error) throw error;
 
       uploadedLogoPath = null;
+      setIsSubmitting(false);
+      setToast({
+        type: "success",
+        message: "Your house was created. Redirecting to your dashboard...",
+      });
+      await new Promise((resolve) => window.setTimeout(resolve, 1600));
       router.replace("/home/dashboard");
     } catch (error) {
       let message =
@@ -800,6 +807,37 @@ export default function CreateProject() {
                 Yes
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isSubmitting && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-[#030712]/75 px-4 backdrop-blur-md"
+        >
+          <div className="w-full max-w-sm rounded-3xl border border-blue-400/15 bg-gradient-to-br from-[#142139] to-[#0B1220] p-7 text-center shadow-[0_24px_90px_rgba(0,0,0,0.6)]">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
+              <LoaderCircle
+                size={27}
+                strokeWidth={1.8}
+                className="animate-spin"
+                aria-hidden="true"
+              />
+            </div>
+            <h2 className="mt-5 text-base font-semibold text-white">
+              Saving your house
+            </h2>
+            <p className="mt-2 text-xs leading-5 text-slate-400">
+              {formData.logo_image
+                ? "Uploading your logo and saving your details..."
+                : "Saving your details securely..."}
+            </p>
+            <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.14em] text-blue-300/80">
+              Please keep this page open
+            </p>
           </div>
         </div>
       )}
