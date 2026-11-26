@@ -133,7 +133,7 @@ function Metric({
         outline-none
         focus-visible:ring-2 focus-visible:ring-blue-500/70
         focus-visible:ring-offset-2 focus-visible:ring-offset-[#050b14]
-        transition-transform duration-700
+        transition duration-700
         ease-[cubic-bezier(0.16,1,0.3,1)]
         hover:-translate-y-1.5
         active:translate-y-0
@@ -146,7 +146,7 @@ function Metric({
         className="
           pointer-events-none absolute -inset-1 rounded-[28px]
           bg-blue-500/[0.08] opacity-0 blur-xl
-          transition-opacity duration-700
+          transition duration-700
           ease-[cubic-bezier(0.16,1,0.3,1)]
           group-hover:opacity-100
           motion-reduce:transition-none
