@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowRight,
   GraduationCap,
@@ -24,12 +24,8 @@ import useApp from "@/lib/useApp";
 const EMPTY_STUDENTS: StudentDetailsWithRelations[] = [];
 
 export default function StudentsPage() {
-  // Your dynamic route is [id], so read params.id.
-  const params = useParams<{ id: string | string[] }>();
-
-  const projectId = Array.isArray(params.id)
-    ? params.id[0]
-    : params.id;
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("id");
 
   const { projects } = useApp();
 
