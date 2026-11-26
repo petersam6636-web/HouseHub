@@ -188,6 +188,12 @@ export default function CreateProject() {
         <div className="absolute left-[-12rem] top-1/2 h-80 w-80 -translate-y-1/2 rounded-full bg-blue-600/[0.07] blur-[110px]" />
         <div className="absolute right-[-10rem] top-[-6rem] h-80 w-80 rounded-full bg-blue-500/[0.06] blur-[110px]" />
       </div>
+
+
+      <div className="mx-auto w-full max-w-[1200px]">
+        {/* Shared form and illustration card */}
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl ">
+          <div className="pointer-events-none absolute -right-32 -top-32 hidden h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px] md:block" />
            <div className=" w-full text-center mb-4">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
                 <Sparkles size={12} className="text-blue-400" />
@@ -207,11 +213,7 @@ export default function CreateProject() {
               </p>
             </div>
 
-      <div className="mx-auto w-full max-w-[1200px]">
-        {/* Shared form and illustration card */}
-        <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl md:grid md:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
-          <div className="pointer-events-none absolute -right-32 -top-32 hidden h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px] md:block" />
-
+          <div className="md:grid md:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
           {/* LEFT: Form */}
           <section className="relative min-w-0 p-4 sm:p-6 lg:p-6">
             {/* Form card */}
@@ -626,6 +628,7 @@ export default function CreateProject() {
             </div>
           </aside>
           
+        </div>
         </div>
       </div>
     </main>
