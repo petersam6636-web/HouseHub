@@ -101,6 +101,7 @@ function CardHeading({
   );
 }
 
+
 function Metric({
   label,
   value,
@@ -128,10 +129,26 @@ function Metric({
       aria-label={`View ${label.toLowerCase()}`}
       className="group block min-w-0 cursor-pointer rounded-[24px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050b14]"
     >
-      <Card className="h-full transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:border-blue-400/30 group-hover:shadow-lg group-hover:shadow-blue-500/[0.08] group-active:translate-y-0">
+      <Card
+        className="
+          h-full
+          transform-gpu
+          transition-[transform,box-shadow,border-color]
+          duration-500
+          ease-[cubic-bezier(0.22,1,0.36,1)]
+          group-hover:-translate-y-1
+          group-hover:scale-[1.01]
+          group-hover:border-blue-400/30
+          group-hover:shadow-[0_18px_45px_rgba(37,99,235,0.10)]
+          group-active:scale-[0.99]
+          group-active:translate-y-0
+          motion-reduce:transform-none
+          motion-reduce:transition-none
+        "
+      >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-slate-400 transition-colors group-hover:text-blue-200">
+            <p className="text-[11px] font-medium text-slate-400 transition-colors duration-500 ease-out group-hover:text-blue-200">
               {label}
             </p>
 
@@ -147,9 +164,21 @@ function Metric({
           </div>
 
           <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-all duration-300 group-hover:scale-105 group-hover:border-blue-400/30 ${accentClasses[accent]}`}
+            className={`
+              flex h-10 w-10 shrink-0 items-center justify-center
+              rounded-xl border
+              transition-all duration-500
+              ease-[cubic-bezier(0.22,1,0.36,1)]
+              group-hover:scale-105
+              group-hover:-translate-y-0.5
+              group-hover:border-blue-400/30
+              ${accentClasses[accent]}
+            `}
           >
-            <Icon size={18} />
+            <Icon
+              size={18}
+              className="transition-transform duration-500 ease-out group-hover:scale-105"
+            />
           </div>
         </div>
       </Card>
