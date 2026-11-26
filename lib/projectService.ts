@@ -6,11 +6,16 @@ export async function fetchProjectsForUser(
 ): Promise<ProjectWithRelations[]> {
   const { data, error } = await supabase
     .from("projects")
-    .select("*, students(*, semester_jobs(*)), daily_jobs(*), part_time_jobs(*)")
+    .select("*")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
 
-  return (data ?? []) as ProjectWithRelations[];
+  return (data ?? []).map((project) => ({
+    ...project,
+    students: [],
+    daily_jobs: [],
+    part_time_jobs: [],
+  })) as ProjectWithRelations[];
 }
