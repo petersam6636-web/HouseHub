@@ -183,7 +183,7 @@ export type StudentDetailsWithRelations = {
 
   location: string;
   gender: string;
-
+  password: string;
   profile_image: string | null;
   created_at: string;
 

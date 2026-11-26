@@ -9,7 +9,7 @@ export default function Loading() {
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute -left-40 top-[15%] h-96 w-96 animate-[loading-float_8s_ease-in-out_infinite] rounded-full bg-emerald-500/[0.09] blur-[120px]" />
-        <div className="absolute -right-36 bottom-[8%] h-[28rem] w-[28rem] animate-[loading-float_10s_ease-in-out_infinite_reverse] rounded-full bg-blue-500/[0.08] blur-[130px]" />
+        <div className="absolute -right-36 bottom-[8%] h-[28rem] w-[28rem] animate-[loading-float_10s_ease-in-out_infinite] rounded-full bg-blue-500/[0.08] blur-[130px]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.07),transparent_52%)]" />
       </div>
 

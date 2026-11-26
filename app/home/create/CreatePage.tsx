@@ -199,12 +199,18 @@ export default function CreateProject() {
 
   const handleLogoChange = (file: File | undefined) => {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setToast({ type: "error", message: "Choose an image file for the logo." });
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setToast({
+        type: "error",
+        message: "Choose a PNG, JPG, or WEBP image for the logo.",
+      });
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setToast({ type: "error", message: "The logo image must be 5 MB or smaller." });
+      setToast({
+        type: "error",
+        message: "The logo image must be 5 MB or smaller.",
+      });
       return;
     }
 
@@ -225,10 +231,13 @@ export default function CreateProject() {
       let logoImage: string | null = null;
 
       if (logoFile) {
-        const extension = logoFile.name.split(".").pop()?.toLowerCase();
-        uploadedLogoPath = `${userId}/${crypto.randomUUID()}.${
-          extension && /^[a-z0-9]{1,8}$/.test(extension) ? extension : "img"
-        }`;
+        const extension =
+          logoFile.type === "image/png"
+            ? "png"
+            : logoFile.type === "image/jpeg"
+              ? "jpg"
+              : "webp";
+        uploadedLogoPath = `${userId}/${crypto.randomUUID()}.${extension}`;
 
         const { error: uploadError } = await supabase.storage
           .from("logos")
@@ -263,7 +272,10 @@ export default function CreateProject() {
             .from("logos")
             .remove([uploadedLogoPath]);
           if (cleanupError) {
-            console.error("Unable to remove the unused uploaded logo.", cleanupError);
+            console.error(
+              "Unable to remove the unused uploaded logo.",
+              cleanupError
+            );
           }
         }
         if (error) throw error;
@@ -298,14 +310,12 @@ export default function CreateProject() {
       await new Promise((resolve) => window.setTimeout(resolve, 1200));
       router.replace(`/home/${project.id}`);
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Your house could not be created. Please try again.";
-
       setToast({
         type: "error",
-        message: getErrorMessage(error, "Your house could not be created. Please try again."),
+        message: getErrorMessage(
+          error,
+          "Your house could not be created. Please try again."
+        ),
       });
     } finally {
       setIsSubmitting(false);
@@ -498,7 +508,7 @@ export default function CreateProject() {
                             <input
                               id="house-logo"
                               type="file"
-                              accept="image/*"
+                              accept="image/png,image/jpeg,image/webp"
                               className="sr-only"
                               onChange={(event) =>
                                 handleLogoChange(event.currentTarget.files?.[0])
