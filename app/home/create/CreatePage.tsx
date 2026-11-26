@@ -47,13 +47,20 @@ type ProjectFormData = {
   academic_year: string;
 };
 
-const initialFormData: ProjectFormData = {
+const getTodayDate = () => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+};
+
+const createInitialFormData = (): ProjectFormData => ({
   title: "",
   school_name: "",
   location: "",
-  start_date: "",
+  start_date: getTodayDate(),
   academic_year: "",
-};
+});
 
 const bars = [38, 62, 48, 82, 57, 91, 70];
 const rooms = [
@@ -79,7 +86,7 @@ export default function CreateProject() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [formData, setFormData] =
-    useState<ProjectFormData>(initialFormData);
+    useState<ProjectFormData>(createInitialFormData);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isLogoDragging, setIsLogoDragging] = useState(false);
@@ -225,6 +232,17 @@ export default function CreateProject() {
     handleLogoChange(event.dataTransfer.files[0]);
   };
 
+  const resetFormAfterCreate = () => {
+    setStep(0);
+    setFormData(createInitialFormData());
+    setLogoFile(null);
+    setLogoPreview(null);
+    setIsLogoDragging(false);
+    if (logoInputRef.current) {
+      logoInputRef.current.value = "";
+    }
+  };
+
   const handleConfirmCreate = async () => {
     setIsConfirmOpen(false);
     setIsSubmitting(true);
@@ -288,6 +306,8 @@ export default function CreateProject() {
         if (error) throw error;
         throw new Error("The project was saved without returning its ID.");
       }
+
+      resetFormAfterCreate();
 
       try {
         const userProjects = await fetchProjectsForUser(userId);
@@ -503,19 +523,19 @@ export default function CreateProject() {
                               }
                             }}
                             onDrop={handleLogoDrop}
-                            className={`group flex min-h-36 w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-4 py-5 text-center outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                            className={`group flex min-h-28 w-full items-center justify-start gap-4 rounded-2xl border-2 border-dashed px-4 py-5 text-left outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
                               isLogoDragging
                                 ? "scale-[1.01] border-blue-400 bg-blue-500/[0.12] shadow-[0_0_36px_rgba(59,130,246,0.16)]"
                                 : "border-white/[0.1] bg-[#070C14]/70 hover:border-blue-400/60 hover:bg-blue-500/[0.05] hover:shadow-[0_0_30px_rgba(59,130,246,0.08)]"
                             }`}
                           >
-                            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-blue-400/20 bg-blue-500/[0.1] text-blue-300 transition duration-200 group-hover:-translate-y-0.5 group-hover:bg-blue-500/[0.16]">
+                            <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-blue-400/20 bg-blue-500/[0.1] text-blue-300 transition duration-200 group-hover:scale-105 group-hover:bg-blue-500/[0.16]">
                               {logoPreview ? (
                                 <Image
                                   src={logoPreview}
                                   alt=""
-                                  width={48}
-                                  height={48}
+                                  width={56}
+                                  height={56}
                                   unoptimized
                                   className="h-full w-full object-cover"
                                 />
@@ -523,8 +543,8 @@ export default function CreateProject() {
                                 <Upload size={20} aria-hidden="true" />
                               )}
                             </span>
-                            <span className="min-w-0">
-                              <span className="block truncate text-xs font-semibold text-slate-100">
+                            <span className="flex min-w-0 flex-1 flex-col">
+                              <span className="truncate text-xs font-semibold text-slate-100">
                                 {isLogoDragging
                                   ? "Drop your logo to upload"
                                   : logoFile
@@ -533,7 +553,7 @@ export default function CreateProject() {
                               </span>
                               <span className="mt-1 block text-[10px] text-slate-400">
                                 {logoFile
-                                  ? "Click or drop another image to replace it"
+                                  ? "Click or drop another image to replace this one"
                                   : "or click to browse · PNG, JPG, WEBP · max 5 MB"}
                               </span>
                             </span>
