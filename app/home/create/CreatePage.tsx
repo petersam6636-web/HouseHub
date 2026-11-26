@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { DragEvent, FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -373,6 +374,14 @@ export default function CreateProject() {
 
 
       <div className="mx-auto w-full max-w-[1200px]">
+        <Link
+          href="/home/project"
+          className="mb-4 inline-flex items-center gap-2 text-xs font-medium text-slate-400 transition hover:text-white"
+        >
+          <ArrowLeft size={15} />
+          All projects
+        </Link>
+
         {/* Shared form and illustration card */}
         <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl ">
           <div className="pointer-events-none absolute -right-32 -top-32 hidden h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px] md:block" />

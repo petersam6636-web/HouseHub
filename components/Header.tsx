@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   House,
   Wallet,
@@ -48,6 +49,7 @@ const navigation = [
 ];
 
 export default function Header() {
+  const router = useRouter();
   const { authenticatedId, setAuthenticatedId } = useApp();
   const [loginUser, setLoginUser] = useState<LoginUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -194,8 +196,14 @@ export default function Header() {
   }
 
   async function handleSignOut() {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Unable to sign out.", error);
+      return;
+    }
+
     setProfileOpen(false);
+    router.replace("/");
   }
 
   return (

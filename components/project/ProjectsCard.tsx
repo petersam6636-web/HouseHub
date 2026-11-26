@@ -457,7 +457,7 @@ export default function ProjectsCard() {
 
         <Link
           href="/home/create"
-          className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-400/20 bg-blue-500/[0.09] px-4 py-2 text-xs font-semibold text-blue-200 transition-all hover:border-blue-400/40 hover:bg-blue-500/[0.16] active:scale-[0.97]"
+          className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-blue-950/25 transition-all hover:bg-blue-500 active:scale-[0.97]"
         >
           <Plus size={15} />
           Add Project
