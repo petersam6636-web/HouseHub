@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, DragEvent } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -60,6 +61,7 @@ const inputClass =
   "h-11 sm:h-12 w-full rounded-xl border border-white/[0.08] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]";
 
 export default function CreateProject() {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const formContentRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -211,17 +213,9 @@ export default function CreateProject() {
 
   const handleConfirmCreate = async () => {
     setIsConfirmOpen(false);
-
-    if (formData.logo_image) {
-      setToast({
-        type: "error",
-        message:
-          "Logo uploads are not configured yet. Remove the selected logo and try again.",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
+
+    let uploadedLogoPath: string | null = null;
 
     try {
       const {
@@ -232,11 +226,38 @@ export default function CreateProject() {
       if (userError) throw userError;
       if (!user) throw new Error("Sign in before creating a house.");
 
+      let logoUrl: string | null = null;
+      if (formData.logo_image) {
+        const extension = formData.logo_image.name
+          .split(".")
+          .pop()
+          ?.match(/^[a-z0-9]{1,10}$/i)?.[0]
+          .toLowerCase();
+        const logoPath = `${user.id}/${crypto.randomUUID()}${extension ? `.${extension}` : ""}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("logos")
+          .upload(logoPath, formData.logo_image, {
+            cacheControl: "3600",
+            contentType: formData.logo_image.type,
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw new Error(`Logo upload failed: ${uploadError.message}`);
+        }
+
+        uploadedLogoPath = logoPath;
+        logoUrl = supabase.storage
+          .from("logos")
+          .getPublicUrl(logoPath).data.publicUrl;
+      }
+
       const { error } = await supabase.from("projects").insert({
         title: formData.title.trim(),
         school_name: formData.school_name.trim(),
         location: formData.location.trim(),
-        logo_image: null,
+        logo_image: logoUrl,
         start_date: formData.start_date,
         academic_year: formData.academic_year.trim(),
         user_id: user.id,
@@ -244,20 +265,35 @@ export default function CreateProject() {
 
       if (error) throw error;
 
-      setFormData(initialFormData);
-      setStep(0);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      setToast({
-        type: "success",
-        message: "Your house was created successfully.",
-      });
+      uploadedLogoPath = null;
+      router.replace("/home/dashboard");
     } catch (error) {
+      let message =
+        error instanceof Error
+          ? error.message
+          : "Your house could not be created. Please try again.";
+
+      if (uploadedLogoPath) {
+        try {
+          const { error: cleanupError } = await supabase.storage
+            .from("logos")
+            .remove([uploadedLogoPath]);
+
+          if (cleanupError) {
+            message += ` The uploaded logo could not be removed: ${cleanupError.message}`;
+          }
+        } catch (cleanupError) {
+          const cleanupMessage =
+            cleanupError instanceof Error
+              ? cleanupError.message
+              : "Unknown storage cleanup error.";
+          message += ` The uploaded logo could not be removed: ${cleanupMessage}`;
+        }
+      }
+
       setToast({
         type: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Your house could not be created. Please try again.",
+        message,
       });
     } finally {
       setIsSubmitting(false);
