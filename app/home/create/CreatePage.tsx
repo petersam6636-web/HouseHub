@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -9,11 +9,13 @@ import {
   CalendarDays,
   Check,
   CheckCircle2,
+  ClipboardCheck,
+  GraduationCap,
   ImagePlus,
   MapPin,
   School,
   Sparkles,
-  Upload,
+  Users,
   X,
 } from "lucide-react";
 import { gsap } from "gsap";
@@ -37,23 +39,14 @@ const initialFormData: ProjectFormData = {
   academic_year: "",
 };
 
-const steps = [
-  {
-    number: "01",
-    title: "Project identity",
-    description: "Let's start with the basic information about your project.",
-  },
-  {
-    number: "02",
-    title: "Academic details",
-    description: "Complete the academic information to finish setting up.",
-  },
-];
+const inputClass =
+  "h-11 w-full rounded-xl border border-white/[0.08] bg-[#080E19] pl-10 pr-4 text-xs text-white outline-none transition-all duration-300 placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]";
 
 export default function CreateProject() {
   const containerRef = useRef<HTMLDivElement>(null);
   const formContentRef = useRef<HTMLDivElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
+  const illustrationRef = useRef<HTMLDivElement>(null);
+  const stepIndicatorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState(0);
@@ -61,8 +54,8 @@ export default function CreateProject() {
     useState<ProjectFormData>(initialFormData);
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-
   const [isDragging, setIsDragging] = useState(false);
+  const [logoError, setLogoError] = useState("");
 
   useEffect(() => {
     if (!formData.logo_image) {
@@ -70,18 +63,21 @@ export default function CreateProject() {
       return;
     }
 
-    const url = URL.createObjectURL(formData.logo_image);
-    setLogoPreview(url);
+    const objectUrl = URL.createObjectURL(formData.logo_image);
+    setLogoPreview(objectUrl);
 
-    return () => URL.revokeObjectURL(url);
+    return () => URL.revokeObjectURL(objectUrl);
   }, [formData.logo_image]);
 
   useGSAP(
     () => {
-      if (!formContentRef.current || !previewRef.current) return;
+      const targets = [
+        formContentRef.current,
+        illustrationRef.current,
+      ].filter(Boolean);
 
       gsap.fromTo(
-        formContentRef.current,
+        targets,
         {
           opacity: 0,
           y: 12,
@@ -92,23 +88,29 @@ export default function CreateProject() {
           y: 0,
           filter: "blur(0px)",
           duration: 0.3,
+          stagger: 0.035,
           ease: "power3.out",
         }
       );
 
-      gsap.fromTo(
-        previewRef.current,
-        {
-          opacity: 0.6,
-          y: 10,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.3,
-          ease: "power3.out",
+      if (stepIndicatorRef.current) {
+        const active = stepIndicatorRef.current.querySelector(
+          `[data-step="${step}"]`
+        );
+
+        if (active) {
+          gsap.fromTo(
+            active,
+            { scale: 0.88, opacity: 0.65 },
+            {
+              scale: 1,
+              opacity: 1,
+              duration: 0.3,
+              ease: "back.out(1.7)",
+            }
+          );
         }
-      );
+      }
     },
     {
       dependencies: [step],
@@ -130,13 +132,23 @@ export default function CreateProject() {
   const handleLogo = (file?: File) => {
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) return;
+    if (!file.type.startsWith("image/")) {
+      setLogoError("Please select a valid image file.");
+      return;
+    }
 
+    if (file.size > 5 * 1024 * 1024) {
+      setLogoError("Your image must be smaller than 5MB.");
+      return;
+    }
+
+    setLogoError("");
     updateField("logo_image", file);
   };
 
   const removeLogo = () => {
     updateField("logo_image", null);
+    setLogoError("");
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -144,24 +156,22 @@ export default function CreateProject() {
   };
 
   const nextStep = () => {
-    if (step === 0) {
-      if (
-        !formData.title.trim() ||
-        !formData.school_name.trim() ||
-        !formData.location.trim()
-      ) {
-        return;
-      }
-
-      setStep(1);
+    if (
+      !formData.title.trim() ||
+      !formData.school_name.trim() ||
+      !formData.location.trim()
+    ) {
+      return;
     }
+
+    setStep(1);
   };
 
   const previousStep = () => {
     setStep(0);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (
@@ -174,481 +184,724 @@ export default function CreateProject() {
       return;
     }
 
-    // Connect your Supabase project insert and logo upload here.
-    // user_id should come from the authenticated user.
-    // id should be generated automatically by the database.
+    // Connect your Supabase logo upload and project insert here.
+    // id is generated by the database.
+    // user_id comes from the authenticated user.
   };
 
-  const activeStep = steps[step];
+  const projectName =
+    formData.title.trim() || "Your project name";
+
+  const schoolName =
+    formData.school_name.trim() || "Your school name";
+
+  const location =
+    formData.location.trim() || "School location";
+
+  const academicYear =
+    formData.academic_year.trim() || "2026 / 2027";
 
   return (
     <main
       ref={containerRef}
-      className="relative min-h-full w-full overflow-hidden py-5 text-white sm:py-8"
+      className="w-full py-5 text-white sm:py-8 lg:py-10"
     >
       <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-5xl">
-          {/* Page introduction */}
-          <div className="mb-7 sm:mb-9">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
-              <Sparkles size={12} className="text-blue-400" />
-              <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-300">
-                New workspace
+        <div className="mx-auto w-full max-w-6xl">
+          {/* Introduction */}
+          <div className="mb-7 max-w-xl sm:mb-9">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/[0.07] px-3 py-1.5">
+              <Sparkles size={12} className="text-blue-300" />
+              <span className="text-[10px] font-semibold tracking-wide text-blue-200">
+                Create your workspace
               </span>
             </div>
 
-            <h1 className="text-2xl font-bold tracking-[-0.05em] text-white sm:text-3xl lg:text-[36px]">
-              Start a new project<span className="text-blue-400">.</span>
+            <h1 className="text-[2rem] font-extrabold leading-tight tracking-[-0.05em] text-white sm:text-3xl lg:text-[2.65rem]">
+              Start a new project
+              <span className="text-blue-400">.</span>
             </h1>
 
-            <p className="mt-2 max-w-xl text-xs leading-6 text-slate-500 sm:text-sm">
-              Create your school workspace and bring your academic activities
-              together in one organized place.
+            <p className="mt-3 max-w-[440px] text-xs leading-6 text-slate-400 sm:text-sm sm:leading-7">
+              Set up your school workspace, organize your academic
+              information and get everything ready for your students.
             </p>
           </div>
 
-          {/* Main form layout */}
-          <div className="grid items-stretch gap-5 md:grid-cols-[minmax(0,1fr)_230px] lg:grid-cols-[minmax(0,1fr)_270px] lg:gap-7">
-            {/* LEFT: Form */}
-            <section className="min-w-0 overflow-hidden rounded-[1.5rem] border border-white/[0.07] bg-gradient-to-br from-[#0D1523]/95 via-[#090F1A]/95 to-[#070B12]/95 shadow-[0_20px_70px_rgba(0,0,0,0.2)] backdrop-blur-xl">
-              {/* Progress */}
-              <div className="border-b border-white/[0.06] px-5 py-5 sm:px-7">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-500">
-                      Step {step + 1} of 2
-                    </p>
-
-                    <h2 className="mt-1 text-sm font-semibold text-white">
-                      {activeStep.title}
-                    </h2>
-                  </div>
-
-                  <span className="text-xs font-semibold tabular-nums text-blue-300">
-                    {step === 0 ? "50%" : "100%"}
-                  </span>
-                </div>
-
-                <div className="mt-4 flex gap-2">
-                  <div
-                    className={`h-1 flex-1 overflow-hidden rounded-full transition-colors duration-300 ${
-                      step >= 0 ? "bg-blue-500" : "bg-white/[0.08]"
-                    }`}
-                  />
-                  <div
-                    className={`h-1 flex-1 overflow-hidden rounded-full transition-colors duration-300 ${
-                      step >= 1 ? "bg-blue-500" : "bg-white/[0.08]"
-                    }`}
-                  />
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit}>
-                <div
-                  ref={formContentRef}
-                  className="min-h-[390px] px-5 py-6 sm:px-7 sm:py-8"
-                >
-                  {step === 0 ? (
-                    <div className="space-y-5">
-                      <div>
-                        <h3 className="text-lg font-bold tracking-tight text-white">
-                          Tell us about your project
-                        </h3>
-
-                        <p className="mt-1.5 text-xs leading-5 text-slate-500">
-                          Start by giving your project an identity.
-                        </p>
-                      </div>
-
-                      {/* Project title */}
-                      <div>
-                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          Project title
-                        </label>
-
-                        <div className="relative">
-                          <Building2
-                            size={15}
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                          />
-
-                          <input
-                            required
-                            value={formData.title}
-                            onChange={(e) =>
-                              updateField("title", e.target.value)
-                            }
-                            placeholder="e.g. 2026 Academic Project"
-                            className="h-12 w-full rounded-xl border border-white/[0.07] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]"
-                          />
-                        </div>
-                      </div>
-
-                      {/* School name */}
-                      <div>
-                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          School name
-                        </label>
-
-                        <div className="relative">
-                          <School
-                            size={15}
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                          />
-
-                          <input
-                            required
-                            value={formData.school_name}
-                            onChange={(e) =>
-                              updateField("school_name", e.target.value)
-                            }
-                            placeholder="Enter your school's name"
-                            className="h-12 w-full rounded-xl border border-white/[0.07] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Location */}
-                      <div>
-                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          School location
-                        </label>
-
-                        <div className="relative">
-                          <MapPin
-                            size={15}
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                          />
-
-                          <input
-                            required
-                            value={formData.location}
-                            onChange={(e) =>
-                              updateField("location", e.target.value)
-                            }
-                            placeholder="e.g. Accra, Ghana"
-                            className="h-12 w-full rounded-xl border border-white/[0.07] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-5">
-                      <div>
-                        <h3 className="text-lg font-bold tracking-tight text-white">
-                          Academic details
-                        </h3>
-
-                        <p className="mt-1.5 text-xs leading-5 text-slate-500">
-                          Add the academic year, starting date and school logo.
-                        </p>
-                      </div>
-
-                      {/* Logo upload */}
-                      <div>
-                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          School logo
-                          <span className="ml-1 text-slate-600">
-                            (optional)
-                          </span>
-                        </label>
-
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) =>
-                            handleLogo(e.target.files?.[0])
-                          }
-                        />
-
-                        {logoPreview ? (
-                          <div className="flex items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/[0.05] p-3">
-                            <img
-                              src={logoPreview}
-                              alt="School logo preview"
-                              className="h-12 w-12 rounded-lg border border-white/[0.08] object-cover"
-                            />
-
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-xs font-medium text-white">
-                                {formData.logo_image?.name}
-                              </p>
-                              <p className="mt-1 text-[10px] text-blue-300">
-                                Logo selected
-                              </p>
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={removeLogo}
-                              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white/[0.06] hover:text-white"
-                              aria-label="Remove logo"
-                            >
-                              <X size={15} />
-                            </button>
-                          </div>
+          {/* Main layout */}
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-9 md:flex-row md:items-center md:justify-between md:gap-7 lg:gap-12">
+            {/* LEFT: Registration card */}
+            <section className="order-1 w-full max-w-[490px] min-w-0 md:order-none md:flex-1">
+              <div className="overflow-hidden rounded-[1.5rem] border border-blue-400/[0.13] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] shadow-[0_25px_80px_rgba(0,0,0,0.45),0_0_35px_rgba(37,99,235,0.07)]">
+                {/* Card heading */}
+                <div className="border-b border-white/[0.06] px-5 py-5 sm:px-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
+                        {step === 0 ? (
+                          <Building2 size={19} />
                         ) : (
-                          <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            onDragOver={(e) => {
-                              e.preventDefault();
-                              setIsDragging(true);
-                            }}
-                            onDragLeave={() => setIsDragging(false)}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              setIsDragging(false);
-                              handleLogo(e.dataTransfer.files?.[0]);
-                            }}
-                            className={`flex min-h-[100px] w-full flex-col items-center justify-center rounded-xl border border-dashed px-4 py-5 transition ${
-                              isDragging
-                                ? "border-blue-400 bg-blue-500/[0.1]"
-                                : "border-white/[0.12] bg-[#070C14] hover:border-blue-400/30 hover:bg-blue-500/[0.035]"
-                            }`}
-                          >
-                            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/[0.08] text-blue-300">
-                              <ImagePlus size={17} />
-                            </div>
-
-                            <span className="text-[11px] font-semibold text-slate-200">
-                              Upload school logo
-                            </span>
-
-                            <span className="mt-1 text-[9px] text-slate-500">
-                              PNG, JPG or WEBP
-                            </span>
-                          </button>
+                          <GraduationCap size={20} />
                         )}
                       </div>
 
-                      {/* Start date */}
                       <div>
-                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          Project start date
-                        </label>
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-blue-300">
+                          Step 0{step + 1} of 02
+                        </p>
 
-                        <div className="relative">
-                          <CalendarDays
-                            size={15}
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                          />
-
-                          <input
-                            required
-                            type="date"
-                            value={formData.start_date}
-                            onChange={(e) =>
-                              updateField("start_date", e.target.value)
-                            }
-                            className="h-12 w-full rounded-xl border border-white/[0.07] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08] [color-scheme:dark]"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Academic year */}
-                      <div>
-                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          Academic year
-                        </label>
-
-                        <div className="relative">
-                          <CalendarDays
-                            size={15}
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-                          />
-
-                          <input
-                            required
-                            value={formData.academic_year}
-                            onChange={(e) =>
-                              updateField("academic_year", e.target.value)
-                            }
-                            placeholder="e.g. 2026/2027"
-                            className="h-12 w-full rounded-xl border border-white/[0.07] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]"
-                          />
-                        </div>
+                        <h2 className="mt-1 text-sm font-bold text-white">
+                          {step === 0
+                            ? "Project information"
+                            : "Academic details"}
+                        </h2>
                       </div>
                     </div>
-                  )}
-                </div>
 
-                {/* Form actions */}
-                <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.012] px-5 py-4 sm:px-7">
-                  {step === 0 ? (
-                    <span className="text-[10px] text-slate-600">
-                      Your project starts here.
+                    <span className="text-xs font-semibold text-blue-300">
+                      {step === 0 ? "50%" : "100%"}
                     </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={previousStep}
-                      className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] px-4 text-[11px] font-medium text-slate-400 transition hover:border-white/[0.15] hover:text-white"
-                    >
-                      <ArrowLeft size={13} />
-                      Back
-                    </button>
-                  )}
+                  </div>
 
-                  {step === 0 ? (
-                    <button
-                      type="button"
-                      onClick={nextStep}
-                      disabled={
-                        !formData.title.trim() ||
-                        !formData.school_name.trim() ||
-                        !formData.location.trim()
-                      }
-                      className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-5 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      Continue
-                      <ArrowRight
-                        size={14}
-                        className="transition-transform duration-300 group-hover:translate-x-1"
+                  <div className="mt-5 flex gap-1.5">
+                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.07]">
+                      <div className="h-full w-full rounded-full bg-blue-500" />
+                    </div>
+
+                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.07]">
+                      <div
+                        className={`h-full rounded-full bg-blue-500 transition-all duration-300 ${
+                          step === 1 ? "w-full" : "w-0"
+                        }`}
                       />
-                    </button>
-                  ) : (
-                    <button
-                      type="submit"
-                      disabled={
-                        !formData.start_date ||
-                        !formData.academic_year.trim()
-                      }
-                      className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-5 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <Check size={14} />
-                      Create project
-                    </button>
-                  )}
+                    </div>
+                  </div>
                 </div>
-              </form>
+
+                <form onSubmit={handleSubmit}>
+                  <div
+                    ref={formContentRef}
+                    className="min-h-[385px] px-5 py-6 sm:px-6 sm:py-7"
+                  >
+                    {step === 0 ? (
+                      <div className="space-y-5">
+                        <div className="mb-5">
+                          <h3 className="text-lg font-bold tracking-tight text-white">
+                            Let's get started.
+                          </h3>
+
+                          <p className="mt-1.5 text-[11px] leading-5 text-slate-400">
+                            Tell us a little about your school project.
+                          </p>
+                        </div>
+
+                        {/* Project title */}
+                        <div>
+                          <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                            Project title
+                          </label>
+
+                          <div className="relative">
+                            <Building2
+                              size={15}
+                              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                            />
+
+                            <input
+                              required
+                              value={formData.title}
+                              onChange={(e) =>
+                                updateField("title", e.target.value)
+                              }
+                              placeholder="e.g. 2026 Academic Project"
+                              className={inputClass}
+                            />
+                          </div>
+                        </div>
+
+                        {/* School name */}
+                        <div>
+                          <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                            School name
+                          </label>
+
+                          <div className="relative">
+                            <School
+                              size={15}
+                              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                            />
+
+                            <input
+                              required
+                              value={formData.school_name}
+                              onChange={(e) =>
+                                updateField("school_name", e.target.value)
+                              }
+                              placeholder="Enter your school's name"
+                              className={inputClass}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Location */}
+                        <div>
+                          <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                            School location
+                          </label>
+
+                          <div className="relative">
+                            <MapPin
+                              size={15}
+                              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                            />
+
+                            <input
+                              required
+                              value={formData.location}
+                              onChange={(e) =>
+                                updateField("location", e.target.value)
+                              }
+                              placeholder="e.g. Accra, Ghana"
+                              className={inputClass}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-5">
+                        <div className="mb-5">
+                          <h3 className="text-lg font-bold tracking-tight text-white">
+                            Academic details.
+                          </h3>
+
+                          <p className="mt-1.5 text-[11px] leading-5 text-slate-400">
+                            Add the remaining information for your workspace.
+                          </p>
+                        </div>
+
+                        {/* Logo upload */}
+                        <div>
+                          <div className="mb-2 flex items-center justify-between">
+                            <label className="text-[11px] font-medium text-slate-300">
+                              School logo
+                            </label>
+
+                            <span className="text-[9px] text-slate-600">
+                              Optional · Max 5MB
+                            </span>
+                          </div>
+
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                            className="hidden"
+                            onChange={(e) =>
+                              handleLogo(e.target.files?.[0])
+                            }
+                          />
+
+                          {logoPreview ? (
+                            <div className="flex items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/[0.06] p-3">
+                              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-[#080E19]">
+                                <img
+                                  src={logoPreview}
+                                  alt="School logo preview"
+                                  className="h-full w-full object-contain"
+                                />
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-[11px] font-semibold text-white">
+                                  {formData.logo_image?.name}
+                                </p>
+
+                                <p className="mt-1 text-[9px] text-blue-300">
+                                  Image ready to upload
+                                </p>
+
+                                <p className="mt-1 text-[9px] text-slate-600">
+                                  {(
+                                    (formData.logo_image?.size || 0) /
+                                    1024
+                                  ).toFixed(0)}{" "}
+                                  KB
+                                </p>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={removeLogo}
+                                aria-label="Remove school logo"
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] text-slate-400 transition hover:border-red-400/20 hover:bg-red-500/10 hover:text-red-300"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => fileInputRef.current?.click()}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                setIsDragging(true);
+                              }}
+                              onDragLeave={(e) => {
+                                e.preventDefault();
+                                setIsDragging(false);
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                setIsDragging(false);
+                                handleLogo(e.dataTransfer.files?.[0]);
+                              }}
+                              className={`group relative flex min-h-[125px] w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed px-4 py-5 transition-all duration-300 ${
+                                isDragging
+                                  ? "border-blue-400 bg-blue-500/[0.12] shadow-[0_0_25px_rgba(37,99,235,0.12)]"
+                                  : "border-white/[0.13] bg-[#080E19] hover:border-blue-400/40 hover:bg-blue-500/[0.035]"
+                              }`}
+                            >
+                              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_65%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                              <div className="relative mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.1] text-blue-300 transition-transform duration-300 group-hover:-translate-y-1">
+                                {isDragging ? (
+                                  <ImagePlus size={19} />
+                                ) : (
+                                  <Upload size={18} />
+                                )}
+                              </div>
+
+                              <span className="relative text-[11px] font-semibold text-slate-200">
+                                {isDragging
+                                  ? "Drop your logo here"
+                                  : "Drag and drop your school logo"}
+                              </span>
+
+                              <span className="relative mt-1 text-[9px] text-slate-500">
+                                or click to browse your files
+                              </span>
+
+                              <span className="relative mt-2 text-[8px] font-medium uppercase tracking-[0.13em] text-blue-400/70">
+                                PNG · JPG · WEBP · SVG
+                              </span>
+                            </button>
+                          )}
+
+                          {logoError && (
+                            <p className="mt-2 text-[10px] text-red-400">
+                              {logoError}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Start date */}
+                        <div>
+                          <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                            Project start date
+                          </label>
+
+                          <div className="relative">
+                            <CalendarDays
+                              size={15}
+                              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                            />
+
+                            <input
+                              required
+                              type="date"
+                              value={formData.start_date}
+                              onChange={(e) =>
+                                updateField("start_date", e.target.value)
+                              }
+                              className={`${inputClass} [color-scheme:dark]`}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Academic year */}
+                        <div>
+                          <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                            Academic year
+                          </label>
+
+                          <div className="relative">
+                            <CalendarDays
+                              size={15}
+                              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                            />
+
+                            <input
+                              required
+                              value={formData.academic_year}
+                              onChange={(e) =>
+                                updateField("academic_year", e.target.value)
+                              }
+                              placeholder="e.g. 2026/2027"
+                              className={inputClass}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.02] px-5 py-4 sm:px-6">
+                    {step === 0 ? (
+                      <span className="text-[9px] text-slate-600">
+                        You can review your details before creating.
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={previousStep}
+                        className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] px-4 text-[10px] font-semibold text-slate-400 transition hover:border-white/[0.15] hover:text-white"
+                      >
+                        <ArrowLeft size={13} />
+                        Back
+                      </button>
+                    )}
+
+                    {step === 0 ? (
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        disabled={
+                          !formData.title.trim() ||
+                          !formData.school_name.trim() ||
+                          !formData.location.trim()
+                        }
+                        className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-5 text-[10px] font-bold text-white shadow-[0_7px_22px_rgba(37,99,235,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        Continue
+                        <ArrowRight
+                          size={14}
+                          className="transition-transform duration-300 group-hover:translate-x-1"
+                        />
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={
+                          !formData.start_date ||
+                          !formData.academic_year.trim()
+                        }
+                        className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-5 text-[10px] font-bold text-white shadow-[0_7px_22px_rgba(37,99,235,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <Check size={14} />
+                        Create project
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
             </section>
 
-            {/* RIGHT: Compact visual preview */}
-            <aside
-              ref={previewRef}
-              className="hidden flex-col justify-center gap-3 md:flex"
-            >
-              {/* Preview card 1 */}
+            {/* RIGHT: HouseHub illustration */}
+            <div className="order-2 hidden w-full max-w-[430px] items-center gap-4 md:order-none md:flex md:flex-1 lg:gap-5">
+              {/* Vertical step selector */}
               <div
-                className={`relative overflow-hidden rounded-[1.4rem] border p-4 transition-all duration-300 ${
-                  step === 0
-                    ? "border-blue-400/30 bg-gradient-to-br from-[#142440] to-[#0B1423] shadow-[0_12px_40px_rgba(37,99,235,0.12)]"
-                    : "border-white/[0.07] bg-[#0A101B]"
-                }`}
+                ref={stepIndicatorRef}
+                className="relative flex shrink-0 flex-col items-center gap-3"
               >
-                <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-500/[0.09] blur-3xl" />
+                <div className="absolute bottom-8 top-8 w-px bg-gradient-to-b from-blue-400/50 via-blue-400/20 to-blue-400/50" />
 
-                <div className="relative">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
-                      Step 01
-                    </span>
+                {[0, 1].map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    data-step={item}
+                    onClick={() => {
+                      if (
+                        item === 0 ||
+                        (formData.title.trim() &&
+                          formData.school_name.trim() &&
+                          formData.location.trim())
+                      ) {
+                        setStep(item);
+                      }
+                    }}
+                    aria-label={`Go to step ${item + 1}`}
+                    className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-xl border text-[10px] font-bold transition-all duration-300 ${
+                      step === item
+                        ? "scale-105 border-blue-400/40 bg-blue-600 text-white shadow-[0_0_25px_rgba(37,99,235,0.3)]"
+                        : item < step
+                          ? "border-blue-400/20 bg-[#10203A] text-blue-300"
+                          : "border-white/[0.08] bg-[#0A101B] text-slate-500 hover:border-blue-400/30 hover:text-blue-300"
+                    }`}
+                  >
+                    {item < step ? <Check size={15} /> : `0${item + 1}`}
+                  </button>
+                ))}
+              </div>
 
-                    {step > 0 ? (
-                      <CheckCircle2
-                        size={15}
-                        className="text-blue-400"
-                      />
+              {/* Illustration */}
+              <div ref={illustrationRef} className="relative min-w-0 flex-1">
+                {/* Glow */}
+                <div className="pointer-events-none absolute inset-8 rounded-[3rem] bg-blue-600/[0.18] blur-[70px]" />
+
+                {/* Main illustration frame */}
+                <div className="relative overflow-hidden rounded-[1.8rem] border border-blue-400/[0.18] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-3.5 shadow-[0_25px_80px_rgba(0,0,0,0.55),0_0_40px_rgba(37,99,235,0.1)] sm:p-4">
+                  {/* Illustration top bar */}
+                  <div className="mb-3 flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15 text-blue-300">
+                        <GraduationCap size={17} />
+                      </div>
+
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-200">
+                          HouseHub
+                        </p>
+                        <p className="text-[8px] text-slate-500">
+                          School workspace
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-2 py-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                      <span className="text-[8px] font-semibold text-blue-300">
+                        Setup
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Dynamic illustration content */}
+                  <div className="relative min-h-[310px] overflow-hidden rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-4">
+                    <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-blue-500/[0.11] blur-[55px]" />
+
+                    {step === 0 ? (
+                      <div className="relative">
+                        {/* Project illustration */}
+                        <div className="mb-5 flex items-center justify-between">
+                          <div>
+                            <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
+                              Your new workspace
+                            </p>
+                            <h3 className="mt-1.5 text-base font-bold tracking-tight text-white">
+                              Project identity
+                            </h3>
+                          </div>
+
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
+                            <Building2 size={19} />
+                          </div>
+                        </div>
+
+                        {/* School building visual */}
+                        <div className="relative mb-4 flex h-[125px] items-center justify-center overflow-hidden rounded-2xl border border-blue-400/[0.13] bg-gradient-to-br from-[#142A49] via-[#0E1B30] to-[#0A1220]">
+                          <div className="absolute bottom-0 left-0 right-0 h-12 bg-blue-500/[0.04]" />
+
+                          <div className="relative flex flex-col items-center">
+                            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-blue-300/20 bg-blue-400/10 text-blue-200 shadow-[0_0_25px_rgba(59,130,246,0.15)]">
+                              <School size={21} />
+                            </div>
+
+                            <div className="h-1.5 w-20 rounded-full bg-blue-100/50" />
+                            <div className="mt-1.5 h-1 w-12 rounded-full bg-blue-200/20" />
+                          </div>
+
+                          <div className="absolute bottom-3 left-4 h-5 w-5 rounded-md border border-blue-300/10 bg-blue-400/[0.06]" />
+                          <div className="absolute right-5 top-4 h-8 w-8 rounded-full border border-blue-300/10 bg-blue-400/[0.05]" />
+                        </div>
+
+                        {/* Live form preview */}
+                        <div className="space-y-2.5">
+                          <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
+                            <div className="mb-2 flex items-center gap-2">
+                              <Building2 size={12} className="text-blue-400" />
+                              <span className="text-[9px] text-slate-500">
+                                Project name
+                              </span>
+                            </div>
+
+                            <p className="truncate text-[11px] font-semibold text-slate-200">
+                              {projectName}
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
+                              <div className="mb-2 flex items-center gap-1.5">
+                                <School size={11} className="text-blue-400" />
+                                <span className="text-[8px] text-slate-500">
+                                  School
+                                </span>
+                              </div>
+
+                              <p className="truncate text-[9px] font-medium text-slate-300">
+                                {schoolName}
+                              </p>
+                            </div>
+
+                            <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
+                              <div className="mb-2 flex items-center gap-1.5">
+                                <MapPin size={11} className="text-blue-400" />
+                                <span className="text-[8px] text-slate-500">
+                                  Location
+                                </span>
+                              </div>
+
+                              <p className="truncate text-[9px] font-medium text-slate-300">
+                                {location}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     ) : (
-                      <span className="h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                      <div className="relative">
+                        {/* Academic illustration */}
+                        <div className="mb-5 flex items-center justify-between">
+                          <div>
+                            <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
+                              Almost ready
+                            </p>
+                            <h3 className="mt-1.5 text-base font-bold tracking-tight text-white">
+                              Academic details
+                            </h3>
+                          </div>
+
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
+                            <CalendarDays size={19} />
+                          </div>
+                        </div>
+
+                        {/* School crest */}
+                        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-blue-400/[0.13] bg-gradient-to-r from-[#142A49]/80 to-[#0C1728] p-4">
+                          <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-blue-400/20 bg-blue-500/[0.09]">
+                            {logoPreview ? (
+                              <img
+                                src={logoPreview}
+                                alt="School logo"
+                                className="h-full w-full object-contain"
+                              />
+                            ) : (
+                              <GraduationCap
+                                size={26}
+                                className="text-blue-300"
+                              />
+                            )}
+                          </div>
+
+                          <div className="min-w-0">
+                            <p className="truncate text-[11px] font-bold text-white">
+                              {schoolName}
+                            </p>
+
+                            <p className="mt-1 text-[9px] text-slate-500">
+                              School identity
+                            </p>
+
+                            <div className="mt-2 inline-flex items-center gap-1.5 text-[8px] text-blue-300">
+                              <CheckCircle2 size={10} />
+                              {logoPreview ? "Logo added" : "Logo preview"}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Academic information cards */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
+                            <CalendarDays
+                              size={13}
+                              className="mb-3 text-blue-400"
+                            />
+                            <p className="text-[8px] text-slate-500">
+                              Start date
+                            </p>
+                            <p className="mt-1 truncate text-[10px] font-semibold text-slate-200">
+                              {formData.start_date || "Not selected"}
+                            </p>
+                          </div>
+
+                          <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
+                            <ClipboardCheck
+                              size={13}
+                              className="mb-3 text-blue-400"
+                            />
+                            <p className="text-[8px] text-slate-500">
+                              Academic year
+                            </p>
+                            <p className="mt-1 truncate text-[10px] font-semibold text-slate-200">
+                              {academicYear}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Completion */}
+                        <div className="mt-3 rounded-xl border border-blue-400/[0.12] bg-blue-500/[0.05] p-3">
+                          <div className="mb-2 flex items-center justify-between">
+                            <span className="text-[9px] font-medium text-slate-300">
+                              Workspace setup
+                            </span>
+                            <span className="text-[9px] font-bold text-blue-300">
+                              100%
+                            </span>
+                          </div>
+
+                          <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
+                            <div className="h-full w-full rounded-full bg-gradient-to-r from-blue-600 to-blue-300" />
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
 
-                  <div className="my-5 flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.1] text-blue-300">
-                    <Building2 size={20} />
-                  </div>
+                  {/* Bottom illustration information */}
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] p-2.5">
+                      <Users size={13} className="shrink-0 text-blue-400" />
+                      <span className="text-[8px] text-slate-400">
+                        Students
+                      </span>
+                    </div>
 
-                  <p className="text-xs font-semibold text-white">
-                    Project identity
-                  </p>
+                    <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] p-2.5">
+                      <ClipboardCheck
+                        size={13}
+                        className="shrink-0 text-blue-400"
+                      />
+                      <span className="text-[8px] text-slate-400">
+                        Activities
+                      </span>
+                    </div>
 
-                  <p className="mt-1 text-[10px] leading-5 text-slate-500">
-                    Project name, school and location.
-                  </p>
-
-                  <div className="mt-4 space-y-2">
-                    <div className="h-1.5 w-full rounded-full bg-white/[0.07]" />
-                    <div className="h-1.5 w-3/4 rounded-full bg-white/[0.07]" />
-                    <div className="h-1.5 w-1/2 rounded-full bg-white/[0.07]" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Connection */}
-              <div className="flex items-center gap-2 px-5">
-                <div className="h-5 w-px bg-gradient-to-b from-blue-400/40 to-blue-400/10" />
-                <span className="text-[9px] text-slate-600">
-                  {step === 0 ? "Next step" : "Completed"}
-                </span>
-              </div>
-
-              {/* Preview card 2 */}
-              <div
-                className={`relative overflow-hidden rounded-[1.4rem] border p-4 transition-all duration-300 ${
-                  step === 1
-                    ? "border-blue-400/30 bg-gradient-to-br from-[#142440] to-[#0B1423] shadow-[0_12px_40px_rgba(37,99,235,0.12)]"
-                    : "border-white/[0.07] bg-[#0A101B]"
-                }`}
-              >
-                <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-500/[0.09] blur-3xl" />
-
-                <div className="relative">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
-                      Step 02
-                    </span>
-
-                    {step === 1 ? (
-                      <span className="h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-                    ) : (
+                    <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] p-2.5">
                       <CalendarDays
-                        size={14}
-                        className="text-slate-600"
+                        size={13}
+                        className="shrink-0 text-blue-400"
                       />
-                    )}
-                  </div>
-
-                  <div className="my-5 flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.1] text-blue-300">
-                    <CalendarDays size={20} />
-                  </div>
-
-                  <p className="text-xs font-semibold text-white">
-                    Academic details
-                  </p>
-
-                  <p className="mt-1 text-[10px] leading-5 text-slate-500">
-                    School logo, start date and academic year.
-                  </p>
-
-                  <div className="mt-4 flex items-center gap-2">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.04]">
-                      <ImagePlus size={12} className="text-blue-300" />
-                    </div>
-
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-1.5 w-full rounded-full bg-white/[0.07]" />
-                      <div className="h-1.5 w-2/3 rounded-full bg-white/[0.07]" />
+                      <span className="text-[8px] text-slate-400">
+                        Academic
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Bottom note */}
-              <div className="mt-1 flex items-start gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-                <CheckCircle2
-                  size={14}
-                  className="mt-0.5 shrink-0 text-blue-400"
-                />
+                {/* Floating status tile */}
+                <div className="absolute -bottom-4 -left-3 flex items-center gap-2.5 rounded-xl border border-blue-400/15 bg-[#101827]/95 px-3 py-2.5 shadow-[0_12px_35px_rgba(0,0,0,0.5)] backdrop-blur-xl lg:-left-5">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
+                    <CheckCircle2 size={15} className="text-blue-400" />
+                  </div>
 
-                <p className="text-[9px] leading-5 text-slate-500">
-                  Your project details will help organize your school
-                  workspace.
-                </p>
+                  <div>
+                    <p className="text-[9px] font-semibold text-slate-200">
+                      {step === 0 ? "Build your workspace" : "Almost complete"}
+                    </p>
+                    <p className="mt-0.5 text-[8px] text-slate-500">
+                      {step === 0
+                        ? "Start with the basics"
+                        : "Your school details"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Floating corner accent */}
+                <div className="pointer-events-none absolute -right-3 -top-3 h-14 w-14 rounded-2xl border border-blue-400/15 bg-blue-500/[0.08] shadow-[0_0_30px_rgba(37,99,235,0.12)]" />
               </div>
-            </aside>
+            </div>
           </div>
         </div>
       </div>
