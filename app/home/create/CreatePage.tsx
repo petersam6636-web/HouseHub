@@ -280,8 +280,8 @@ export default function CreateProject() {
         type: "success",
         message: "Your house was created. Redirecting to your dashboard...",
       });
-      await new Promise((resolve) => window.setTimeout(resolve, 1600));
-      router.replace("/home/dashboard");
+      await new Promise((resolve) => window.setTimeout(resolve, 1200));
+      router.replace("/home/project/dashboard");
     } catch (error) {
       let message =
         error instanceof Error
