@@ -1,10 +1,11 @@
+
 export type StudentMessageRole =
   | "house_master"
   | "student";
 
 export type StudentMessage = {
-  id: number;
-  student_id: number;
+  id: string;
+  student_id: string;
 
   sender_name: string;
   sender_role: StudentMessageRole;
@@ -17,8 +18,8 @@ export type StudentMessage = {
 };
 
 export type StudentFee = {
-  id: number;
-  student_id: number;
+  id: string;
+  student_id: string;
 
   academic_year: string;
   semester: string;
@@ -32,15 +33,22 @@ export type StudentFee = {
   created_at: string;
 };
 
-export type Amount = Record<string, unknown>;
+export type Amount = {
+  id: string;
+  student_id: string;
 
-export type StudentsPartTimeJobType = "daily" | "part_time";
+  [key: string]: unknown;
+};
+
+export type StudentsPartTimeJobType =
+  | "daily"
+  | "part_time";
 
 export type StudentPartTimeJob = {
-  id: number;
-  part_time_job_id: number | null;
+  id: string;
+  part_time_job_id: string | null;
 
-  student_id: number;
+  student_id: string;
 
   level: string;
   semester: string;
@@ -51,13 +59,15 @@ export type StudentPartTimeJob = {
   created_at: string;
 };
 
-export type StudentsSemesterJobType = "daily" | "part_time";
+export type StudentsSemesterJobType =
+  | "daily"
+  | "part_time";
 
 export type StudentSemesterJob = {
-  id: number;
-  psemester_job_id: number | null;
+  id: string;
+  psemester_job_id: string | null;
 
-  student_id: number;
+  student_id: string;
 
   level: string;
   semester: string;
@@ -68,9 +78,8 @@ export type StudentSemesterJob = {
   created_at: string;
 };
 
-
 export type PartTimeJob = {
-  id: number;
+  id: string;
 
   job_name: string;
   description: string | null;
@@ -85,7 +94,7 @@ export type PartTimeJob = {
 };
 
 export type DailyJob = {
-  id: number;
+  id: string;
 
   job_name: string;
   description: string | null;
@@ -100,15 +109,16 @@ export type DailyJob = {
 };
 
 export type StudentFeedback = {
-  id: number;
-  student_id: number;
+  id: string;
+  student_id: string;
+
   feedback_date: string;
   created_at: string;
 };
 
 export type Product = {
-  id: number;
-  student_id: number;
+  id: string;
+  student_id: string;
 
   product_info: string;
   price: number;
@@ -119,7 +129,6 @@ export type Product = {
 
   created_at: string;
 };
-
 
 export type TransactionState =
   | "loan"
@@ -135,8 +144,8 @@ export type TransactionStatus =
   | "cancelled";
 
 export type Transaction = {
-  id: number;
-  student_id: number;
+  id: string;
+  student_id: string;
 
   state: TransactionState;
   created_at: string;
@@ -150,12 +159,10 @@ export type Transaction = {
 };
 
 
-
-
 // Student has many related records
 export type StudentDetailsWithRelations = {
-  id: number;
-  project_id: number;
+  id: string;
+  project_id: string;
 
   full_name: string;
   index_number: string | null;
@@ -190,18 +197,36 @@ export type StudentDetailsWithRelations = {
   part_time_jobs: StudentPartTimeJob[];
 };
 
+
 // Project has many students and jobs
 export type ProjectWithRelations = {
-  id: number;
+  id: string;
+
   title: string;
   school_name: string;
   location: string | null;
   logo_image: string | null;
   start_date: string | null;
   academic_year: string;
+
   user_id: string;
+
   created_at: string | null;
+
   students: StudentDetailsWithRelations[];
   daily_jobs: DailyJob[];
   part_time_jobs: PartTimeJob[];
 };
+
+export type ProjectSummary = Pick<
+  ProjectWithRelations,
+  | "id"
+  | "title"
+  | "school_name"
+  | "location"
+  | "logo_image"
+  | "start_date"
+  | "academic_year"
+  | "user_id"
+  | "created_at"
+>;

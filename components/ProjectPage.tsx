@@ -5,7 +5,10 @@ import Link from "next/link";
 import { AlertCircle, ArrowUpRight, GraduationCap, Plus } from "lucide-react";
 import Loading from "@/components/Loading";
 import ProjectsCard from "@/components/project/ProjectsCard";
-import { fetchProjectsForUser } from "@/lib/projectService";
+import {
+  fetchProjectsForUser,
+  getErrorMessage,
+} from "@/lib/projectService";
 import useApp from "@/lib/useApp";
 
 export default function ProjectPage() {
@@ -35,9 +38,7 @@ export default function ProjectPage() {
         console.error("Unable to load projects.", error);
         if (!cancelled) {
           setLoadError(
-            error instanceof Error
-              ? error.message
-              : "Unable to load projects. Please try again."
+            getErrorMessage(error, "Unable to load projects. Please try again.")
           );
         }
       } finally {

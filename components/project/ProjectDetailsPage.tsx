@@ -13,7 +13,10 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
-import { fetchProjectForUser } from "@/lib/projectService";
+import {
+  fetchProjectForUser,
+  getErrorMessage,
+} from "@/lib/projectService";
 import useApp from "@/lib/useApp";
 import type { ProjectWithRelations } from "@/types";
 
@@ -25,10 +28,13 @@ export default function ProjectDetailsPage({
   projectId,
 }: ProjectDetailsPageProps) {
   const { projects, setProjects, authenticatedId } = useApp();
-  const numericProjectId = Number(projectId);
+  const isValidProjectId =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      projectId
+    );
   const cachedProject = useMemo(
-    () => projects.find((project) => project.id === numericProjectId) ?? null,
-    [projects, numericProjectId]
+    () => projects.find((project) => project.id === projectId) ?? null,
+    [projects, projectId]
   );
   const [loadedProject, setLoadedProject] =
     useState<ProjectWithRelations | null>(null);
@@ -36,9 +42,9 @@ export default function ProjectDetailsPage({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const project =
-    cachedProject?.id === numericProjectId
+    cachedProject?.id === projectId
       ? cachedProject
-      : loadedProject?.id === numericProjectId
+      : loadedProject?.id === projectId
         ? loadedProject
         : null;
 
@@ -46,7 +52,7 @@ export default function ProjectDetailsPage({
     let cancelled = false;
 
     async function loadProject() {
-      if (!Number.isInteger(numericProjectId) || numericProjectId <= 0) {
+      if (!isValidProjectId) {
         setLoadError("This project link is invalid.");
         setIsLoading(false);
         return;
@@ -71,7 +77,7 @@ export default function ProjectDetailsPage({
       try {
         const result = await fetchProjectForUser(
           authenticatedId,
-          numericProjectId
+          projectId
         );
 
         if (!result) {
@@ -88,9 +94,7 @@ export default function ProjectDetailsPage({
         console.error("Unable to load project details.", error);
         if (!cancelled) {
           setLoadError(
-            error instanceof Error
-              ? error.message
-              : "Unable to load project details."
+            getErrorMessage(error, "Unable to load project details.")
           );
         }
       } finally {
@@ -105,7 +109,8 @@ export default function ProjectDetailsPage({
   }, [
     authenticatedId,
     cachedProject,
-    numericProjectId,
+    isValidProjectId,
+    projectId,
     reloadKey,
     setProjects,
   ]);

@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ArrowLeft,
   ArrowRight,
@@ -15,11 +16,13 @@ import {
   ClipboardCheck,
   CircleHelp,
   House,
+  ImagePlus,
   LoaderCircle,
   MapPin,
   MessageCircle,
   School,
   Sparkles,
+  Upload,
   Wallet,
   X,
 } from "lucide-react";
@@ -27,7 +30,10 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { supabase } from "@/lib/supabase-client";
 import useApp from "@/lib/useApp";
-import { fetchProjectsForUser } from "@/lib/projectService";
+import {
+  fetchProjectsForUser,
+  getErrorMessage,
+} from "@/lib/projectService";
 
 type Toast = {
   type: "success" | "error";
@@ -74,6 +80,8 @@ export default function CreateProject() {
   const [toast, setToast] = useState<Toast | null>(null);
   const [formData, setFormData] =
     useState<ProjectFormData>(initialFormData);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!toast) return;
@@ -81,6 +89,17 @@ export default function CreateProject() {
     const timeoutId = window.setTimeout(() => setToast(null), 7000);
     return () => window.clearTimeout(timeoutId);
   }, [toast]);
+
+  useEffect(() => {
+    if (!logoFile) {
+      setLogoPreview(null);
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(logoFile);
+    setLogoPreview(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [logoFile]);
 
   useEffect(() => {
     if (!isConfirmOpen) return;
@@ -178,15 +197,52 @@ export default function CreateProject() {
     setIsConfirmOpen(true);
   };
 
+  const handleLogoChange = (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setToast({ type: "error", message: "Choose an image file for the logo." });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setToast({ type: "error", message: "The logo image must be 5 MB or smaller." });
+      return;
+    }
+
+    setToast(null);
+    setLogoFile(file);
+  };
+
   const handleConfirmCreate = async () => {
     setIsConfirmOpen(false);
     setIsSubmitting(true);
+    let uploadedLogoPath: string | null = null;
 
     try {
       if (!authenticatedId) {
         throw new Error("Sign in before creating a house.");
       }
       const userId = authenticatedId;
+      let logoImage: string | null = null;
+
+      if (logoFile) {
+        const extension = logoFile.name.split(".").pop()?.toLowerCase();
+        uploadedLogoPath = `${userId}/${crypto.randomUUID()}.${
+          extension && /^[a-z0-9]{1,8}$/.test(extension) ? extension : "img"
+        }`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("logos")
+          .upload(uploadedLogoPath, logoFile, {
+            cacheControl: "3600",
+            contentType: logoFile.type,
+            upsert: false,
+          });
+        if (uploadError) throw uploadError;
+
+        logoImage = supabase.storage
+          .from("logos")
+          .getPublicUrl(uploadedLogoPath).data.publicUrl;
+      }
 
       const { data: project, error } = await supabase
         .from("projects")
@@ -194,24 +250,46 @@ export default function CreateProject() {
           title: formData.title.trim(),
           school_name: formData.school_name.trim(),
           location: formData.location.trim(),
-          logo_image: null,
+          logo_image: logoImage,
           start_date: formData.start_date,
           academic_year: formData.academic_year.trim(),
           user_id: userId,
         })
         .select("id")
         .single();
-      if (error) throw error;
-      if (!project) throw new Error("The project was saved without returning its ID.");
+      if (error || !project) {
+        if (uploadedLogoPath) {
+          const { error: cleanupError } = await supabase.storage
+            .from("logos")
+            .remove([uploadedLogoPath]);
+          if (cleanupError) {
+            console.error("Unable to remove the unused uploaded logo.", cleanupError);
+          }
+        }
+        if (error) throw error;
+        throw new Error("The project was saved without returning its ID.");
+      }
 
-      void fetchProjectsForUser(userId)
-        .then(setProjects)
-        .catch((refreshError: unknown) => {
-          console.error(
-            "The house was created, but the project cache could not be refreshed.",
-            refreshError
-          );
+      try {
+        const userProjects = await fetchProjectsForUser(userId);
+        setProjects(userProjects);
+      } catch (refreshError) {
+        console.error(
+          "The house was created, but its related project data could not be loaded.",
+          refreshError
+        );
+        setToast({
+          type: "error",
+          message: `The house was created, but its related data could not be loaded: ${getErrorMessage(
+            refreshError,
+            "Unable to load project data."
+          )}`,
         });
+        await new Promise((resolve) => window.setTimeout(resolve, 1200));
+        router.replace(`/home/${project.id}`);
+        return;
+      }
+
       setIsSubmitting(false);
       setToast({
         type: "success",
@@ -227,7 +305,7 @@ export default function CreateProject() {
 
       setToast({
         type: "error",
-        message,
+        message: getErrorMessage(error, "Your house could not be created. Please try again."),
       });
     } finally {
       setIsSubmitting(false);
@@ -373,6 +451,71 @@ export default function CreateProject() {
                         <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
                           Add the date and academic year for your house.
                         </p>
+                      </div>
+
+                      <div>
+                        <div className="mb-2 flex items-center justify-between">
+                          <label
+                            htmlFor="house-logo"
+                            className="text-[11px] font-medium text-slate-300"
+                          >
+                            House logo
+                            <span className="ml-1.5 text-[10px] text-slate-500">
+                              Optional · max 5 MB
+                            </span>
+                          </label>
+                        </div>
+                        <div className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-[#070C14] p-3">
+                          <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.03]">
+                            {logoPreview ? (
+                              <Image
+                                src={logoPreview}
+                                alt="Selected house logo preview"
+                                width={56}
+                                height={56}
+                                unoptimized
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <ImagePlus
+                                size={20}
+                                className="text-slate-500"
+                                aria-hidden="true"
+                              />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <label
+                              htmlFor="house-logo"
+                              className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-white/[0.1] px-3 text-[11px] font-semibold text-slate-200 transition hover:border-emerald-400/40 hover:bg-emerald-400/[0.06]"
+                            >
+                              <Upload size={13} />
+                              {logoFile ? "Change image" : "Choose image"}
+                            </label>
+                            <p className="mt-1.5 truncate text-[10px] text-slate-500">
+                              {logoFile?.name ?? "PNG, JPG, WEBP or another image"}
+                            </p>
+                            <input
+                              id="house-logo"
+                              type="file"
+                              accept="image/*"
+                              className="sr-only"
+                              onChange={(event) =>
+                                handleLogoChange(event.currentTarget.files?.[0])
+                              }
+                            />
+                          </div>
+                          {logoFile && (
+                            <button
+                              type="button"
+                              aria-label="Remove selected logo"
+                              onClick={() => setLogoFile(null)}
+                              className="rounded-lg p-2 text-slate-400 transition hover:bg-white/[0.06] hover:text-white"
+                            >
+                              <X size={15} />
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {/* Start date */}

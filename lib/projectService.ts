@@ -1,6 +1,21 @@
 import type { ProjectWithRelations } from "@/types";
 import { supabase } from "@/lib/supabase-client";
 
+export function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) return error.message;
+
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
 const projectRelations = `
   *,
   daily_jobs (*),
@@ -50,7 +65,7 @@ export async function fetchProjectsForUser(
 
 export async function fetchProjectForUser(
   userId: string,
-  projectId: number
+  projectId: string
 ): Promise<ProjectWithRelations | null> {
   const { data, error } = await supabase
     .from("projects")
