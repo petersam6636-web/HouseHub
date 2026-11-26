@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent, DragEvent } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -9,7 +10,6 @@ import {
   CalendarDays,
   Check,
   CheckCircle2,
-  ClipboardCheck,
   GraduationCap,
   ImagePlus,
   MapPin,
@@ -40,23 +40,34 @@ const initialFormData: ProjectFormData = {
   academic_year: "",
 };
 
+const steps = [
+  {
+    number: "01",
+    title: "Project identity",
+    description: "Let's start with the basic information about your project.",
+  },
+  {
+    number: "02",
+    title: "Academic details",
+    description: "Complete the academic information to finish setting up.",
+  },
+];
+
 const inputClass =
-  "h-11 w-full rounded-xl border border-white/[0.08] bg-[#080E19] pl-10 pr-4 text-xs text-white outline-none transition-all duration-300 placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]";
+  "h-11 sm:h-12 w-full rounded-xl border border-white/[0.08] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]";
 
 export default function CreateProject() {
   const containerRef = useRef<HTMLDivElement>(null);
   const formContentRef = useRef<HTMLDivElement>(null);
-  const illustrationRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const stepIndicatorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState(0);
   const [formData, setFormData] =
     useState<ProjectFormData>(initialFormData);
-
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [logoError, setLogoError] = useState("");
 
   useEffect(() => {
     if (!formData.logo_image) {
@@ -64,53 +75,62 @@ export default function CreateProject() {
       return;
     }
 
-    const objectUrl = URL.createObjectURL(formData.logo_image);
-    setLogoPreview(objectUrl);
+    const url = URL.createObjectURL(formData.logo_image);
+    setLogoPreview(url);
 
-    return () => URL.revokeObjectURL(objectUrl);
+    return () => URL.revokeObjectURL(url);
   }, [formData.logo_image]);
 
   useGSAP(
     () => {
-      const targets = [
-        formContentRef.current,
-        illustrationRef.current,
-      ].filter(Boolean);
+      if (!formContentRef.current || !previewRef.current) return;
 
       gsap.fromTo(
-        targets,
+        formContentRef.current,
         {
           opacity: 0,
-          y: 12,
-          filter: "blur(3px)",
+          y: 10,
+          filter: "blur(2px)",
         },
         {
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
           duration: 0.3,
-          stagger: 0.035,
+          ease: "power3.out",
+        }
+      );
+
+      gsap.fromTo(
+        previewRef.current,
+        {
+          opacity: 0,
+          x: 12,
+          scale: 0.985,
+        },
+        {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+          duration: 0.35,
           ease: "power3.out",
         }
       );
 
       if (stepIndicatorRef.current) {
-        const active = stepIndicatorRef.current.querySelector(
-          `[data-step="${step}"]`
+        gsap.fromTo(
+          stepIndicatorRef.current,
+          {
+            opacity: 0.5,
+            x: 8,
+          },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.3,
+            ease: "power3.out",
+          }
         );
-
-        if (active) {
-          gsap.fromTo(
-            active,
-            { scale: 0.88, opacity: 0.65 },
-            {
-              scale: 1,
-              opacity: 1,
-              duration: 0.3,
-              ease: "back.out(1.7)",
-            }
-          );
-        }
       }
     },
     {
@@ -131,168 +151,138 @@ export default function CreateProject() {
   };
 
   const handleLogo = (file?: File) => {
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      setLogoError("Please select a valid image file.");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setLogoError("Your image must be smaller than 5MB.");
-      return;
-    }
-
-    setLogoError("");
+    if (!file || !file.type.startsWith("image/")) return;
     updateField("logo_image", file);
+  };
+
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    handleLogo(event.dataTransfer.files?.[0]);
   };
 
   const removeLogo = () => {
     updateField("logo_image", null);
-    setLogoError("");
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const nextStep = () => {
-    if (
-      !formData.title.trim() ||
-      !formData.school_name.trim() ||
-      !formData.location.trim()
-    ) {
-      return;
-    }
+  const isIdentityValid =
+    formData.title.trim().length > 0 &&
+    formData.school_name.trim().length > 0 &&
+    formData.location.trim().length > 0;
 
-    setStep(1);
+  const isAcademicValid =
+    formData.start_date.length > 0 &&
+    formData.academic_year.trim().length > 0;
+
+  const goToStep = (nextStep: number) => {
+    if (nextStep === 1 && !isIdentityValid) return;
+    setStep(nextStep);
+  };
+
+  const nextStep = () => {
+    if (!isIdentityValid) return;
+    goToStep(1);
   };
 
   const previousStep = () => {
-    setStep(0);
+    goToStep(0);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (
-      !formData.title.trim() ||
-      !formData.school_name.trim() ||
-      !formData.location.trim() ||
-      !formData.start_date ||
-      !formData.academic_year.trim()
-    ) {
-      return;
-    }
+    if (!isIdentityValid || !isAcademicValid) return;
 
-    // Connect your Supabase logo upload and project insert here.
-    // id is generated by the database.
-    // user_id comes from the authenticated user.
+    // TODO: Upload logo_image to Supabase Storage.
+    // TODO: Insert the project details into the projects table.
+    // user_id should come from the authenticated user.
+    // id and created_at should be generated by the database.
   };
 
-  const projectName =
-    formData.title.trim() || "Your project name";
-
-  const schoolName =
-    formData.school_name.trim() || "Your school name";
-
-  const location =
-    formData.location.trim() || "School location";
-
-  const academicYear =
-    formData.academic_year.trim() || "2026 / 2027";
+  const activeStep = steps[step];
 
   return (
     <main
       ref={containerRef}
-      className="w-full py-5 text-white sm:py-8 lg:py-10"
+      className="relative min-h-full w-full py-5 text-white sm:py-8"
     >
       <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-6xl">
-          {/* Introduction */}
-          <div className="mb-7 max-w-xl sm:mb-9">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/[0.07] px-3 py-1.5">
-              <Sparkles size={12} className="text-blue-300" />
-              <span className="text-[10px] font-semibold tracking-wide text-blue-200">
-                Create your workspace
-              </span>
-            </div>
+          <div className="grid items-start gap-5 md:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)] lg:gap-7 xl:gap-8">
+            {/* LEFT: Registration form */}
+            <section className="min-w-0">
+              {/* Heading */}
+              <div className="mb-5 text-center md:mb-6 md:text-left">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
+                  <Sparkles size={12} className="text-blue-400" />
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+                    New workspace
+                  </span>
+                </div>
 
-            <h1 className="text-[2rem] font-extrabold leading-tight tracking-[-0.05em] text-white sm:text-3xl lg:text-[2.65rem]">
-              Start a new project
-              <span className="text-blue-400">.</span>
-            </h1>
+                <h1 className="text-2xl font-bold tracking-[-0.05em] text-white sm:text-3xl lg:text-[34px]">
+                  Start a new project
+                  <span className="text-blue-400">.</span>
+                </h1>
 
-            <p className="mt-3 max-w-[440px] text-xs leading-6 text-slate-400 sm:text-sm sm:leading-7">
-              Set up your school workspace, organize your academic
-              information and get everything ready for your students.
-            </p>
-          </div>
+                <p className="mx-auto mt-2 max-w-md text-xs leading-6 text-slate-500 sm:text-sm md:mx-0">
+                  Create your school workspace and bring your academic
+                  activities together in one organized place.
+                </p>
+              </div>
 
-          {/* Main layout */}
-          <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-9 md:flex-row md:items-center md:justify-between md:gap-7 lg:gap-12">
-            {/* LEFT: Registration card */}
-            <section className="order-1 w-full max-w-[490px] min-w-0 md:order-none md:flex-1">
-              <div className="overflow-hidden rounded-[1.5rem] border border-blue-400/[0.13] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] shadow-[0_25px_80px_rgba(0,0,0,0.45),0_0_35px_rgba(37,99,235,0.07)]">
-                {/* Card heading */}
-                <div className="border-b border-white/[0.06] px-5 py-5 sm:px-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
-                        {step === 0 ? (
-                          <Building2 size={19} />
-                        ) : (
-                          <GraduationCap size={20} />
-                        )}
-                      </div>
+              {/* Form card */}
+              <section className="min-w-0 overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-gradient-to-br from-[#0D1523]/95 via-[#090F1A]/95 to-[#070B12]/95 shadow-[0_20px_60px_rgba(0,0,0,0.22)] backdrop-blur-xl">
+                {/* Progress header */}
+                <div className="border-b border-white/[0.06] px-4 py-4 sm:px-6 sm:py-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                        Step {step + 1} of 2
+                      </p>
 
-                      <div>
-                        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-blue-300">
-                          Step 0{step + 1} of 02
-                        </p>
-
-                        <h2 className="mt-1 text-sm font-bold text-white">
-                          {step === 0
-                            ? "Project information"
-                            : "Academic details"}
-                        </h2>
-                      </div>
+                      <h2 className="mt-1 text-sm font-semibold text-white">
+                        {activeStep.title}
+                      </h2>
                     </div>
 
-                    <span className="text-xs font-semibold text-blue-300">
+                    <span className="text-xs font-semibold tabular-nums text-blue-300">
                       {step === 0 ? "50%" : "100%"}
                     </span>
                   </div>
 
-                  <div className="mt-5 flex gap-1.5">
-                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.07]">
-                      <div className="h-full w-full rounded-full bg-blue-500" />
-                    </div>
-
-                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.07]">
-                      <div
-                        className={`h-full rounded-full bg-blue-500 transition-all duration-300 ${
-                          step === 1 ? "w-full" : "w-0"
-                        }`}
-                      />
-                    </div>
+                  <div className="mt-4 flex gap-2">
+                    <div
+                      className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                        step >= 0 ? "bg-blue-500" : "bg-white/[0.08]"
+                      }`}
+                    />
+                    <div
+                      className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                        step >= 1 ? "bg-blue-500" : "bg-white/[0.08]"
+                      }`}
+                    />
                   </div>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                   <div
                     ref={formContentRef}
-                    className="min-h-[385px] px-5 py-6 sm:px-6 sm:py-7"
+                    className="min-h-[360px] px-4 py-5 sm:min-h-[390px] sm:px-6 sm:py-7"
                   >
                     {step === 0 ? (
-                      <div className="space-y-5">
-                        <div className="mb-5">
-                          <h3 className="text-lg font-bold tracking-tight text-white">
-                            Let's get started.
+                      <div className="space-y-4 sm:space-y-5">
+                        <div>
+                          <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
+                            Tell us about your project
                           </h3>
 
-                          <p className="mt-1.5 text-[11px] leading-5 text-slate-400">
-                            Tell us a little about your school project.
+                          <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
+                            Start by giving your project an identity.
                           </p>
                         </div>
 
@@ -369,33 +359,30 @@ export default function CreateProject() {
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-5">
-                        <div className="mb-5">
-                          <h3 className="text-lg font-bold tracking-tight text-white">
-                            Academic details.
+                      <div className="space-y-4 sm:space-y-5">
+                        <div>
+                          <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
+                            Academic details
                           </h3>
 
-                          <p className="mt-1.5 text-[11px] leading-5 text-slate-400">
-                            Add the remaining information for your workspace.
+                          <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
+                            Add the academic year, starting date and school logo.
                           </p>
                         </div>
 
                         {/* Logo upload */}
                         <div>
-                          <div className="mb-2 flex items-center justify-between">
-                            <label className="text-[11px] font-medium text-slate-300">
-                              School logo
-                            </label>
-
-                            <span className="text-[9px] text-slate-600">
-                              Optional · Max 5MB
+                          <label className="mb-2 block text-[11px] font-medium text-slate-300">
+                            School logo
+                            <span className="ml-1 text-slate-600">
+                              (optional)
                             </span>
-                          </div>
+                          </label>
 
                           <input
                             ref={fileInputRef}
                             type="file"
-                            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                            accept="image/*"
                             className="hidden"
                             onChange={(e) =>
                               handleLogo(e.target.files?.[0])
@@ -403,95 +390,68 @@ export default function CreateProject() {
                           />
 
                           {logoPreview ? (
-                            <div className="flex items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/[0.06] p-3">
-                              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-[#080E19]">
-                                <img
-                                  src={logoPreview}
-                                  alt="School logo preview"
-                                  className="h-full w-full object-contain"
-                                />
-                              </div>
+                            <div className="flex items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/[0.05] p-3">
+                              <img
+                                src={logoPreview}
+                                alt="School logo preview"
+                                className="h-12 w-12 rounded-lg border border-white/[0.08] object-cover"
+                              />
 
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-[11px] font-semibold text-white">
+                                <p className="truncate text-xs font-medium text-white">
                                   {formData.logo_image?.name}
                                 </p>
-
-                                <p className="mt-1 text-[9px] text-blue-300">
-                                  Image ready to upload
-                                </p>
-
-                                <p className="mt-1 text-[9px] text-slate-600">
-                                  {(
-                                    (formData.logo_image?.size || 0) /
-                                    1024
-                                  ).toFixed(0)}{" "}
-                                  KB
+                                <p className="mt-1 text-[10px] text-blue-300">
+                                  Logo selected
                                 </p>
                               </div>
 
                               <button
                                 type="button"
                                 onClick={removeLogo}
-                                aria-label="Remove school logo"
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] text-slate-400 transition hover:border-red-400/20 hover:bg-red-500/10 hover:text-red-300"
+                                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white/[0.06] hover:text-white"
+                                aria-label="Remove logo"
                               >
-                                <X size={14} />
+                                <X size={15} />
                               </button>
                             </div>
                           ) : (
-                            <button
-                              type="button"
+                            <div
                               onClick={() => fileInputRef.current?.click()}
                               onDragOver={(e) => {
                                 e.preventDefault();
                                 setIsDragging(true);
                               }}
-                              onDragLeave={(e) => {
-                                e.preventDefault();
-                                setIsDragging(false);
+                              onDragLeave={() => setIsDragging(false)}
+                              onDrop={handleDrop}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  fileInputRef.current?.click();
+                                }
                               }}
-                              onDrop={(e) => {
-                                e.preventDefault();
-                                setIsDragging(false);
-                                handleLogo(e.dataTransfer.files?.[0]);
-                              }}
-                              className={`group relative flex min-h-[125px] w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed px-4 py-5 transition-all duration-300 ${
+                              className={`group relative flex min-h-[112px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed px-4 py-5 transition-all duration-300 ${
                                 isDragging
-                                  ? "border-blue-400 bg-blue-500/[0.12] shadow-[0_0_25px_rgba(37,99,235,0.12)]"
-                                  : "border-white/[0.13] bg-[#080E19] hover:border-blue-400/40 hover:bg-blue-500/[0.035]"
+                                  ? "border-blue-400 bg-blue-500/[0.1] shadow-[0_0_30px_rgba(59,130,246,0.1)]"
+                                  : "border-white/[0.12] bg-[#070C14] hover:border-blue-400/35 hover:bg-blue-500/[0.035]"
                               }`}
                             >
-                              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_65%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.04] via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-                              <div className="relative mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.1] text-blue-300 transition-transform duration-300 group-hover:-translate-y-1">
-                                {isDragging ? (
-                                  <ImagePlus size={19} />
-                                ) : (
-                                  <Upload size={18} />
-                                )}
+                              <div className="relative mb-2 flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.09] text-blue-300 transition-transform duration-300 group-hover:-translate-y-0.5">
+                                <Upload size={16} />
                               </div>
 
                               <span className="relative text-[11px] font-semibold text-slate-200">
-                                {isDragging
-                                  ? "Drop your logo here"
-                                  : "Drag and drop your school logo"}
+                                Drop your school logo here
                               </span>
 
                               <span className="relative mt-1 text-[9px] text-slate-500">
-                                or click to browse your files
+                                or click to browse · PNG, JPG, WEBP
                               </span>
-
-                              <span className="relative mt-2 text-[8px] font-medium uppercase tracking-[0.13em] text-blue-400/70">
-                                PNG · JPG · WEBP · SVG
-                              </span>
-                            </button>
-                          )}
-
-                          {logoError && (
-                            <p className="mt-2 text-[10px] text-red-400">
-                              {logoError}
-                            </p>
+                            </div>
                           )}
                         </div>
 
@@ -546,17 +506,17 @@ export default function CreateProject() {
                     )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.02] px-5 py-4 sm:px-6">
+                  {/* Form actions */}
+                  <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.012] px-4 py-4 sm:px-6">
                     {step === 0 ? (
-                      <span className="text-[9px] text-slate-600">
-                        You can review your details before creating.
+                      <span className="text-[9px] text-slate-600 sm:text-[10px]">
+                        Your project starts here.
                       </span>
                     ) : (
                       <button
                         type="button"
                         onClick={previousStep}
-                        className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] px-4 text-[10px] font-semibold text-slate-400 transition hover:border-white/[0.15] hover:text-white"
+                        className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] px-3 text-[11px] font-medium text-slate-400 transition hover:border-white/[0.15] hover:text-white sm:px-4"
                       >
                         <ArrowLeft size={13} />
                         Back
@@ -567,12 +527,8 @@ export default function CreateProject() {
                       <button
                         type="button"
                         onClick={nextStep}
-                        disabled={
-                          !formData.title.trim() ||
-                          !formData.school_name.trim() ||
-                          !formData.location.trim()
-                        }
-                        className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-5 text-[10px] font-bold text-white shadow-[0_7px_22px_rgba(37,99,235,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+                        disabled={!isIdentityValid}
+                        className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-5"
                       >
                         Continue
                         <ArrowRight
@@ -583,11 +539,8 @@ export default function CreateProject() {
                     ) : (
                       <button
                         type="submit"
-                        disabled={
-                          !formData.start_date ||
-                          !formData.academic_year.trim()
-                        }
-                        className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-5 text-[10px] font-bold text-white shadow-[0_7px_22px_rgba(37,99,235,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+                        disabled={!isAcademicValid}
+                        className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-5"
                       >
                         <Check size={14} />
                         Create project
@@ -595,314 +548,275 @@ export default function CreateProject() {
                     )}
                   </div>
                 </form>
-              </div>
+              </section>
             </section>
 
-            {/* RIGHT: HouseHub illustration */}
-            <div className="order-2 hidden w-full max-w-[430px] items-center gap-4 md:order-none md:flex md:flex-1 lg:gap-5">
-              {/* Vertical step selector */}
+            {/* RIGHT: Hero-style project illustration */}
+            <aside className="hidden min-w-0 items-start gap-3 md:flex lg:gap-4">
               <div
-                ref={stepIndicatorRef}
-                className="relative flex shrink-0 flex-col items-center gap-3"
+                ref={previewRef}
+                className="relative min-w-0 flex-1 pt-2"
               >
-                <div className="absolute bottom-8 top-8 w-px bg-gradient-to-b from-blue-400/50 via-blue-400/20 to-blue-400/50" />
+                {/* Illustration backdrop */}
+                <div className="pointer-events-none absolute -inset-x-4 top-8 bottom-8 rounded-[2.5rem] bg-blue-500/[0.06] blur-3xl" />
 
-                {[0, 1].map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    data-step={item}
-                    onClick={() => {
-                      if (
-                        item === 0 ||
-                        (formData.title.trim() &&
-                          formData.school_name.trim() &&
-                          formData.location.trim())
-                      ) {
-                        setStep(item);
-                      }
-                    }}
-                    aria-label={`Go to step ${item + 1}`}
-                    className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-xl border text-[10px] font-bold transition-all duration-300 ${
-                      step === item
-                        ? "scale-105 border-blue-400/40 bg-blue-600 text-white shadow-[0_0_25px_rgba(37,99,235,0.3)]"
-                        : item < step
-                          ? "border-blue-400/20 bg-[#10203A] text-blue-300"
-                          : "border-white/[0.08] bg-[#0A101B] text-slate-500 hover:border-blue-400/30 hover:text-blue-300"
-                    }`}
-                  >
-                    {item < step ? <Check size={15} /> : `0${item + 1}`}
-                  </button>
-                ))}
-              </div>
+                <div className="relative overflow-hidden rounded-[1.8rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101D31] via-[#0B1423] to-[#080E18] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-5 lg:p-6">
+                  {/* Soft illustration glow */}
+                  <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/[0.12] blur-[70px]" />
+                  <div className="pointer-events-none absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-sky-500/[0.08] blur-[65px]" />
 
-              {/* Illustration */}
-              <div ref={illustrationRef} className="relative min-w-0 flex-1">
-                {/* Glow */}
-                <div className="pointer-events-none absolute inset-8 rounded-[3rem] bg-blue-600/[0.18] blur-[70px]" />
-
-                {/* Main illustration frame */}
-                <div className="relative overflow-hidden rounded-[1.8rem] border border-blue-400/[0.18] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-3.5 shadow-[0_25px_80px_rgba(0,0,0,0.55),0_0_40px_rgba(37,99,235,0.1)] sm:p-4">
-                  {/* Illustration top bar */}
-                  <div className="mb-3 flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15 text-blue-300">
+                  {/* Tiny top bar */}
+                  <div className="relative flex items-center justify-between border-b border-white/[0.07] pb-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.12] text-blue-300">
                         <GraduationCap size={17} />
                       </div>
 
                       <div>
-                        <p className="text-[10px] font-bold text-slate-200">
-                          HouseHub
+                        <p className="text-[9px] font-bold tracking-[0.14em] text-white">
+                          HOUSEHUB
                         </p>
-                        <p className="text-[8px] text-slate-500">
+                        <p className="mt-0.5 text-[8px] text-slate-500">
+                          PROJECT SETUP
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-2.5 py-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                      <span className="text-[8px] font-medium text-blue-200">
+                        New project
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* School/project identity visual */}
+                  <div className="relative mt-5 rounded-2xl border border-white/[0.08] bg-[#07101D]/80 p-4 sm:p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-blue-300/20 bg-gradient-to-br from-blue-500/20 to-sky-500/[0.06] text-blue-200 shadow-[0_8px_28px_rgba(37,99,235,0.13)]">
+                        {logoPreview ? (
+                          <img
+                            src={logoPreview}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <School size={25} strokeWidth={1.5} />
+                        )}
+                      </div>
+
+                      <div className="min-w-0 flex-1 pt-0.5">
+                        <p className="truncate text-[8px] font-semibold uppercase tracking-[0.14em] text-blue-300">
                           School workspace
                         </p>
+
+                        <h3 className="mt-1.5 truncate text-sm font-bold tracking-tight text-white sm:text-base">
+                          {formData.school_name || "Your school name"}
+                        </h3>
+
+                        <p className="mt-1 truncate text-[10px] text-slate-500">
+                          {formData.location || "School location"}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-2 py-1">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-                      <span className="text-[8px] font-semibold text-blue-300">
-                        Setup
-                      </span>
+                    <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-[8px] uppercase tracking-[0.12em] text-slate-500">
+                          Project
+                        </p>
+                        <p className="mt-1 truncate text-[11px] font-semibold text-slate-200">
+                          {formData.title || "Academic project"}
+                        </p>
+                      </div>
+
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/[0.1] text-blue-300">
+                        <Building2 size={15} />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Dynamic illustration content */}
-                  <div className="relative min-h-[310px] overflow-hidden rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-4">
-                    <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-blue-500/[0.11] blur-[55px]" />
-
-                    {step === 0 ? (
-                      <div className="relative">
-                        {/* Project illustration */}
-                        <div className="mb-5 flex items-center justify-between">
-                          <div>
-                            <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
-                              Your new workspace
-                            </p>
-                            <h3 className="mt-1.5 text-base font-bold tracking-tight text-white">
-                              Project identity
-                            </h3>
-                          </div>
-
-                          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
-                            <Building2 size={19} />
-                          </div>
-                        </div>
-
-                        {/* School building visual */}
-                        <div className="relative mb-4 flex h-[125px] items-center justify-center overflow-hidden rounded-2xl border border-blue-400/[0.13] bg-gradient-to-br from-[#142A49] via-[#0E1B30] to-[#0A1220]">
-                          <div className="absolute bottom-0 left-0 right-0 h-12 bg-blue-500/[0.04]" />
-
-                          <div className="relative flex flex-col items-center">
-                            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-blue-300/20 bg-blue-400/10 text-blue-200 shadow-[0_0_25px_rgba(59,130,246,0.15)]">
-                              <School size={21} />
-                            </div>
-
-                            <div className="h-1.5 w-20 rounded-full bg-blue-100/50" />
-                            <div className="mt-1.5 h-1 w-12 rounded-full bg-blue-200/20" />
-                          </div>
-
-                          <div className="absolute bottom-3 left-4 h-5 w-5 rounded-md border border-blue-300/10 bg-blue-400/[0.06]" />
-                          <div className="absolute right-5 top-4 h-8 w-8 rounded-full border border-blue-300/10 bg-blue-400/[0.05]" />
-                        </div>
-
-                        {/* Live form preview */}
-                        <div className="space-y-2.5">
-                          <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
-                            <div className="mb-2 flex items-center gap-2">
-                              <Building2 size={12} className="text-blue-400" />
-                              <span className="text-[9px] text-slate-500">
-                                Project name
-                              </span>
-                            </div>
-
-                            <p className="truncate text-[11px] font-semibold text-slate-200">
-                              {projectName}
-                            </p>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
-                              <div className="mb-2 flex items-center gap-1.5">
-                                <School size={11} className="text-blue-400" />
-                                <span className="text-[8px] text-slate-500">
-                                  School
-                                </span>
-                              </div>
-
-                              <p className="truncate text-[9px] font-medium text-slate-300">
-                                {schoolName}
-                              </p>
-                            </div>
-
-                            <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
-                              <div className="mb-2 flex items-center gap-1.5">
-                                <MapPin size={11} className="text-blue-400" />
-                                <span className="text-[8px] text-slate-500">
-                                  Location
-                                </span>
-                              </div>
-
-                              <p className="truncate text-[9px] font-medium text-slate-300">
-                                {location}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
+                  {/* Academic overview illustration */}
+                  <div className="relative mt-3 grid grid-cols-2 gap-3">
+                    <div className="rounded-2xl border border-white/[0.07] bg-[#0A1422]/90 p-3.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[8px] font-medium text-slate-500">
+                          Academic year
+                        </span>
+                        <CalendarDays size={13} className="text-blue-300" />
                       </div>
-                    ) : (
-                      <div className="relative">
-                        {/* Academic illustration */}
-                        <div className="mb-5 flex items-center justify-between">
-                          <div>
-                            <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
-                              Almost ready
-                            </p>
-                            <h3 className="mt-1.5 text-base font-bold tracking-tight text-white">
-                              Academic details
-                            </h3>
-                          </div>
 
-                          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
-                            <CalendarDays size={19} />
-                          </div>
-                        </div>
+                      <p className="mt-3 truncate text-sm font-bold text-white">
+                        {formData.academic_year || "2026 / 2027"}
+                      </p>
 
-                        {/* School crest */}
-                        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-blue-400/[0.13] bg-gradient-to-r from-[#142A49]/80 to-[#0C1728] p-4">
-                          <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-blue-400/20 bg-blue-500/[0.09]">
-                            {logoPreview ? (
-                              <img
-                                src={logoPreview}
-                                alt="School logo"
-                                className="h-full w-full object-contain"
-                              />
-                            ) : (
-                              <GraduationCap
-                                size={26}
-                                className="text-blue-300"
-                              />
-                            )}
-                          </div>
-
-                          <div className="min-w-0">
-                            <p className="truncate text-[11px] font-bold text-white">
-                              {schoolName}
-                            </p>
-
-                            <p className="mt-1 text-[9px] text-slate-500">
-                              School identity
-                            </p>
-
-                            <div className="mt-2 inline-flex items-center gap-1.5 text-[8px] text-blue-300">
-                              <CheckCircle2 size={10} />
-                              {logoPreview ? "Logo added" : "Logo preview"}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Academic information cards */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
-                            <CalendarDays
-                              size={13}
-                              className="mb-3 text-blue-400"
-                            />
-                            <p className="text-[8px] text-slate-500">
-                              Start date
-                            </p>
-                            <p className="mt-1 truncate text-[10px] font-semibold text-slate-200">
-                              {formData.start_date || "Not selected"}
-                            </p>
-                          </div>
-
-                          <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
-                            <ClipboardCheck
-                              size={13}
-                              className="mb-3 text-blue-400"
-                            />
-                            <p className="text-[8px] text-slate-500">
-                              Academic year
-                            </p>
-                            <p className="mt-1 truncate text-[10px] font-semibold text-slate-200">
-                              {academicYear}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Completion */}
-                        <div className="mt-3 rounded-xl border border-blue-400/[0.12] bg-blue-500/[0.05] p-3">
-                          <div className="mb-2 flex items-center justify-between">
-                            <span className="text-[9px] font-medium text-slate-300">
-                              Workspace setup
-                            </span>
-                            <span className="text-[9px] font-bold text-blue-300">
-                              100%
-                            </span>
-                          </div>
-
-                          <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
-                            <div className="h-full w-full rounded-full bg-gradient-to-r from-blue-600 to-blue-300" />
-                          </div>
-                        </div>
+                      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r from-blue-500 to-sky-300 transition-all duration-500 ${
+                            step === 1 ? "w-full" : "w-1/2"
+                          }`}
+                        />
                       </div>
-                    )}
+                    </div>
+
+                    <div className="rounded-2xl border border-white/[0.07] bg-[#0A1422]/90 p-3.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[8px] font-medium text-slate-500">
+                          Students
+                        </span>
+                        <Users size={13} className="text-blue-300" />
+                      </div>
+
+                      <p className="mt-3 text-sm font-bold text-white">
+                        Organized
+                      </p>
+
+                      <p className="mt-1 text-[9px] text-slate-500">
+                        Ready for records
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Bottom illustration information */}
-                  <div className="mt-3 grid grid-cols-3 gap-2">
-                    <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] p-2.5">
-                      <Users size={13} className="shrink-0 text-blue-400" />
-                      <span className="text-[8px] text-slate-400">
-                        Students
+                  {/* Project registration steps */}
+                  <div className="relative mt-3 rounded-2xl border border-white/[0.07] bg-[#08111E]/90 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                          Setup progress
+                        </p>
+                        <p className="mt-1.5 text-xs font-semibold text-white">
+                          {step === 0
+                            ? "Project identity"
+                            : "Academic details"}
+                        </p>
+                      </div>
+
+                      <span className="text-xs font-bold tabular-nums text-blue-300">
+                        {step === 0 ? "01" : "02"}
+                        <span className="text-slate-600"> / 02</span>
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] p-2.5">
-                      <ClipboardCheck
-                        size={13}
-                        className="shrink-0 text-blue-400"
+                    <div className="mt-4 flex items-center gap-2">
+                      <div
+                        className={`flex h-7 w-7 items-center justify-center rounded-lg border transition-all duration-300 ${
+                          step === 0
+                            ? "border-blue-400/30 bg-blue-500/20 text-blue-200"
+                            : "border-blue-400/20 bg-blue-500/[0.08] text-blue-300"
+                        }`}
+                      >
+                        {step === 0 ? (
+                          <Building2 size={13} />
+                        ) : (
+                          <Check size={13} />
+                        )}
+                      </div>
+
+                      <div
+                        className={`h-px flex-1 transition-colors duration-300 ${
+                          step === 1 ? "bg-blue-400/60" : "bg-white/[0.08]"
+                        }`}
                       />
-                      <span className="text-[8px] text-slate-400">
-                        Activities
-                      </span>
+
+                      <div
+                        className={`flex h-7 w-7 items-center justify-center rounded-lg border transition-all duration-300 ${
+                          step === 1
+                            ? "border-blue-400/30 bg-blue-500/20 text-blue-200"
+                            : "border-white/[0.08] bg-white/[0.025] text-slate-600"
+                        }`}
+                      >
+                        <CalendarDays size={13} />
+                      </div>
+
+                      <div className="ml-1 flex-1">
+                        <div className="h-1.5 rounded-full bg-white/[0.06]">
+                          <div
+                            className={`h-full rounded-full bg-blue-500 transition-all duration-500 ${
+                              step === 0 ? "w-1/2" : "w-full"
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom floating confirmation */}
+                  <div className="relative mt-4 flex items-center gap-3 rounded-2xl border border-blue-300/[0.12] bg-gradient-to-r from-blue-500/[0.09] to-sky-500/[0.035] p-3.5">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-300/15 bg-blue-500/[0.12] text-blue-200">
+                      <CheckCircle2 size={17} />
                     </div>
 
-                    <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] p-2.5">
-                      <CalendarDays
-                        size={13}
-                        className="shrink-0 text-blue-400"
-                      />
-                      <span className="text-[8px] text-slate-400">
-                        Academic
-                      </span>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-slate-200">
+                        Everything in one place
+                      </p>
+                      <p className="mt-1 text-[9px] leading-4 text-slate-500">
+                        Set up your school workspace in just two steps.
+                      </p>
                     </div>
+
+                    <Sparkles
+                      size={15}
+                      className="ml-auto shrink-0 text-blue-300/70"
+                    />
                   </div>
                 </div>
 
-                {/* Floating status tile */}
-                <div className="absolute -bottom-4 -left-3 flex items-center gap-2.5 rounded-xl border border-blue-400/15 bg-[#101827]/95 px-3 py-2.5 shadow-[0_12px_35px_rgba(0,0,0,0.5)] backdrop-blur-xl lg:-left-5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
-                    <CheckCircle2 size={15} className="text-blue-400" />
+                {/* Small decorative floating chips */}
+                <div className="absolute -left-3 top-24 hidden items-center gap-2 rounded-xl border border-white/[0.08] bg-[#101B2B] px-3 py-2 shadow-xl lg:flex">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-500/[0.12] text-blue-300">
+                    <School size={12} />
                   </div>
-
-                  <div>
-                    <p className="text-[9px] font-semibold text-slate-200">
-                      {step === 0 ? "Build your workspace" : "Almost complete"}
-                    </p>
-                    <p className="mt-0.5 text-[8px] text-slate-500">
-                      {step === 0
-                        ? "Start with the basics"
-                        : "Your school details"}
-                    </p>
-                  </div>
+                  <span className="text-[9px] font-medium text-slate-300">
+                    School profile
+                  </span>
                 </div>
 
-                {/* Floating corner accent */}
-                <div className="pointer-events-none absolute -right-3 -top-3 h-14 w-14 rounded-2xl border border-blue-400/15 bg-blue-500/[0.08] shadow-[0_0_30px_rgba(37,99,235,0.12)]" />
+                <div className="absolute -bottom-3 right-5 hidden items-center gap-2 rounded-xl border border-white/[0.08] bg-[#101B2B] px-3 py-2 shadow-xl lg:flex">
+                  <CheckCircle2 size={13} className="text-blue-300" />
+                  <span className="text-[9px] font-medium text-slate-300">
+                    Setup ready
+                  </span>
+                </div>
               </div>
-            </div>
+
+              {/* Vertical step buttons — RIGHT of illustration */}
+              <div
+                ref={stepIndicatorRef}
+                className="relative flex shrink-0 flex-col items-center gap-3 pt-10"
+              >
+                <div className="absolute left-1/2 top-[3.2rem] bottom-[3.2rem] w-px -translate-x-1/2 bg-white/[0.08]" />
+
+                {[0, 1].map((indicatorStep) => {
+                  const isActive = step === indicatorStep;
+                  const isComplete = step > indicatorStep;
+
+                  return (
+                    <button
+                      key={indicatorStep}
+                      type="button"
+                      onClick={() => goToStep(indicatorStep)}
+                      disabled={indicatorStep === 1 && !isIdentityValid}
+                      aria-label={`Go to step ${indicatorStep + 1}: ${steps[indicatorStep].title}`}
+                      aria-current={isActive ? "step" : undefined}
+                      className={`group relative z-10 flex h-10 w-10 items-center justify-center rounded-xl border text-xs font-semibold transition-all duration-300 ${
+                        isActive
+                          ? "scale-105 border-blue-400/40 bg-blue-500 text-white shadow-[0_0_24px_rgba(59,130,246,0.3)]"
+                          : isComplete
+                            ? "border-blue-400/25 bg-blue-500/[0.12] text-blue-300"
+                            : "border-white/[0.08] bg-[#0B1421] text-slate-500 hover:border-blue-400/25 hover:text-blue-300"
+                      } disabled:cursor-not-allowed disabled:opacity-40`}
+                    >
+                      {isComplete ? (
+                        <Check size={15} />
+                      ) : (
+                        indicatorStep + 1
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </aside>
           </div>
         </div>
       </div>
