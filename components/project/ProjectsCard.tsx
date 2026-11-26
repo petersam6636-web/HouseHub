@@ -5,7 +5,6 @@ import Link from "next/link";
 import useApp from "@/lib/useApp";
 import {
   Plus,
-  MapPin,
   CalendarDays,
   Users,
   ArrowUpRight,
@@ -276,46 +275,29 @@ function ProjectCard({
         </div>
 
         {/* Project metadata */}
- {/* Project metadata */}
-{/* Project metadata */}
-<div className="mt-5 flex items-center justify-between gap-3">
-  {/* Location and academic year on the left */}
-  <div className="flex min-w-0 w-full flex-row items-start gap-2">
-    <div className="inline-flex items-center gap-1.5 rounded-lg border border-blue-400/[0.12] bg-blue-500/[0.07] px-2.5 py-1.5">
-      <MapPin
-        size={13}
-        className="shrink-0 text-sky-300"
-      />
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <div className="inline-flex min-w-0 items-center gap-1.5 rounded-lg border border-blue-400/[0.12] bg-blue-500/[0.07] px-2.5 py-1.5 transition-colors group-hover:border-blue-400/25 group-hover:bg-blue-500/[0.12]">
+            <CalendarDays
+              size={13}
+              className="shrink-0 text-sky-300"
+            />
 
-      <span className="text-sm font-bold tracking-tight text-sky-300">
-        {project.location || "Location not set"}
-      </span>
-    </div>
+            <span className="truncate text-sm font-bold tracking-tight text-sky-300">
+              {project.academic_year}
+            </span>
+          </div>
 
-    {/* Academic year emphasized */}
-    <div className="inline-flex items-center gap-1.5 rounded-lg border border-blue-400/[0.12] bg-blue-500/[0.07] px-2.5 py-1.5">
-      <CalendarDays
-        size={13}
-        className="shrink-0 text-sky-300"
-      />
+          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-blue-400/[0.12] bg-blue-500/[0.07] px-2.5 py-1.5 transition-colors group-hover:border-blue-400/25 group-hover:bg-blue-500/[0.12]">
+            <Users
+              size={13}
+              className="shrink-0 text-sky-300"
+            />
 
-      <span className="text-sm font-bold tracking-tight text-sky-300">
-        {project.academic_year}
-      </span>
-    </div>
-  </div>
-
-  {/* Registered students on the right */}
-  <div className="inline-flex items-center gap-1.5 rounded-lg border border-blue-400/[0.12] bg-blue-500/[0.07] px-2.5 py-1.5">
-    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/[0.12] text-blue-400">
-      <Users size={13} />
-    </div>
-
-    <span className="text-sm font-bold tracking-tight text-sky-300">
-      {studentCount.toLocaleString("en-GH")}
-    </span>
-  </div>
-</div>
+            <span className="text-sm font-bold tracking-tight text-sky-300">
+              {studentCount.toLocaleString("en-GH")}
+            </span>
+          </div>
+        </div>
 
         {/* Main financial panel */}
         <div className="relative mt-5 overflow-hidden rounded-[22px] border border-blue-400/[0.12] bg-[#080F1B]/80 p-4 sm:p-5">
