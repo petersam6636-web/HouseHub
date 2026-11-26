@@ -1,4 +1,10 @@
 import ProjectPage from "@/components/ProjectPage";
+import Header from "@/components/Header";
 export default function Project() {
-  return <ProjectPage />;
+  return (
+    <>
+      <Header />
+      <ProjectPage />
+    </>
+  );
 }

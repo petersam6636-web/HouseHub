@@ -5,23 +5,16 @@ import { useMemo, useState } from "react";
 import useApp from "@/lib/useApp";
 import {
   ArrowUpRight,
-  BookOpen,
   CalendarDays,
   CheckCircle2,
-  ChevronRight,
-  ClipboardList,
-  Clock3,
   GraduationCap,
-  MapPin,
   Plus,
   Search,
   Users,
-  Wallet,
-  BriefcaseBusiness,
-  Layers3,
-  FolderOpen,
-  Sparkles,
   XCircle,
+  FolderOpen,
+  ChevronRight,
+  SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -32,38 +25,6 @@ export default function ProjectPage() {
 
   const [search, setSearch] = useState("");
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
-
-  const projectStats = useMemo(() => {
-    const totalStudents = projects.reduce(
-      (total, project) => total + (project.students?.length || 0),
-      0
-    );
-
-    const projectsWithTasks = projects.filter((project) =>
-      project.students?.some(
-        (student) => (student.semester_jobs?.length || 0) > 0
-      )
-    ).length;
-
-    const totalAssignments = projects.reduce(
-      (total, project) =>
-        total +
-        (project.students?.reduce(
-          (studentTotal, student) =>
-            studentTotal + (student.semester_jobs?.length || 0),
-          0
-        ) || 0),
-      0
-    );
-
-    return {
-      totalProjects: projects.length,
-      totalStudents,
-      projectsWithTasks,
-      projectsWithoutTasks: projects.length - projectsWithTasks,
-      totalAssignments,
-    };
-  }, [projects]);
 
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
@@ -100,191 +61,42 @@ export default function ProjectPage() {
   };
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden bg-[#05070D] px-1.5 py-5 text-white md:px-3 md:py-8">
+    <main className="relative min-h-screen w-full overflow-hidden bg-[#05070D] py-8 text-white">
 
       {/* Background atmosphere */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden">
         <div className="absolute -top-48 left-[45%] h-[450px] w-[450px] rounded-full bg-blue-600/[0.10] blur-[140px]" />
-        <div className="absolute right-[-180px] top-[35%] h-[350px] w-[350px] rounded-full bg-blue-500/[0.07] blur-[120px]" />
-        <div className="absolute bottom-[-180px] left-[-100px] h-[350px] w-[350px] rounded-full bg-blue-700/[0.07] blur-[130px]" />
+        <div className="absolute -right-40 top-1/3 h-72 w-72 rounded-full bg-blue-500/[0.07] blur-[110px]" />
+        <div className="absolute -bottom-40 left-0 h-80 w-80 rounded-full bg-blue-700/[0.07] blur-[120px]" />
+
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.018)_1px,transparent_1px)] [background-size:24px_24px]" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-[1500px]">
+      <div className="relative mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="mb-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-
-          <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-3 py-1.5">
-              <Sparkles size={12} className="text-blue-400" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
-                HouseHub workspace
-              </span>
-            </div>
-
-            <h1 className="text-2xl font-bold tracking-[-0.045em] sm:text-3xl">
-              Projects
-              <span className="ml-2 text-blue-400">.</span>
-            </h1>
-
-            <p className="mt-2 max-w-lg text-xs leading-6 text-slate-500 sm:text-sm">
-              Manage your school projects, monitor academic activities and
-              keep track of student assignments in one place.
-            </p>
-          </div>
-
-          <Link
-            href="/home/project/create"
-            className="group inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-[0_8px_25px_rgba(37,99,235,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500"
-          >
-            <Plus size={15} />
-            Create project
-            <ArrowUpRight
-              size={14}
-              className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            />
-          </Link>
-        </div>
-
-        {/* Overview cards */}
-        <div className="mb-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
-
-          {/* Projects */}
-          <div className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-br from-[#101A2B] to-[#080E19] p-4 transition-all hover:border-blue-400/20 sm:p-5">
-            <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-500/[0.09] blur-3xl" />
-
-            <div className="relative flex items-center justify-between">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/10 text-blue-300">
-                <FolderOpen size={17} />
-              </div>
-              <span className="text-[10px] font-medium uppercase tracking-wider text-slate-600">
-                Overview
-              </span>
-            </div>
-
-            <div className="relative mt-5">
-              <p className="text-2xl font-bold tracking-tight">
-                {projectStats.totalProjects}
-              </p>
-              <p className="mt-1 text-[11px] text-slate-500">
-                Total projects
-              </p>
-            </div>
-          </div>
-
-          {/* Students */}
-          <div className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-br from-[#101A2B] to-[#080E19] p-4 transition-all hover:border-blue-400/20 sm:p-5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/10 text-blue-300">
-              <Users size={17} />
-            </div>
-
-            <div className="mt-5">
-              <p className="text-2xl font-bold tracking-tight">
-                {projectStats.totalStudents}
-              </p>
-              <p className="mt-1 text-[11px] text-slate-500">
-                Registered students
-              </p>
-            </div>
-          </div>
-
-          {/* Active academic tasks */}
-          <div className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-br from-[#101A2B] to-[#080E19] p-4 transition-all hover:border-blue-400/20 sm:p-5">
-            <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-500/[0.08] blur-3xl" />
-
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/10 text-blue-300">
-              <ClipboardList size={17} />
-            </div>
-
-            <div className="relative mt-5">
-              <p className="text-2xl font-bold tracking-tight">
-                {projectStats.projectsWithTasks}
-              </p>
-              <p className="mt-1 text-[11px] text-slate-500">
-                Projects with assignments
-              </p>
-            </div>
-          </div>
-
-          {/* Assignments */}
-          <div className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-br from-[#101A2B] to-[#080E19] p-4 transition-all hover:border-blue-400/20 sm:p-5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/10 text-blue-300">
-              <Layers3 size={17} />
-            </div>
-
-            <div className="mt-5">
-              <p className="text-2xl font-bold tracking-tight">
-                {projectStats.totalAssignments}
-              </p>
-              <p className="mt-1 text-[11px] text-slate-500">
-                Student assignments
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Academic task overview */}
-        <div className="mb-7 overflow-hidden rounded-2xl border border-blue-400/[0.12] bg-gradient-to-br from-[#101B2E] via-[#0B1321] to-[#080E19] p-4 sm:p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/10 text-blue-300">
-                <GraduationCap size={19} />
-              </div>
-
-              <div>
-                <h2 className="text-sm font-semibold text-slate-100">
-                  Academic task overview
-                </h2>
-                <p className="mt-1 text-[11px] leading-5 text-slate-500">
-                  Check which projects currently have student semester
-                  assignments.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:min-w-[280px]">
-              <div className="rounded-xl border border-blue-400/10 bg-blue-500/[0.06] px-3 py-3">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={13} className="text-blue-400" />
-                  <span className="text-[10px] text-slate-400">
-                    With tasks
-                  </span>
-                </div>
-                <p className="mt-2 text-xl font-bold">
-                  {projectStats.projectsWithTasks}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-3">
-                <div className="flex items-center gap-2">
-                  <XCircle size={13} className="text-slate-500" />
-                  <span className="text-[10px] text-slate-400">
-                    Without tasks
-                  </span>
-                </div>
-                <p className="mt-2 text-xl font-bold">
-                  {projectStats.projectsWithoutTasks}
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* Projects table container */}
-        <section className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#090F19]/90 shadow-[0_20px_60px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+        {/* Projects table */}
+        <section className="overflow-hidden rounded-[1.5rem] border border-white/[0.07] bg-gradient-to-br from-[#0D1523]/95 via-[#090F1A]/95 to-[#070B12]/95 shadow-[0_25px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl">
 
           {/* Table header */}
           <div className="flex flex-col gap-4 border-b border-white/[0.06] p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
 
             <div>
-              <h2 className="text-sm font-semibold text-white">
-                Your projects
-              </h2>
-              <p className="mt-1 text-[11px] text-slate-500">
-                Explore and monitor your academic workspaces.
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-blue-400/[0.14] bg-blue-500/[0.08] text-blue-300">
+                  <FolderOpen size={15} />
+                </div>
+
+                <h2 className="text-sm font-semibold tracking-tight text-white">
+                  Your projects
+                </h2>
+
+                <span className="rounded-md border border-blue-400/15 bg-blue-500/[0.07] px-2 py-0.5 text-[9px] font-semibold text-blue-300">
+                  {projects.length}
+                </span>
+              </div>
+
+              <p className="mt-2 text-[11px] text-slate-500">
+                Manage school projects and monitor academic activities.
               </p>
             </div>
 
@@ -296,11 +108,12 @@ export default function ProjectPage() {
                   size={14}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
                 />
+
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search projects..."
-                  className="h-10 w-full rounded-xl border border-white/[0.07] bg-[#070C14] pl-9 pr-3 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/30 focus:ring-2 focus:ring-blue-500/10 sm:w-[220px]"
+                  className="h-10 w-full rounded-xl border border-white/[0.07] bg-[#070C14] pl-9 pr-3 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/30 focus:ring-2 focus:ring-blue-500/10 sm:w-[210px]"
                 />
               </div>
 
@@ -318,7 +131,7 @@ export default function ProjectPage() {
                     onClick={() => setTaskFilter(filter.value)}
                     className={`rounded-lg px-2.5 py-2 text-[10px] font-medium transition-all ${
                       taskFilter === filter.value
-                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                        ? "bg-blue-600 text-white shadow-[0_4px_15px_rgba(37,99,235,0.2)]"
                         : "text-slate-500 hover:bg-white/[0.05] hover:text-slate-200"
                     }`}
                   >
@@ -329,51 +142,87 @@ export default function ProjectPage() {
             </div>
           </div>
 
-          {/* Table */}
+          {/* Empty state */}
           {projects.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-5 py-16 text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-400/15 bg-blue-500/[0.08] text-blue-300">
-                <FolderOpen size={25} />
+            <div className="relative flex min-h-[390px] flex-col items-center justify-center overflow-hidden px-5 py-16 text-center">
+
+              <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/[0.09] blur-[90px]" />
+
+              <div className="relative">
+
+                <div className="relative mx-auto mb-5 flex h-[76px] w-[76px] items-center justify-center rounded-[1.6rem] border border-blue-400/20 bg-gradient-to-br from-blue-500/[0.16] to-blue-600/[0.04] shadow-[0_0_45px_rgba(37,99,235,0.12)]">
+                  <GraduationCap
+                    size={32}
+                    strokeWidth={1.5}
+                    className="text-blue-300"
+                  />
+
+                  <div className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-xl border border-blue-400/20 bg-[#101B2D] text-blue-300">
+                    <Plus size={14} />
+                  </div>
+                </div>
+
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/15 bg-blue-500/[0.06] px-3 py-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
+                    Workspace ready
+                  </span>
+                </div>
+
+                <h3 className="text-xl font-bold tracking-[-0.04em] text-white sm:text-2xl">
+                  No projects yet.
+                </h3>
+
+                <p className="mx-auto mt-3 max-w-[340px] text-xs leading-6 text-slate-500 sm:text-[13px]">
+                  Your academic workspace is waiting. Create your first
+                  school project to organize students, semester jobs and
+                  everyday academic activities.
+                </p>
+
+                <Link
+                  href="/home/project/create"
+                  className="group mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-xs font-bold text-white shadow-[0_8px_30px_rgba(37,99,235,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-[0_12px_35px_rgba(37,99,235,0.32)]"
+                >
+                  <Plus size={15} />
+                  Create your first project
+
+                  <ArrowUpRight
+                    size={14}
+                    className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </Link>
               </div>
-
-              <h3 className="text-sm font-semibold text-white">
-                No projects yet
-              </h3>
-
-              <p className="mt-2 max-w-xs text-xs leading-6 text-slate-500">
-                You haven't created a project yet. Create your first school
-                project to start managing students and academic activities.
-              </p>
-
-              <Link
-                href="/home/project/create"
-                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-blue-500"
-              >
-                <Plus size={14} />
-                Create your first project
-              </Link>
             </div>
           ) : filteredProjects.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-5 py-14 text-center">
-              <Search size={23} className="mb-3 text-slate-600" />
+
+            /* No search results */
+            <div className="flex min-h-[300px] flex-col items-center justify-center px-5 py-14 text-center">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.07] bg-white/[0.025] text-slate-500">
+                <Search size={20} />
+              </div>
+
               <p className="text-sm font-semibold text-slate-200">
                 No matching projects
               </p>
-              <p className="mt-1 text-xs text-slate-500">
-                Try changing your search or filter.
+
+              <p className="mt-2 text-xs text-slate-500">
+                Try another search or change your task filter.
               </p>
+
               <button
                 onClick={() => {
                   setSearch("");
                   setTaskFilter("all");
                 }}
-                className="mt-4 inline-flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300"
+                className="mt-4 text-xs font-medium text-blue-400 transition hover:text-blue-300"
               >
-                <XCircle size={13} />
                 Clear filters
               </button>
             </div>
+
           ) : (
+
+            /* Projects table */
             <div className="w-full overflow-x-auto">
               <table className="w-full min-w-[850px] border-collapse text-left">
 
@@ -382,18 +231,23 @@ export default function ProjectPage() {
                     <th className="px-5 py-4 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Project / School
                     </th>
+
                     <th className="px-4 py-4 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Academic year
                     </th>
+
                     <th className="px-4 py-4 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Students
                     </th>
+
                     <th className="px-4 py-4 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Academic tasks
                     </th>
+
                     <th className="px-4 py-4 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Job assignments
                     </th>
+
                     <th className="px-5 py-4 text-right text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Created
                     </th>
@@ -423,7 +277,7 @@ export default function ProjectPage() {
                         key={project.id}
                         className="group border-b border-white/[0.045] transition-colors duration-300 hover:bg-blue-500/[0.035]"
                       >
-                        {/* Project information */}
+                        {/* Project / School */}
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
 
@@ -446,6 +300,7 @@ export default function ProjectPage() {
                               <p className="max-w-[200px] truncate text-xs font-semibold text-slate-100 transition group-hover:text-blue-300">
                                 {project.title}
                               </p>
+
                               <p className="mt-1 max-w-[200px] truncate text-[10px] text-slate-500">
                                 {project.school_name}
                               </p>
@@ -484,6 +339,7 @@ export default function ProjectPage() {
                                 size={11}
                                 className="text-blue-400"
                               />
+
                               <span className="text-[10px] font-medium text-blue-300">
                                 Available
                               </span>
@@ -494,6 +350,7 @@ export default function ProjectPage() {
                                 size={11}
                                 className="text-slate-500"
                               />
+
                               <span className="text-[10px] font-medium text-slate-400">
                                 Not created
                               </span>
@@ -507,6 +364,7 @@ export default function ProjectPage() {
                             <span className="text-[10px] text-slate-300">
                               {semesterJobs.length} assignments
                             </span>
+
                             <div className="flex items-center gap-2 text-[9px] text-slate-500">
                               <span>{dailyAssignments} daily</span>
                               <span className="h-1 w-1 rounded-full bg-slate-700" />
@@ -544,25 +402,13 @@ export default function ProjectPage() {
                 projects
               </p>
 
-              <div className="flex items-center gap-2 text-[10px] text-slate-600">
+              <span className="flex items-center gap-2 text-[10px] text-slate-600">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
-                Live application data
-              </div>
+                Live workspace data
+              </span>
             </div>
           )}
         </section>
-
-        {/* Bottom information */}
-        <div className="mt-5 flex flex-col gap-2 px-1 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[10px] text-slate-600">
-            HouseHub · Academic management workspace
-          </p>
-
-          <p className="flex items-center gap-1.5 text-[10px] text-slate-600">
-            <Clock3 size={11} />
-            Project information from your workspace
-          </p>
-        </div>
       </div>
     </main>
   );
