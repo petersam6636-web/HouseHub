@@ -17,22 +17,6 @@ export default function Loading() {
           Loading
         </span>
       </div>
-
-      <style jsx>{`
-        @keyframes dot-bounce {
-          0%,
-          60%,
-          100% {
-            transform: translateY(3px);
-            opacity: 0.55;
-          }
-
-          30% {
-            transform: translateY(-5px);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }

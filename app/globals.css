@@ -31,6 +31,20 @@
   --font-mono: var(--font-geist-mono), "SFMono-Regular", Consolas, monospace;
 }
 
+@keyframes dot-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(3px);
+    opacity: 0.55;
+  }
+
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
