@@ -32,10 +32,11 @@ export type StudentFee = {
   created_at: string;
 };
 
+export type Amount = Record<string, unknown>;
 
 export type StudentsPartTimeJobType = "daily" | "part_time";
 
-export type SemesterJob = {
+export type StudentPartTimeJob = {
   id: number;
   part_time_job_id: number | null;
 
@@ -45,14 +46,14 @@ export type SemesterJob = {
   semester: string;
   academic_year: string;
 
-  job_type: SemesterJobType;
+  job_type: StudentsPartTimeJobType;
 
   created_at: string;
 };
 
 export type StudentsSemesterJobType = "daily" | "part_time";
 
-export type SemesterJob = {
+export type StudentSemesterJob = {
   id: number;
   psemester_job_id: number | null;
 
@@ -62,7 +63,7 @@ export type SemesterJob = {
   semester: string;
   academic_year: string;
 
-  job_type: SemesterJobType;
+  job_type: StudentsSemesterJobType;
 
   created_at: string;
 };
@@ -152,8 +153,8 @@ export type Transaction = {
 
 
 // Student has many related records
-export type StudentDetailsWithRelations = StudentDetails & {
-      id: number;
+export type StudentDetailsWithRelations = {
+  id: number;
   project_id: number;
 
   full_name: string;
@@ -177,19 +178,20 @@ export type StudentDetailsWithRelations = StudentDetails & {
   gender: string;
 
   profile_image: string | null;
-    password: string;
   created_at: string;
 
+  amounts: Amount[];
   transactions: Transaction[];
   products: Product[];
   fees: StudentFee[];
   messages: StudentMessage[];
   feedback: StudentFeedback[];
-  semester_jobs: SemesterJob[];
+  semester_jobs: StudentSemesterJob[];
+  part_time_jobs: StudentPartTimeJob[];
 };
 
 // Project has many students and jobs
-export type ProjectWithRelations = Project & {
+export type ProjectWithRelations = {
   id: number;
   title: string;
   school_name: string;
@@ -202,5 +204,4 @@ export type ProjectWithRelations = Project & {
   students: StudentDetailsWithRelations[];
   daily_jobs: DailyJob[];
   part_time_jobs: PartTimeJob[];
-  created_at: string;
 };

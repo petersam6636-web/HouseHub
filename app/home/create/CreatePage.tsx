@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent, DragEvent } from "react";
+import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -20,7 +20,6 @@ import {
   MessageCircle,
   School,
   Sparkles,
-  Upload,
   Wallet,
   X,
 } from "lucide-react";
@@ -39,7 +38,6 @@ type ProjectFormData = {
   title: string;
   school_name: string;
   location: string;
-  logo_image: File | null;
   start_date: string;
   academic_year: string;
 };
@@ -48,7 +46,6 @@ const initialFormData: ProjectFormData = {
   title: "",
   school_name: "",
   location: "",
-  logo_image: null,
   start_date: "",
   academic_year: "",
 };
@@ -69,7 +66,6 @@ export default function CreateProject() {
   const containerRef = useRef<HTMLDivElement>(null);
   const formContentRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const cancelConfirmationRef = useRef<HTMLButtonElement>(null);
 
   const [step, setStep] = useState(0);
@@ -78,20 +74,6 @@ export default function CreateProject() {
   const [toast, setToast] = useState<Toast | null>(null);
   const [formData, setFormData] =
     useState<ProjectFormData>(initialFormData);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-
-  useEffect(() => {
-    if (!formData.logo_image) {
-      setLogoPreview(null);
-      return;
-    }
-
-    const url = URL.createObjectURL(formData.logo_image);
-    setLogoPreview(url);
-
-    return () => URL.revokeObjectURL(url);
-  }, [formData.logo_image]);
 
   useEffect(() => {
     if (!toast) return;
@@ -169,25 +151,6 @@ export default function CreateProject() {
     }));
   };
 
-  const handleLogo = (file?: File) => {
-    if (!file || !file.type.startsWith("image/")) return;
-    updateField("logo_image", file);
-  };
-
-  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-    handleLogo(event.dataTransfer.files?.[0]);
-  };
-
-  const removeLogo = () => {
-    updateField("logo_image", null);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   const isIdentityValid =
     formData.title.trim().length > 0 &&
     formData.school_name.trim().length > 0 &&
@@ -219,54 +182,28 @@ export default function CreateProject() {
     setIsConfirmOpen(false);
     setIsSubmitting(true);
 
-    let uploadedLogoPath: string | null = null;
-
     try {
       if (!authenticatedId) {
         throw new Error("Sign in before creating a house.");
       }
       const userId = authenticatedId;
 
-      let logoUrl: string | null = null;
-      if (formData.logo_image) {
-        const extension = formData.logo_image.name
-          .split(".")
-          .pop()
-          ?.match(/^[a-z0-9]{1,10}$/i)?.[0]
-          .toLowerCase();
-        const logoPath = `${userId}/${crypto.randomUUID()}${extension ? `.${extension}` : ""}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("logos")
-          .upload(logoPath, formData.logo_image, {
-            cacheControl: "3600",
-            contentType: formData.logo_image.type,
-            upsert: false,
-          });
-
-        if (uploadError) {
-          throw new Error(`Logo upload failed: ${uploadError.message}`);
-        }
-
-        uploadedLogoPath = logoPath;
-        logoUrl = supabase.storage
-          .from("logos")
-          .getPublicUrl(logoPath).data.publicUrl;
-      }
-
-      const { error } = await supabase.from("projects").insert({
-        title: formData.title.trim(),
-        school_name: formData.school_name.trim(),
-        location: formData.location.trim(),
-        logo_image: logoUrl,
-        start_date: formData.start_date,
-        academic_year: formData.academic_year.trim(),
-        user_id: userId,
-      });
-
+      const { data: project, error } = await supabase
+        .from("projects")
+        .insert({
+          title: formData.title.trim(),
+          school_name: formData.school_name.trim(),
+          location: formData.location.trim(),
+          logo_image: null,
+          start_date: formData.start_date,
+          academic_year: formData.academic_year.trim(),
+          user_id: userId,
+        })
+        .select("id")
+        .single();
       if (error) throw error;
+      if (!project) throw new Error("The project was saved without returning its ID.");
 
-      uploadedLogoPath = null;
       void fetchProjectsForUser(userId)
         .then(setProjects)
         .catch((refreshError: unknown) => {
@@ -278,33 +215,15 @@ export default function CreateProject() {
       setIsSubmitting(false);
       setToast({
         type: "success",
-        message: "Your house was created. Redirecting to your dashboard...",
+        message: "Your project was created. Opening its details...",
       });
       await new Promise((resolve) => window.setTimeout(resolve, 1200));
-      router.replace("/home/project/dashboard");
+      router.replace(`/home/${project.id}`);
     } catch (error) {
-      let message =
+      const message =
         error instanceof Error
           ? error.message
           : "Your house could not be created. Please try again.";
-
-      if (uploadedLogoPath) {
-        try {
-          const { error: cleanupError } = await supabase.storage
-            .from("logos")
-            .remove([uploadedLogoPath]);
-
-          if (cleanupError) {
-            message += ` The uploaded logo could not be removed: ${cleanupError.message}`;
-          }
-        } catch (cleanupError) {
-          const cleanupMessage =
-            cleanupError instanceof Error
-              ? cleanupError.message
-              : "Unknown storage cleanup error.";
-          message += ` The uploaded logo could not be removed: ${cleanupMessage}`;
-        }
-      }
 
       setToast({
         type: "error",
@@ -358,7 +277,7 @@ export default function CreateProject() {
               <form onSubmit={handleSubmit}>
                 <div
                   ref={formContentRef}
-                  className="min-h-[405px] px-4 py-5 sm:min-h-[415px] sm:px-5 sm:py-6"
+                  className="min-h-[350px] px-4 py-5 sm:min-h-[360px] sm:px-5 sm:py-6"
                 >
                   {step === 0 ? (
                     <div className="space-y-4">
@@ -452,92 +371,8 @@ export default function CreateProject() {
                         </h3>
 
                         <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
-                          Add a logo and the date you want to start managing
-                          your house.
+                          Add the date and academic year for your house.
                         </p>
-                      </div>
-
-                      {/* Logo upload */}
-                      <div>
-                        <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          House logo
-                          <span className="ml-1 text-slate-600">
-                            (optional)
-                          </span>
-                        </label>
-
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => handleLogo(e.target.files?.[0])}
-                        />
-
-                        {logoPreview ? (
-                          <div className="flex items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/[0.05] p-3">
-                            <img
-                              src={logoPreview}
-                              alt="House logo preview"
-                              className="h-12 w-12 rounded-lg border border-white/[0.08] object-cover"
-                            />
-
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-xs font-medium text-white">
-                                {formData.logo_image?.name}
-                              </p>
-                              <p className="mt-1 text-[10px] text-blue-300">
-                                Logo selected
-                              </p>
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={removeLogo}
-                              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white/[0.06] hover:text-white"
-                              aria-label="Remove logo"
-                            >
-                              <X size={15} />
-                            </button>
-                          </div>
-                        ) : (
-                          <div
-                            onClick={() => fileInputRef.current?.click()}
-                            onDragOver={(e) => {
-                              e.preventDefault();
-                              setIsDragging(true);
-                            }}
-                            onDragLeave={() => setIsDragging(false)}
-                            onDrop={handleDrop}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                fileInputRef.current?.click();
-                              }
-                            }}
-                            className={`group relative flex min-h-[105px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed px-4 py-4 transition-all duration-300 ${
-                              isDragging
-                                ? "border-blue-400 bg-blue-500/[0.1] shadow-[0_0_30px_rgba(59,130,246,0.1)]"
-                                : "border-white/[0.12] bg-[#070C14] hover:border-blue-400/35 hover:bg-blue-500/[0.035]"
-                            }`}
-                          >
-                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.04] via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                            <div className="relative mb-2 flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/[0.09] text-blue-300 transition-transform duration-300 group-hover:-translate-y-0.5">
-                              <Upload size={16} />
-                            </div>
-
-                            <span className="relative text-[11px] font-semibold text-slate-200">
-                              Drop your house logo here
-                            </span>
-
-                            <span className="relative mt-1 text-[9px] text-slate-500">
-                              or click to browse · PNG, JPG, WEBP
-                            </span>
-                          </div>
-                        )}
                       </div>
 
                       {/* Start date */}
@@ -839,9 +674,7 @@ export default function CreateProject() {
               Saving your house
             </h2>
             <p className="mt-2 text-xs leading-5 text-slate-400">
-              {formData.logo_image
-                ? "Uploading your logo and saving your details..."
-                : "Saving your details securely..."}
+              Saving your project details securely...
             </p>
             <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.14em] text-blue-300/80">
               Please keep this page open
