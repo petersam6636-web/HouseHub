@@ -1,9 +1,9 @@
 
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -276,11 +276,8 @@ function StudentIllustration() {
   );
 }
 
-function StudentRegisterForm() {
+function StudentRegisterForm({ projectId }: { projectId: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const projectId = searchParams.get("projectId");
 
   const containerRef = useRef<HTMLDivElement>(null);
   const formContentRef = useRef<HTMLDivElement>(null);
@@ -1301,16 +1298,10 @@ function StudentRegisterForm() {
   );
 }
 
-export default function StudentRegisterPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="flex min-h-dvh items-center justify-center bg-[#070B12] text-white">
-          <LoaderCircle size={25} className="animate-spin text-blue-400" />
-        </main>
-      }
-    >
-      <StudentRegisterForm />
-    </Suspense>
-  );
+export default function StudentRegisterPage({
+  projectId,
+}: {
+  projectId: string;
+}) {
+  return <StudentRegisterForm projectId={projectId} />;
 }
