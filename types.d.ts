@@ -190,7 +190,7 @@ export type StudentDetailsWithRelations = StudentDetails & {
 
 // Project has many students and jobs
 export type ProjectWithRelations = Project & {
-    id: number;
+  id: number;
   title: string;
   school_name: string;
   location: string | null;
