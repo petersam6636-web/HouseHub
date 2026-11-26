@@ -13,12 +13,16 @@ import {
   Phone,
   Search,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   ProjectWithRelations,
   StudentDetailsWithRelations,
 } from "@/types";
 import useApp from "@/lib/useApp";
+import {
+  fetchProjectForUser,
+  getErrorMessage,
+} from "@/lib/projectService";
 
 // Prevent creating a new empty array on every render.
 const EMPTY_STUDENTS: StudentDetailsWithRelations[] = [];
@@ -27,19 +31,98 @@ export default function StudentsPage() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get("id");
 
-  const { projects } = useApp();
+  const { projects, setProjects, authenticatedId } = useApp();
 
   const [search, setSearch] = useState("");
+  const [loadedProject, setLoadedProject] =
+    useState<ProjectWithRelations | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  // Find the project using the ID from the URL.
-  const project = projects.find(
+  const cachedProject = projects.find(
     (item: ProjectWithRelations) => item.id === projectId
   );
+  const project =
+    cachedProject?.id === projectId
+      ? cachedProject
+      : loadedProject?.id === projectId
+        ? loadedProject
+        : null;
 
-  // Get every student belonging to this project.
   const students = project?.students ?? EMPTY_STUDENTS;
 
-  // Search through all students in the project.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProject() {
+      if (!projectId) {
+        setLoadError("This project link is missing a project ID.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (!authenticatedId) {
+        setLoadError("Sign in to view this project.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (cachedProject) {
+        setLoadedProject(cachedProject);
+        setLoadError(null);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setLoadError(null);
+
+      try {
+        const result = await fetchProjectForUser(
+          authenticatedId,
+          projectId
+        );
+
+        if (!result) {
+          throw new Error("This project could not be found.");
+        }
+
+        if (cancelled) return;
+
+        setLoadedProject(result);
+        setProjects((currentProjects) => [
+          ...currentProjects.filter((item) => item.id !== result.id),
+          result,
+        ]);
+      } catch (error) {
+        console.error("Unable to load project students.", error);
+
+        if (!cancelled) {
+          setLoadError(
+            getErrorMessage(error, "Unable to load project students.")
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadProject();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    authenticatedId,
+    cachedProject,
+    projectId,
+    reloadKey,
+    setProjects,
+  ]);
+
   const filteredStudents = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -63,62 +146,77 @@ export default function StudentsPage() {
     );
   }, [students, search]);
 
-  // Show loading while the projects are being loaded into useApp.
-  if (projects.length === 0) {
+  if (isLoading && !project) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10">
-            <GraduationCap className="h-6 w-6 text-blue-400" />
-          </div>
-
-          <h2 className="mt-4 text-lg font-semibold text-white">
-            Loading students
-          </h2>
-
-          <p className="mt-2 text-sm text-slate-400">
-            Please wait while we load your project.
-          </p>
+      <main className="min-h-[calc(100vh-72px)] w-full px-3 py-6 text-white sm:px-5 sm:py-8 lg:px-8">
+        <div className="mx-auto flex min-h-[calc(100vh-120px)] w-full max-w-6xl items-center justify-center">
+          <section className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#101B2D] to-[#0B1220] p-8 text-center shadow-[0_20px_60px_rgba(0,0,0,0.28)]">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10">
+              <GraduationCap className="h-6 w-6 text-blue-400" />
+            </div>
+            <h1 className="mt-4 text-lg font-semibold text-white">
+              Loading students
+            </h1>
+            <p className="mt-2 text-sm text-slate-400">
+              Please wait while we load your project.
+            </p>
+          </section>
         </div>
-      </div>
+      </main>
     );
   }
 
-  // If the ID is missing or the project doesn't exist.
-  if (!project) {
+  if (loadError || !project) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10">
-            <GraduationCap className="h-6 w-6 text-blue-400" />
-          </div>
+      <main className="min-h-[calc(100vh-72px)] w-full px-3 py-6 text-white sm:px-5 sm:py-8 lg:px-8">
+        <div className="mx-auto flex min-h-[calc(100vh-120px)] w-full max-w-6xl items-center justify-center">
+          <section className="relative w-full max-w-lg overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#101B2D] to-[#0B1220] p-6 text-center shadow-[0_20px_60px_rgba(0,0,0,0.28)] sm:p-8">
+            <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/[0.10] blur-[70px]" />
+            <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10">
+              <GraduationCap className="h-6 w-6 text-blue-400" />
+            </div>
 
-          <h2 className="mt-4 text-lg font-semibold text-white">
-            Project not found
-          </h2>
+            <p className="relative mt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+              Project unavailable
+            </p>
+            <h1 className="relative mt-2 text-lg font-semibold text-white">
+              {loadError ? "Unable to open project" : "Project not found"}
+            </h1>
+            <p className="relative mt-2 text-sm leading-6 text-slate-400">
+              {loadError ??
+                "We couldn’t find this project in your dashboard."}
+            </p>
 
-          <p className="mt-2 text-sm text-slate-400">
-            We couldn’t find this project in your dashboard.
-          </p>
+            {loadError && (
+              <button
+                type="button"
+                onClick={() => setReloadKey((current) => current + 1)}
+                className="relative mt-5 rounded-xl bg-blue-600 px-5 py-3 text-xs font-semibold text-white transition hover:bg-blue-500"
+              >
+                Try again
+              </button>
+            )}
 
-          <Link
-            href="/home"
-            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
-          >
-            Back to dashboard
-            <ArrowRight size={16} />
-          </Link>
+            <Link
+              href="/home/project"
+              className="relative mt-5 inline-flex items-center gap-2 text-xs font-medium text-slate-300 transition hover:text-white"
+            >
+              Back to projects
+              <ArrowRight size={15} />
+            </Link>
+          </section>
         </div>
-      </div>
+      </main>
     );
   }
 
-  const registerHref = `/home/${project.id}/students/register`;
+  const registerHref = `/home/${project.id}/students/${project.id}`;
 
   return (
-    <main className="space-y-7 pb-10">
-      {/* Page heading */}
-      <section className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+    <main className="min-h-[calc(100vh-72px)] w-full px-3 py-6 text-white sm:px-5 sm:py-8 lg:px-8">
+      <div className="mx-auto w-full max-w-6xl space-y-7 pb-10">
+        {/* Page heading */}
+        <section className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-medium text-blue-400">
             <Users size={14} />
@@ -160,7 +258,7 @@ export default function StudentsPage() {
             className="transition-transform duration-300 group-hover:translate-x-0.5"
           />
         </Link>
-      </section>
+        </section>
 
       {/* Directory summary and search */}
       <section className="flex flex-col gap-4 rounded-2xl border border-white/[0.06] bg-[#080f1b]/80 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -205,10 +303,10 @@ export default function StudentsPage() {
             />
           </div>
         )}
-      </section>
+        </section>
 
       {/* Student cards */}
-      {students.length === 0 ? (
+        {students.length === 0 ? (
         <section className="relative overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#080f1b] px-6 py-14 text-center sm:px-10">
           <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-56 -translate-x-1/2 rounded-full bg-blue-500/[0.10] blur-[90px]" />
 
@@ -267,7 +365,8 @@ export default function StudentsPage() {
             )
           )}
         </section>
-      )}
+        )}
+      </div>
     </main>
   );
 }
