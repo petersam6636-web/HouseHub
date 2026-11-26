@@ -280,7 +280,7 @@ function ProjectCard({
 {/* Project metadata */}
 <div className="mt-5 flex items-center justify-between gap-3">
   {/* Location and academic year on the left */}
-  <div className="flex min-w-0 flex-col items-start gap-2">
+  <div className="flex min-w-0 w-full flex-row items-start gap-2">
     <div className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-white/[0.05] bg-white/[0.025] px-2.5 py-1.5">
       <MapPin
         size={12}
