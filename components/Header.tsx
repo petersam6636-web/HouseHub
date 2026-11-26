@@ -48,7 +48,7 @@ const navigation = [
 ];
 
 export default function Header() {
-  const { authenticatedId } = useApp();
+  const { authenticatedId, setAuthenticatedId } = useApp();
   const [loginUser, setLoginUser] = useState<LoginUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState("");
@@ -107,6 +107,7 @@ export default function Header() {
   // Fetch and listen for the logged-in Supabase user.
   useEffect(() => {
     let mounted = true;
+    let authEventsReceived = 0;
 
     function formatUser(user: {
       id: string;
@@ -136,21 +137,38 @@ export default function Header() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      authEventsReceived += 1;
       if (!mounted) return;
 
-      if (!session?.user) {
-        setLoginUser(null);
-        return;
-      }
-
-      setLoginUser(formatUser(session.user));
+      setAuthenticatedId(session?.user.id ?? null);
+      setLoginUser(session?.user ? formatUser(session.user) : null);
     });
+
+    supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (!mounted || authEventsReceived > 0) return;
+
+        if (error) {
+          console.error("Unable to read the current auth session.", error);
+          return;
+        }
+
+        const user = data.session?.user;
+        setAuthenticatedId(user?.id ?? null);
+        setLoginUser(user ? formatUser(user) : null);
+      })
+      .catch((error: unknown) => {
+        if (mounted) {
+          console.error("Unable to read the current auth session.", error);
+        }
+      });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [setAuthenticatedId]);
 
   const currentLoginUser =
     loginUser?.id === authenticatedId ? loginUser : null;
