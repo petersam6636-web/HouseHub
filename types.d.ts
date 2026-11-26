@@ -179,7 +179,7 @@ export type StudentDetailsWithRelations = StudentDetails & {
   profile_image: string | null;
     password: string;
   created_at: string;
-  
+
   transactions: Transaction[];
   products: Product[];
   fees: StudentFee[];
@@ -202,4 +202,5 @@ export type ProjectWithRelations = Project & {
   students: StudentDetailsWithRelations[];
   daily_jobs: DailyJob[];
   part_time_jobs: PartTimeJob[];
+  created_at: string;
 };
