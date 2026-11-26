@@ -9,14 +9,15 @@ import {
   Building2,
   CalendarDays,
   Check,
+  CheckCircle2,
   ClipboardCheck,
   House,
   MapPin,
+  MessageCircle,
   School,
   Sparkles,
   Upload,
-  Users,
-  Wrench,
+  Wallet,
   X,
 } from "lucide-react";
 import { gsap } from "gsap";
@@ -39,6 +40,13 @@ const initialFormData: ProjectFormData = {
   start_date: "",
   academic_year: "",
 };
+
+const bars = [38, 62, 48, 82, 57, 91, 70];
+const rooms = [
+  { width: "w-14", height: "h-1" },
+  { width: "w-10", height: "h-1" },
+  { width: "w-12", height: "h-1" },
+];
 
 const inputClass =
   "h-11 sm:h-12 w-full rounded-xl border border-white/[0.08] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]";
@@ -188,7 +196,7 @@ export default function CreateProject() {
 
           {/* LEFT: Form */}
           <section className="relative min-w-0 p-4 sm:p-6 lg:p-6">
-            <div className="mb-5 w-full text-center md:mb-6">
+            {/* <div className="mb-5 w-full text-center md:mb-6">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
                 <Sparkles size={12} className="text-blue-400" />
                 <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-300">
@@ -205,7 +213,7 @@ export default function CreateProject() {
                 Organize your house, manage responsibilities, and keep
                 house-related issues in one place.
               </p>
-            </div>
+            </div> */}
 
             {/* Form card */}
             <div className="min-w-0 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
@@ -490,235 +498,135 @@ export default function CreateProject() {
             </div>
           </section>
 
-          {/* RIGHT: House management illustration */}
+          {/* RIGHT: House management dashboard illustration */}
           <aside className="relative hidden min-w-0 items-center justify-center px-5 py-5 md:flex lg:px-7 lg:py-6">
-            <div className="pointer-events-none absolute inset-4 rounded-[2.5rem] bg-blue-600/[0.13] blur-[65px]" />
+            <div
+              ref={previewRef}
+              className="order-2 relative mx-auto w-full max-w-[390px] md:order-none md:mx-0 md:flex-1 lg:max-w-[430px]"
+            >
+              <div className="pointer-events-none absolute inset-4 rounded-[2.5rem] bg-blue-600/[0.20] blur-[65px]" />
 
-            <div ref={previewRef} className="relative w-full max-w-[430px]">
-              <div className="relative overflow-hidden rounded-3xl border border-blue-400/[0.15] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-3.5 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:p-4">
-                {/* Illustration glows */}
-                <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/[0.12] blur-[70px]" />
-                <div className="pointer-events-none absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-sky-500/[0.08] blur-[65px]" />
-
-                {/* HouseHub mini header */}
-                <div className="relative mb-5 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/10">
-                      <House size={17} className="text-blue-300" />
-                    </div>
-
-                    <div>
-                      <p className="text-[11px] font-bold tracking-wide text-slate-100">
-                        HOUSEHUB
-                      </p>
-                      <p className="mt-1 text-[9px] text-slate-500">
-                        Your house, organized
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-2.5 py-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-                    <span className="text-[9px] font-medium text-blue-300">
-                      House space
-                    </span>
-                  </div>
-                </div>
-
-                {/* House illustration */}
-                <div className="relative mb-3 overflow-hidden rounded-2xl border border-blue-400/[0.10] bg-[#080F1B]/80 p-4">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.07] via-transparent to-transparent" />
-
-                  <div className="relative flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[9px] font-medium uppercase tracking-[0.13em] text-slate-500">
-                        Your home
-                      </p>
-                      <h3 className="mt-1.5 text-base font-bold text-white">
-                        Manage your house
-                      </h3>
-                      <p className="mt-1 max-w-[150px] text-[10px] leading-4 text-slate-500">
-                        Keep your household running smoothly.
-                      </p>
-                    </div>
-
-                    <div className="relative flex h-[92px] w-[100px] shrink-0 items-center justify-center">
-                      <div className="absolute bottom-1 h-3 w-20 rounded-full bg-blue-500/10 blur-md" />
-
-                      <svg
-                        viewBox="0 0 120 100"
-                        className="relative h-full w-full"
-                        fill="none"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M15 48L60 12L105 48"
-                          stroke="#60A5FA"
-                          strokeWidth="5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M25 43V88H95V43"
-                          fill="#1D4ED8"
-                          fillOpacity="0.14"
-                          stroke="#3B82F6"
-                          strokeOpacity="0.7"
-                          strokeWidth="2"
-                        />
-                        <rect
-                          x="48"
-                          y="58"
-                          width="24"
-                          height="30"
-                          rx="4"
-                          fill="#2563EB"
-                          fillOpacity="0.28"
-                          stroke="#60A5FA"
-                          strokeOpacity="0.65"
-                          strokeWidth="1.5"
-                        />
-                        <rect
-                          x="32"
-                          y="52"
-                          width="12"
-                          height="13"
-                          rx="2"
-                          fill="#60A5FA"
-                          fillOpacity="0.35"
-                        />
-                        <rect
-                          x="76"
-                          y="52"
-                          width="12"
-                          height="13"
-                          rx="2"
-                          fill="#60A5FA"
-                          fillOpacity="0.35"
-                        />
-                        <path
-                          d="M60 12V4"
-                          stroke="#93C5FD"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                        <circle cx="60" cy="3" r="3" fill="#60A5FA" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                {/* House management features */}
-                <div className="relative grid grid-cols-2 gap-3">
-                  <div className="rounded-2xl border border-blue-400/[0.10] bg-[#080F1B]/80 p-3.5">
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
-                        <Users size={14} className="text-blue-300" />
-                      </div>
-                      <span className="text-[9px] text-slate-500">
-                        Household
-                      </span>
-                    </div>
-
-                    <p className="text-xs font-semibold text-slate-200">
-                      Residents
-                    </p>
-                    <p className="mt-1 text-[9px] text-slate-500">
-                      Keep everyone connected
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/[0.05] bg-[#080F1B]/80 p-3.5">
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
-                        <Wrench size={14} className="text-blue-300" />
-                      </div>
-                      <span className="text-[9px] text-slate-500">
-                        Maintenance
-                      </span>
-                    </div>
-
-                    <p className="text-xs font-semibold text-slate-200">
-                      House issues
-                    </p>
-                    <p className="mt-1 text-[9px] text-slate-500">
-                      Track repairs and problems
-                    </p>
-                  </div>
-                </div>
-
-                {/* Example house issue */}
-                <div className="relative mt-3 rounded-2xl border border-white/[0.06] bg-[#080F1B]/80 p-3.5">
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-blue-400/10 bg-blue-500/[0.08]">
-                        <ClipboardCheck
-                          size={14}
-                          className="text-blue-300"
-                        />
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] font-semibold text-slate-200">
-                          House issue
-                        </p>
-                        <p className="mt-0.5 text-[9px] text-slate-500">
-                          Maintenance request
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="rounded-full border border-blue-400/15 bg-blue-500/[0.08] px-2 py-1 text-[8px] font-medium text-blue-300">
-                      Resolved
-                    </span>
-                  </div>
-
-                  <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/[0.10]">
-                        <Wrench size={14} className="text-blue-300" />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-medium text-slate-300">
-                          Repair house light
-                        </p>
-                        <p className="mt-1 text-[9px] text-slate-500">
-                          Issue reported and handled
-                        </p>
-                      </div>
-
-                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/15">
-                        <Check size={11} className="text-blue-300" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom feature strip */}
-                <div className="relative mt-3 flex items-center justify-between rounded-xl border border-white/[0.05] bg-white/[0.025] px-3 py-2.5">
+              <div className="relative rounded-[1.7rem] border border-blue-400/[0.18] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-3.5 shadow-[0_25px_80px_rgba(0,0,0,0.6),0_0_45px_rgba(37,99,235,0.12)] sm:p-4">
+                <div className="mb-3 flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
                   <div className="flex items-center gap-2">
-                    <House size={13} className="text-blue-400" />
-                    <span className="text-[9px] font-medium text-slate-400">
-                      A better-managed home
-                    </span>
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15 text-blue-300">
+                      <House size={14} />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="h-1.5 w-16 rounded-full bg-slate-200/80" />
+                      <div className="h-1 w-10 rounded-full bg-slate-500/50" />
+                    </div>
                   </div>
 
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/10">
-                    <Check size={11} className="text-blue-300" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full border border-blue-400/20 bg-blue-500/10">
+                    <span className="h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
                   </div>
+                </div>
+
+                <div className="grid grid-cols-[1.05fr_0.95fr] gap-3">
+                  <div className="relative overflow-hidden rounded-2xl border border-blue-400/[0.13] bg-[#080F1C]/90 p-3">
+                    <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-500/[0.12] blur-2xl" />
+
+                    <div className="relative mb-3 flex items-center justify-between">
+                      <div className="h-1.5 w-12 rounded-full bg-slate-400/50" />
+                      <div className="h-1.5 w-5 rounded-full bg-blue-400/60" />
+                    </div>
+
+                    <div className="relative flex items-center justify-center py-1">
+                      <div className="relative flex h-[92px] w-[92px] items-center justify-center rounded-full bg-[conic-gradient(from_220deg,#2563eb_0deg,#60a5fa_245deg,rgba(30,41,59,0.65)_245deg,rgba(30,41,59,0.65)_360deg)] shadow-[0_0_24px_rgba(37,99,235,0.16)]">
+                        <div className="absolute inset-[7px] rounded-full bg-[#0B1424]" />
+
+                        <div className="relative flex flex-col items-center gap-1">
+                          <Check size={20} className="text-blue-300" />
+                          <div className="h-1.5 w-7 rounded-full bg-slate-300/60" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative mt-3 space-y-2">
+                      <div className="h-1.5 w-full rounded-full bg-white/[0.06]">
+                        <div className="h-full w-[72%] rounded-full bg-blue-500" />
+                      </div>
+                      <div className="flex justify-between">
+                        <div className="h-1 w-8 rounded-full bg-slate-500/50" />
+                        <div className="h-1 w-5 rounded-full bg-slate-500/30" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <div className="rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-3">
+                      <div className="mb-3 flex items-center justify-between">
+                        <div className="h-1.5 w-10 rounded-full bg-slate-400/50" />
+                        <Wallet size={13} className="text-blue-400/70" />
+                      </div>
+
+                      <div className="h-5 w-14 rounded-md bg-blue-400/15" />
+
+                      <div className="mt-3 flex h-10 items-end gap-1.5">
+                        {bars.map((height, index) => (
+                          <div
+                            key={index}
+                            className="flex-1 rounded-t-sm bg-gradient-to-t from-blue-700/60 to-blue-400/90"
+                            style={{ height: `${height}%` }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-3">
+                      <div className="mb-3 flex items-center justify-between">
+                        <div className="h-1.5 w-12 rounded-full bg-slate-400/50" />
+                        <ClipboardCheck size={13} className="text-blue-400/70" />
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {rooms.map((room, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <div className="flex h-4 w-4 items-center justify-center rounded-md bg-blue-500/15">
+                              <Check size={9} className="text-blue-300" />
+                            </div>
+                            <div
+                              className={`${room.width} ${room.height} rounded-full bg-slate-400/25`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {[Wallet, ClipboardCheck, MessageCircle].map((Icon, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] p-2.5"
+                    >
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
+                        <Icon size={13} className="text-blue-400" />
+                      </div>
+                      <div className="h-1.5 flex-1 rounded-full bg-slate-400/30" />
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Floating detail */}
-              <div className="absolute -bottom-3 right-5 hidden items-center gap-2 rounded-xl border border-white/[0.08] bg-[#101B2B] px-3 py-2 shadow-xl lg:flex">
-                <Check size={13} className="text-blue-300" />
-                <span className="text-[9px] font-medium text-slate-300">
-                  House issues organized
-                </span>
+              <div className="pointer-events-none absolute -right-3 -top-3 h-14 w-14 rounded-2xl border border-blue-400/15 bg-blue-500/[0.08] shadow-[0_0_30px_rgba(37,99,235,0.12)] sm:-right-4 sm:-top-4 sm:h-16 sm:w-16" />
+
+              <div className="absolute -bottom-4 -left-3 flex items-center gap-2.5 rounded-xl border border-blue-400/15 bg-[#101827]/95 px-3 py-2.5 shadow-[0_12px_35px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:-left-5">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
+                  <CheckCircle2 size={15} className="text-blue-400" />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="h-1.5 w-14 rounded-full bg-slate-200/70" />
+                  <div className="h-1 w-10 rounded-full bg-slate-500/50" />
+                </div>
               </div>
             </div>
           </aside>
+          
         </div>
       </div>
     </main>
