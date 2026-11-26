@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowLeft, UserPlus } from "lucide-react";
 import Header from "@/components/Header";
+import Loading from "@/components/Loading";
 
 type StudentRegistrationPageProps = {
   params: Promise<{
@@ -9,7 +11,26 @@ type StudentRegistrationPageProps = {
   }>;
 };
 
-export default async function StudentRegistrationPage({
+export default function StudentRegistrationPage({
+  params,
+}: StudentRegistrationPageProps) {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <Header />
+          <main className="flex min-h-[calc(100vh-72px)] w-full">
+            <Loading />
+          </main>
+        </>
+      }
+    >
+      <StudentRegistrationContent params={params} />
+    </Suspense>
+  );
+}
+
+async function StudentRegistrationContent({
   params,
 }: StudentRegistrationPageProps) {
   const { projectId, studentProjectId } = await params;
