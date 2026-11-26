@@ -281,13 +281,13 @@ function ProjectCard({
 <div className="mt-5 flex items-center justify-between gap-3">
   {/* Location and academic year on the left */}
   <div className="flex min-w-0 w-full flex-row items-start gap-2">
-    <div className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-white/[0.05] bg-white/[0.025] px-2.5 py-1.5">
+    <div className="inline-flex items-center gap-1.5 rounded-lg border border-blue-400/[0.12] bg-blue-500/[0.07] px-2.5 py-1.5">
       <MapPin
-        size={12}
-        className="shrink-0 text-blue-400"
+        size={13}
+        className="shrink-0 text-sky-300"
       />
 
-      <span className="truncate text-[10px] text-slate-400">
+      <span className="text-sm font-bold tracking-tight text-sky-300">
         {project.location || "Location not set"}
       </span>
     </div>
@@ -306,12 +306,12 @@ function ProjectCard({
   </div>
 
   {/* Registered students on the right */}
-  <div className="flex shrink-0 items-center gap-2.5 rounded-xl border border-blue-400/[0.12] bg-blue-500/[0.06] px-3 py-2.5">
+  <div className="inline-flex items-center gap-1.5 rounded-lg border border-blue-400/[0.12] bg-blue-500/[0.07] px-2.5 py-1.5">
     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/[0.12] text-blue-400">
-      <Users size={17} />
+      <Users size={13} />
     </div>
 
-    <span className="text-lg font-bold tracking-tight text-sky-300">
+    <span className="text-sm font-bold tracking-tight text-sky-300">
       {studentCount.toLocaleString("en-GH")}
     </span>
   </div>
