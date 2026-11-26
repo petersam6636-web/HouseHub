@@ -276,29 +276,46 @@ function ProjectCard({
         </div>
 
         {/* Project metadata */}
-        <div className="mt-5 flex flex-wrap items-center gap-2">
-          <div className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-white/[0.05] bg-white/[0.025] px-2.5 py-1.5">
-            <MapPin
-              size={12}
-              className="shrink-0 text-blue-400"
-            />
+ {/* Project metadata */}
+{/* Project metadata */}
+<div className="mt-5 flex items-center justify-between gap-3">
+  {/* Location and academic year on the left */}
+  <div className="flex min-w-0 flex-col items-start gap-2">
+    <div className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-white/[0.05] bg-white/[0.025] px-2.5 py-1.5">
+      <MapPin
+        size={12}
+        className="shrink-0 text-blue-400"
+      />
 
-            <span className="truncate text-[10px] text-slate-400">
-              {project.location || "Location not set"}
-            </span>
-          </div>
+      <span className="truncate text-[10px] text-slate-400">
+        {project.location || "Location not set"}
+      </span>
+    </div>
 
-          <div className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.05] bg-white/[0.025] px-2.5 py-1.5">
-            <CalendarDays
-              size={12}
-              className="text-blue-400"
-            />
+    {/* Academic year emphasized */}
+    <div className="inline-flex items-center gap-1.5 rounded-lg border border-blue-400/[0.12] bg-blue-500/[0.07] px-2.5 py-1.5">
+      <CalendarDays
+        size={13}
+        className="shrink-0 text-sky-300"
+      />
 
-            <span className="text-[10px] text-slate-400">
-              {project.academic_year}
-            </span>
-          </div>
-        </div>
+      <span className="text-sm font-bold tracking-tight text-sky-300">
+        {project.academic_year}
+      </span>
+    </div>
+  </div>
+
+  {/* Registered students on the right */}
+  <div className="flex shrink-0 items-center gap-2.5 rounded-xl border border-blue-400/[0.12] bg-blue-500/[0.06] px-3 py-2.5">
+    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/[0.12] text-blue-400">
+      <Users size={17} />
+    </div>
+
+    <span className="text-lg font-bold tracking-tight text-sky-300">
+      {studentCount.toLocaleString("en-GH")}
+    </span>
+  </div>
+</div>
 
         {/* Main financial panel */}
         <div className="relative mt-5 overflow-hidden rounded-[22px] border border-blue-400/[0.12] bg-[#080F1B]/80 p-4 sm:p-5">
@@ -398,28 +415,6 @@ function ProjectCard({
         </div>
 
         {/* Bottom project summary */}
-        <div className="mt-5 flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/[0.12] bg-blue-500/[0.06] text-blue-400">
-              <Users size={17} />
-            </div>
-
-            <div>
-              <p className="text-[10px] text-slate-500">
-                Registered students
-              </p>
-
-              <p className="mt-0.5 text-base font-bold text-white">
-                {studentCount.toLocaleString("en-GH")}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2 text-[10px] font-medium text-slate-400 transition-colors group-hover:border-blue-400/20 group-hover:text-blue-300">
-            Open project
-            <ArrowUpRight size={13} />
-          </div>
-        </div>
       </div>
     </Link>
   );

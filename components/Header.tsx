@@ -46,6 +46,11 @@ const navigation = [
     path: "/home/chat",
     icon: MessageCircle,
   },
+  {
+    name: "Settings",
+    path: "/home/settings",
+    icon: Settings,
+  },
 ];
 
 export default function Header() {
@@ -186,7 +191,14 @@ export default function Header() {
 
   function isActive(path: string) {
     if (path === "/home") {
-      return currentPath === "/home";
+      return (
+        currentPath === "/home" ||
+        currentPath === "/home/create" ||
+        currentPath === "/home/project" ||
+        /^\/home\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          currentPath
+        )
+      );
     }
 
     return (
