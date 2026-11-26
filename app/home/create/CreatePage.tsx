@@ -12,6 +12,7 @@ import {
   Check,
   CheckCircle2,
   ClipboardCheck,
+  CircleHelp,
   House,
   MapPin,
   MessageCircle,
@@ -732,6 +733,11 @@ export default function CreateProject() {
             aria-labelledby="create-house-confirmation"
             className="w-full max-w-sm rounded-2xl border border-white/[0.1] bg-[#101A2B] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
           >
+            <div className="mb-4 flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10 text-blue-300 shadow-[0_0_28px_rgba(59,130,246,0.12)]">
+                <CircleHelp size={23} strokeWidth={1.8} aria-hidden="true" />
+              </div>
+            </div>
             <p
               id="create-house-confirmation"
               className="text-center text-sm font-medium text-slate-100"
