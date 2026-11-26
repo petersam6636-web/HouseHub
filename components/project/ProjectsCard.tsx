@@ -8,11 +8,12 @@ import {
   MapPin,
   CalendarDays,
   Users,
-  GraduationCap,
   ArrowUpRight,
   Wallet,
-  TrendingDown,
   Building2,
+  GraduationCap,
+  TrendingDown,
+  Layers3,
 } from "lucide-react";
 
 import type {
@@ -52,7 +53,8 @@ function getAmountValue(amount: Amount) {
 function getProjectTotalAmount(project: ProjectWithRelations) {
   return project.students.reduce((total, student) => {
     const studentAmount = student.amounts.reduce(
-      (amountTotal, amount) => amountTotal + getAmountValue(amount),
+      (amountTotal, amount) =>
+        amountTotal + getAmountValue(amount),
       0
     );
 
@@ -61,13 +63,10 @@ function getProjectTotalAmount(project: ProjectWithRelations) {
 }
 
 function isCountableExpense(transaction: Transaction) {
-  if (transaction.state !== "withdraw") {
-    return false;
-  }
-
   return (
-    transaction.status === "completed" ||
-    transaction.status === null
+    transaction.state === "withdraw" &&
+    (transaction.status === "completed" ||
+      transaction.status === null)
   );
 }
 
@@ -113,7 +112,7 @@ function BalanceDonut({
   expenses: number;
   balance: number;
 }) {
-  const radius = 42;
+  const radius = 43;
   const circumference = 2 * Math.PI * radius;
 
   const expenseRatio =
@@ -127,23 +126,26 @@ function BalanceDonut({
   const balanceLength = circumference - expenseLength;
 
   return (
-    <div className="relative flex h-[132px] w-[132px] shrink-0 items-center justify-center">
+    <div className="relative h-[150px] w-[150px] shrink-0">
+      {/* Soft chart glow */}
+      <div className="absolute inset-4 rounded-full bg-blue-500/10 blur-2xl" />
+
       <svg
         viewBox="0 0 100 100"
-        className="h-full w-full -rotate-90 overflow-visible"
-        aria-label={`Expenses ${formatMoney(expenses)}, balance ${formatMoney(balance)}`}
+        className="relative h-full w-full -rotate-90"
+        role="img"
+        aria-label={`Project balance ${formatMoney(balance)}. Expenses ${formatMoney(expenses)}.`}
       >
-        {/* Background ring */}
         <circle
           cx="50"
           cy="50"
           r={radius}
           fill="none"
           stroke="rgba(255,255,255,0.06)"
-          strokeWidth="9"
+          strokeWidth="8"
         />
 
-        {/* Balance ring */}
+        {/* Remaining balance */}
         {balance > 0 && (
           <circle
             cx="50"
@@ -151,15 +153,15 @@ function BalanceDonut({
             r={radius}
             fill="none"
             stroke="#38BDF8"
-            strokeWidth="9"
+            strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={`${balanceLength} ${circumference}`}
             strokeDashoffset={-expenseLength}
-            className="transition-all duration-700 ease-out"
+            className="transition-all duration-1000 ease-out"
           />
         )}
 
-        {/* Expense ring */}
+        {/* Expenses */}
         {expenses > 0 && (
           <circle
             cx="50"
@@ -167,27 +169,31 @@ function BalanceDonut({
             r={radius}
             fill="none"
             stroke="#2563EB"
-            strokeWidth="9"
+            strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={`${expenseLength} ${circumference}`}
-            className="transition-all duration-700 ease-out"
+            className="transition-all duration-1000 ease-out"
           />
         )}
       </svg>
 
-      {/* Center balance */}
+      {/* Chart center */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-[9px] font-medium uppercase tracking-[0.16em] text-slate-500">
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-500">
           Balance
         </span>
 
         <span
-          className={`mt-1 max-w-[90px] truncate text-sm font-bold ${
+          className={`mt-1 max-w-[112px] truncate text-center text-sm font-bold tracking-tight ${
             balance < 0 ? "text-rose-400" : "text-white"
           }`}
           title={formatMoney(balance)}
         >
           {formatMoney(balance)}
+        </span>
+
+        <span className="mt-1 text-[9px] text-slate-500">
+          Remaining funds
         </span>
       </div>
     </div>
@@ -205,37 +211,53 @@ function ProjectCard({
 
   const studentCount = project.students.length;
 
+  const expensePercentage =
+    totalAmount > 0
+      ? Math.min((expenses / totalAmount) * 100, 100)
+      : expenses > 0
+        ? 100
+        : 0;
+
   return (
     <Link
       href={`/home/${project.id}`}
-      className="group relative block min-w-0 overflow-hidden rounded-[26px] border border-white/[0.07] bg-[#0B1220] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-blue-400/30 hover:bg-[#0D1728] hover:shadow-[0_20px_60px_-25px_rgba(37,99,235,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      className="group relative block min-w-0 overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#0A1220] transition-all duration-500 hover:-translate-y-1.5 hover:border-blue-400/30 hover:shadow-[0_24px_80px_-30px_rgba(37,99,235,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
     >
-      {/* Decorative futuristic glow */}
-      <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-blue-500/[0.07] blur-[70px] transition-all duration-500 group-hover:bg-blue-500/[0.15]" />
+      {/* Futuristic background effects */}
+      <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-blue-500/[0.07] blur-[90px] transition duration-700 group-hover:bg-blue-500/[0.16]" />
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.035] via-transparent to-transparent opacity-70" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.045] via-transparent to-sky-500/[0.025]" />
 
-      <div className="relative">
-        {/* Project identity */}
+      {/* Top accent line */}
+      <div className="absolute left-8 right-8 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent opacity-50 transition-opacity duration-500 group-hover:opacity-100" />
+
+      <div className="relative p-5 sm:p-6">
+        {/* Project header */}
         <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-blue-400/15 bg-blue-500/[0.08]">
+          <div className="flex min-w-0 items-center gap-3.5">
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111D30] shadow-inner">
               {project.logo_image ? (
                 <img
                   src={project.logo_image}
                   alt={`${project.school_name} logo`}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               ) : (
-                <Building2
-                  size={21}
-                  className="text-blue-400"
-                />
+                <div className="flex h-full w-full items-center justify-center">
+                  <Building2
+                    size={21}
+                    className="text-blue-400"
+                  />
+                </div>
               )}
             </div>
 
             <div className="min-w-0">
-              <h3 className="truncate text-sm font-semibold text-white transition-colors group-hover:text-blue-200">
+              <p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-blue-400">
+                Academic project
+              </p>
+
+              <h3 className="truncate text-base font-semibold tracking-tight text-white transition-colors group-hover:text-blue-100">
                 {project.title}
               </h3>
 
@@ -245,103 +267,105 @@ function ProjectCard({
             </div>
           </div>
 
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.025] text-slate-500 transition-all group-hover:border-blue-400/20 group-hover:bg-blue-500/10 group-hover:text-blue-300">
-            <ArrowUpRight size={16} />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-slate-500 transition-all duration-300 group-hover:border-blue-400/25 group-hover:bg-blue-500/10 group-hover:text-blue-300">
+            <ArrowUpRight
+              size={17}
+              className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
           </div>
         </div>
 
-        {/* Location and academic year */}
-        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-400">
-            <MapPin size={13} className="shrink-0 text-blue-400" />
-            <span className="truncate">
+        {/* Project metadata */}
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          <div className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-white/[0.05] bg-white/[0.025] px-2.5 py-1.5">
+            <MapPin
+              size={12}
+              className="shrink-0 text-blue-400"
+            />
+
+            <span className="truncate text-[10px] text-slate-400">
               {project.location || "Location not set"}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
+          <div className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.05] bg-white/[0.025] px-2.5 py-1.5">
             <CalendarDays
-              size={13}
-              className="shrink-0 text-blue-400"
+              size={12}
+              className="text-blue-400"
             />
-            <span>{project.academic_year}</span>
+
+            <span className="text-[10px] text-slate-400">
+              {project.academic_year}
+            </span>
           </div>
         </div>
 
-        {/* Student count */}
-        <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/[0.05] bg-white/[0.025] px-3.5 py-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/[0.09] text-blue-400">
-              <Users size={15} />
+        {/* Main financial panel */}
+        <div className="relative mt-5 overflow-hidden rounded-[22px] border border-blue-400/[0.12] bg-[#080F1B]/80 p-4 sm:p-5">
+          <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-sky-500/[0.06] blur-3xl" />
+
+          <div className="relative flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+            {/* Donut chart */}
+            <div className="flex flex-col items-center">
+              <BalanceDonut
+                totalAmount={totalAmount}
+                expenses={expenses}
+                balance={balance}
+              />
+
+              <div className="mt-1 flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                  <span className="text-[9px] text-slate-500">
+                    Expenses
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
+                  <span className="text-[9px] text-slate-500">
+                    Balance
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <p className="text-[10px] text-slate-500">
-                Registered students
-              </p>
-
-              <p className="mt-0.5 text-sm font-semibold text-white">
-                {studentCount.toLocaleString("en-GH")}
-              </p>
-            </div>
-          </div>
-
-          <GraduationCap
-            size={18}
-            className="text-slate-600"
-          />
-        </div>
-
-        {/* Financial overview */}
-        <div className="mt-5 border-t border-white/[0.06] pt-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                Financial overview
-              </p>
-
-              <p className="mt-1 text-xs text-slate-400">
-                Project funds
-              </p>
-            </div>
-
-            <Wallet size={16} className="text-blue-400" />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <BalanceDonut
-              totalAmount={totalAmount}
-              expenses={expenses}
-              balance={balance}
-            />
-
-            <div className="min-w-0 flex-1 space-y-4">
+            {/* Financial values */}
+            <div className="w-full min-w-0 space-y-4 sm:flex-1 sm:pl-3">
               <div>
                 <div className="mb-1.5 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-sky-400" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-400/[0.09] text-sky-400">
+                    <Wallet size={14} />
+                  </div>
+
                   <span className="text-[10px] text-slate-500">
                     Total amount
                   </span>
                 </div>
 
                 <p
-                  className="truncate text-sm font-semibold text-white"
+                  className="truncate text-lg font-bold tracking-tight text-white"
                   title={formatMoney(totalAmount)}
                 >
                   {formatMoney(totalAmount)}
                 </p>
               </div>
 
+              <div className="h-px w-full bg-white/[0.06]" />
+
               <div>
                 <div className="mb-1.5 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-blue-600" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/[0.09] text-blue-400">
+                    <TrendingDown size={14} />
+                  </div>
+
                   <span className="text-[10px] text-slate-500">
                     Total expenses
                   </span>
                 </div>
 
                 <p
-                  className="truncate text-sm font-semibold text-white"
+                  className="truncate text-lg font-bold tracking-tight text-white"
                   title={formatMoney(expenses)}
                 >
                   {formatMoney(expenses)}
@@ -349,18 +373,52 @@ function ProjectCard({
               </div>
             </div>
           </div>
+
+          {/* Expense progress */}
+          <div className="relative mt-5">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-[9px] font-medium uppercase tracking-[0.15em] text-slate-500">
+                Funds used
+              </span>
+
+              <span className="text-[10px] font-semibold text-blue-300">
+                {expensePercentage.toFixed(1)}%
+              </span>
+            </div>
+
+            <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-blue-700 to-sky-400 transition-all duration-1000 ease-out"
+                style={{
+                  width: `${expensePercentage}%`,
+                }}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Bottom action hint */}
-        <div className="mt-5 flex items-center justify-between border-t border-white/[0.06] pt-4">
-          <span className="text-[10px] text-slate-500">
-            Created {formatDate(project.created_at)}
-          </span>
+        {/* Bottom project summary */}
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/[0.12] bg-blue-500/[0.06] text-blue-400">
+              <Users size={17} />
+            </div>
 
-          <span className="flex items-center gap-1.5 text-[11px] font-medium text-blue-400 transition-all group-hover:gap-2.5">
-            View project
+            <div>
+              <p className="text-[10px] text-slate-500">
+                Registered students
+              </p>
+
+              <p className="mt-0.5 text-base font-bold text-white">
+                {studentCount.toLocaleString("en-GH")}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2 text-[10px] font-medium text-slate-400 transition-colors group-hover:border-blue-400/20 group-hover:text-blue-300">
+            Open project
             <ArrowUpRight size={13} />
-          </span>
+          </div>
         </div>
       </div>
     </Link>
@@ -374,29 +432,41 @@ export default function ProjectsCard() {
 
   return (
     <section className="w-full">
-      {/* Section heading */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      {/* Section header */}
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-white">
+          <div className="mb-2 flex items-center gap-2">
+            <Layers3
+              size={15}
+              className="text-blue-400"
+            />
+
+            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-400">
+              Workspace
+            </span>
+          </div>
+
+          <h2 className="text-xl font-semibold tracking-tight text-white">
             Your Projects
           </h2>
 
-          <p className="mt-1 text-xs text-slate-400">
-            Your academic projects at a glance.
+          <p className="mt-1.5 text-xs text-slate-400">
+            Your academic projects, students and finances.
           </p>
         </div>
 
         <Link
           href="/home/create"
-          className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-blue-950/20 transition hover:bg-blue-500 active:scale-[0.98]"
+          className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-400/20 bg-blue-500/[0.09] px-4 py-2 text-xs font-semibold text-blue-200 transition-all hover:border-blue-400/40 hover:bg-blue-500/[0.16] active:scale-[0.97]"
         >
           <Plus size={15} />
           Add Project
         </Link>
       </div>
 
+      {/* Responsive project grid */}
       {projectList.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
           {projectList.map((project) => (
             <ProjectCard
               key={project.id}
@@ -405,29 +475,31 @@ export default function ProjectsCard() {
           ))}
         </div>
       ) : (
-        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[26px] border border-white/[0.06] bg-[#0B1220]/70 px-6 py-12 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-400/15 bg-blue-500/[0.08]">
+        <div className="relative flex min-h-[320px] flex-col items-center justify-center overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#0A1220]/80 px-6 py-12 text-center">
+          <div className="pointer-events-none absolute -top-20 h-48 w-48 rounded-full bg-blue-500/[0.08] blur-[80px]" />
+
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/15 bg-blue-500/[0.08]">
             <GraduationCap
-              size={25}
+              size={27}
               className="text-blue-400"
             />
           </div>
 
-          <h3 className="text-sm font-semibold text-white">
-            No projects yet
+          <h3 className="relative mt-5 text-base font-semibold text-white">
+            Your workspace is waiting
           </h3>
 
-          <p className="mt-2 max-w-xs text-xs leading-5 text-slate-400">
-            Create your first academic project to manage students
-            and keep track of project funds.
+          <p className="relative mt-2 max-w-sm text-xs leading-6 text-slate-400">
+            Create your first academic project to organize students,
+            monitor funds and manage school activities.
           </p>
 
           <Link
             href="/home/create"
-            className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500"
+            className="relative mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500 active:scale-[0.98]"
           >
             <Plus size={15} />
-            Create Project
+            Create your first project
           </Link>
         </div>
       )}
