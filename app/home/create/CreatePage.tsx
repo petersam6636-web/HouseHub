@@ -8,15 +8,15 @@ import {
   ArrowRight,
   Building2,
   CalendarDays,
-  CalendarCheck,
   Check,
-  ClipboardList,
+  ClipboardCheck,
+  House,
   MapPin,
   School,
   Sparkles,
   Upload,
   Users,
-  Wallet,
+  Wrench,
   X,
 } from "lucide-react";
 import { gsap } from "gsap";
@@ -42,19 +42,17 @@ const initialFormData: ProjectFormData = {
 
 const steps = [
   {
-    title: "Project identity",
-    description: "Let's start with the basic information about your project.",
+    title: "House identity",
+    description: "Let's start with the basic information about your house.",
   },
   {
-    title: "Academic details",
-    description: "Complete the academic information to finish setting up.",
+    title: "House details",
+    description: "Complete the details to finish setting up your house.",
   },
 ];
 
 const inputClass =
   "h-11 sm:h-12 w-full rounded-xl border border-white/[0.08] bg-[#070C14] pl-10 pr-4 text-xs text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/[0.08]";
-
-const chartHeights = [35, 55, 42, 72, 50, 88, 64, 96];
 
 export default function CreateProject() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -82,23 +80,23 @@ export default function CreateProject() {
 
   useGSAP(
     () => {
-      if (!formContentRef.current) return;
-
-      gsap.fromTo(
-        formContentRef.current,
-        {
-          opacity: 0,
-          y: 10,
-          filter: "blur(2px)",
-        },
-        {
-          opacity: 1,
-          y: 0,
-          filter: "blur(0px)",
-          duration: 0.3,
-          ease: "power3.out",
-        }
-      );
+      if (formContentRef.current) {
+        gsap.fromTo(
+          formContentRef.current,
+          {
+            opacity: 0,
+            y: 10,
+            filter: "blur(2px)",
+          },
+          {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.3,
+            ease: "power3.out",
+          }
+        );
+      }
 
       if (previewRef.current) {
         gsap.fromTo(
@@ -190,43 +188,41 @@ export default function CreateProject() {
       ref={containerRef}
       className="relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden px-3 py-5 text-white sm:px-5 sm:py-8"
     >
-      {/* Subtle page atmosphere */}
+      {/* Page atmosphere */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[-12rem] top-1/2 h-80 w-80 -translate-y-1/2 rounded-full bg-blue-600/[0.07] blur-[110px]" />
         <div className="absolute right-[-10rem] top-[-6rem] h-80 w-80 rounded-full bg-blue-500/[0.06] blur-[110px]" />
       </div>
 
       <div className="mx-auto w-full max-w-[1080px]">
-        {/* One shared card on desktop */}
+        {/* Shared form and illustration card */}
         <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl md:grid md:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
-          {/* Shared card glow */}
           <div className="pointer-events-none absolute -right-32 -top-32 hidden h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px] md:block" />
 
-          {/* LEFT: Registration */}
+          {/* LEFT: Form */}
           <section className="relative min-w-0 p-4 sm:p-6 lg:p-7">
-            {/* Heading */}
             <div className="mb-5 text-center md:mb-6 md:text-left">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
                 <Sparkles size={12} className="text-blue-400" />
                 <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-300">
-                  New workspace
+                  HouseHub setup
                 </span>
               </div>
 
               <h1 className="text-2xl font-bold tracking-[-0.05em] text-white sm:text-3xl lg:text-[30px]">
-                Start a new project
+                Set up your house
                 <span className="text-blue-400">.</span>
               </h1>
 
               <p className="mx-auto mt-2 max-w-md text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6 md:mx-0">
-                Create your school workspace and bring your academic
-                activities together in one organized place.
+                Organize your house, manage responsibilities, and keep
+                house-related issues in one place.
               </p>
             </div>
 
-            {/* Form section — no separate nested card */}
+            {/* Form card */}
             <div className="min-w-0 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
-              {/* Progress header */}
+              {/* Progress */}
               <div className="border-b border-white/[0.06] px-4 py-3.5 sm:px-5 sm:py-4">
                 <div className="flex items-center justify-between gap-4">
                   <div>
@@ -267,18 +263,18 @@ export default function CreateProject() {
                     <div className="space-y-4">
                       <div>
                         <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
-                          Tell us about your project
+                          Tell us about your house
                         </h3>
 
                         <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
-                          Start by giving your project an identity.
+                          Give your house or residence a name and location.
                         </p>
                       </div>
 
-                      {/* Project title */}
+                      {/* House title */}
                       <div>
                         <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          Project title
+                          House name
                         </label>
 
                         <div className="relative">
@@ -293,16 +289,16 @@ export default function CreateProject() {
                             onChange={(e) =>
                               updateField("title", e.target.value)
                             }
-                            placeholder="e.g. 2026 Academic Project"
+                            placeholder="e.g. My House"
                             className={inputClass}
                           />
                         </div>
                       </div>
 
-                      {/* School name */}
+                      {/* School / house name */}
                       <div>
                         <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          School name
+                          Institution or property name
                         </label>
 
                         <div className="relative">
@@ -317,7 +313,7 @@ export default function CreateProject() {
                             onChange={(e) =>
                               updateField("school_name", e.target.value)
                             }
-                            placeholder="Enter your school's name"
+                            placeholder="e.g. House, hostel or school"
                             className={inputClass}
                           />
                         </div>
@@ -326,7 +322,7 @@ export default function CreateProject() {
                       {/* Location */}
                       <div>
                         <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          School location
+                          House location
                         </label>
 
                         <div className="relative">
@@ -351,18 +347,19 @@ export default function CreateProject() {
                     <div className="space-y-4">
                       <div>
                         <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
-                          Academic details
+                          House details
                         </h3>
 
                         <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs">
-                          Add the academic year, starting date and school logo.
+                          Add a logo and the date you want to start managing
+                          your house.
                         </p>
                       </div>
 
                       {/* Logo upload */}
                       <div>
                         <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          School logo
+                          House logo
                           <span className="ml-1 text-slate-600">
                             (optional)
                           </span>
@@ -380,7 +377,7 @@ export default function CreateProject() {
                           <div className="flex items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/[0.05] p-3">
                             <img
                               src={logoPreview}
-                              alt="School logo preview"
+                              alt="House logo preview"
                               className="h-12 w-12 rounded-lg border border-white/[0.08] object-cover"
                             />
 
@@ -432,7 +429,7 @@ export default function CreateProject() {
                             </div>
 
                             <span className="relative text-[11px] font-semibold text-slate-200">
-                              Drop your school logo here
+                              Drop your house logo here
                             </span>
 
                             <span className="relative mt-1 text-[9px] text-slate-500">
@@ -445,7 +442,7 @@ export default function CreateProject() {
                       {/* Start date */}
                       <div>
                         <label className="mb-2 block text-[11px] font-medium text-slate-300">
-                          Project start date
+                          Start date
                         </label>
 
                         <div className="relative">
@@ -497,7 +494,7 @@ export default function CreateProject() {
                 <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.012] px-4 py-3.5 sm:px-5">
                   {step === 0 ? (
                     <span className="text-[9px] text-slate-600 sm:text-[10px]">
-                      Your project starts here.
+                      A better-managed house starts here.
                     </span>
                   ) : (
                     <button
@@ -530,7 +527,7 @@ export default function CreateProject() {
                       className="group inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-[11px] font-semibold text-white shadow-[0_5px_20px_rgba(37,99,235,0.2)] transition duration-300 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-5"
                     >
                       <Check size={14} />
-                      Create project
+                      Create house
                     </button>
                   )}
                 </div>
@@ -538,126 +535,231 @@ export default function CreateProject() {
             </div>
           </section>
 
-          {/* RIGHT: AboutHouseHub abstract dashboard illustration */}
+          {/* RIGHT: House management illustration */}
           <aside className="relative hidden min-w-0 items-center justify-center border-l border-white/[0.05] px-5 py-6 md:flex lg:px-7 lg:py-8">
-            {/* Blue glow behind illustration */}
             <div className="pointer-events-none absolute inset-4 rounded-[2.5rem] bg-blue-600/[0.13] blur-[65px]" />
 
-            <div
-              ref={previewRef}
-              className="relative w-full max-w-[390px]"
-            >
+            <div ref={previewRef} className="relative w-full max-w-[390px]">
               <div className="relative overflow-hidden rounded-3xl border border-blue-400/[0.15] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-4 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:p-5">
-                {/* Illustration glow */}
+                {/* Illustration glows */}
                 <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/[0.12] blur-[70px]" />
                 <div className="pointer-events-none absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-sky-500/[0.08] blur-[65px]" />
 
-                {/* Dashboard header */}
-                <div className="relative mb-4 flex items-center justify-between">
+                {/* HouseHub mini header */}
+                <div className="relative mb-5 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/10">
-                      <Building2 size={17} className="text-blue-300" />
+                      <House size={17} className="text-blue-300" />
                     </div>
 
-                    <div className="space-y-1.5">
-                      <div className="h-2 w-20 rounded-full bg-slate-200/70" />
-                      <div className="h-1.5 w-12 rounded-full bg-slate-500/40" />
+                    <div>
+                      <p className="text-[11px] font-bold tracking-wide text-slate-100">
+                        HOUSEHUB
+                      </p>
+                      <p className="mt-1 text-[9px] text-slate-500">
+                        Your house, organized
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-blue-400/10 bg-blue-500/[0.07]">
-                    <span className="h-2 w-2 rounded-full bg-blue-400" />
+                  <div className="flex items-center gap-1.5 rounded-full border border-blue-400/15 bg-blue-500/[0.07] px-2.5 py-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                    <span className="text-[9px] font-medium text-blue-300">
+                      House space
+                    </span>
                   </div>
                 </div>
 
-                {/* Dashboard cards */}
-                <div className="relative grid grid-cols-2 gap-3">
-                  <div className="rounded-2xl border border-blue-400/[0.10] bg-[#080F1B]/80 p-3.5">
-                    <div className="mb-4 flex items-center justify-between">
-                      <div className="h-1.5 w-12 rounded-full bg-slate-400/40" />
-                      <Users size={14} className="text-blue-400/70" />
+                {/* House illustration */}
+                <div className="relative mb-3 overflow-hidden rounded-2xl border border-blue-400/[0.10] bg-[#080F1B]/80 p-4">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.07] via-transparent to-transparent" />
+
+                  <div className="relative flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[9px] font-medium uppercase tracking-[0.13em] text-slate-500">
+                        Your home
+                      </p>
+                      <h3 className="mt-1.5 text-base font-bold text-white">
+                        Manage your house
+                      </h3>
+                      <p className="mt-1 max-w-[150px] text-[10px] leading-4 text-slate-500">
+                        Keep your household running smoothly.
+                      </p>
                     </div>
 
-                    <div className="h-6 w-14 rounded-md bg-blue-400/15" />
-                    <div className="mt-2 h-1.5 w-20 rounded-full bg-slate-500/30" />
+                    <div className="relative flex h-[92px] w-[100px] shrink-0 items-center justify-center">
+                      <div className="absolute bottom-1 h-3 w-20 rounded-full bg-blue-500/10 blur-md" />
+
+                      <svg
+                        viewBox="0 0 120 100"
+                        className="relative h-full w-full"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M15 48L60 12L105 48"
+                          stroke="#60A5FA"
+                          strokeWidth="5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M25 43V88H95V43"
+                          fill="#1D4ED8"
+                          fillOpacity="0.14"
+                          stroke="#3B82F6"
+                          strokeOpacity="0.7"
+                          strokeWidth="2"
+                        />
+                        <rect
+                          x="48"
+                          y="58"
+                          width="24"
+                          height="30"
+                          rx="4"
+                          fill="#2563EB"
+                          fillOpacity="0.28"
+                          stroke="#60A5FA"
+                          strokeOpacity="0.65"
+                          strokeWidth="1.5"
+                        />
+                        <rect
+                          x="32"
+                          y="52"
+                          width="12"
+                          height="13"
+                          rx="2"
+                          fill="#60A5FA"
+                          fillOpacity="0.35"
+                        />
+                        <rect
+                          x="76"
+                          y="52"
+                          width="12"
+                          height="13"
+                          rx="2"
+                          fill="#60A5FA"
+                          fillOpacity="0.35"
+                        />
+                        <path
+                          d="M60 12V4"
+                          stroke="#93C5FD"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <circle cx="60" cy="3" r="3" fill="#60A5FA" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* House management features */}
+                <div className="relative grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl border border-blue-400/[0.10] bg-[#080F1B]/80 p-3.5">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
+                        <Users size={14} className="text-blue-300" />
+                      </div>
+                      <span className="text-[9px] text-slate-500">
+                        Household
+                      </span>
+                    </div>
+
+                    <p className="text-xs font-semibold text-slate-200">
+                      Residents
+                    </p>
+                    <p className="mt-1 text-[9px] text-slate-500">
+                      Keep everyone connected
+                    </p>
                   </div>
 
                   <div className="rounded-2xl border border-white/[0.05] bg-[#080F1B]/80 p-3.5">
-                    <div className="mb-4 flex items-center justify-between">
-                      <div className="h-1.5 w-12 rounded-full bg-slate-400/40" />
-                      <CalendarCheck size={14} className="text-blue-400/70" />
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
+                        <Wrench size={14} className="text-blue-300" />
+                      </div>
+                      <span className="text-[9px] text-slate-500">
+                        Maintenance
+                      </span>
                     </div>
 
-                    <div className="h-6 w-14 rounded-md bg-slate-300/[0.08]" />
-                    <div className="mt-2 h-1.5 w-16 rounded-full bg-slate-500/30" />
-                  </div>
-
-                  {/* Abstract bar chart */}
-                  <div className="col-span-2 rounded-2xl border border-white/[0.05] bg-[#080F1B]/80 p-4">
-                    <div className="mb-4 flex items-center justify-between">
-                      <div className="h-1.5 w-20 rounded-full bg-slate-300/40" />
-                      <div className="h-1.5 w-8 rounded-full bg-blue-400/50" />
-                    </div>
-
-                    <div className="flex h-20 items-end gap-2">
-                      {chartHeights.map((height, index) => (
-                        <div
-                          key={index}
-                          className="flex-1 rounded-t-md bg-gradient-to-t from-blue-700/60 to-blue-400/90"
-                          style={{ height: `${height}%` }}
-                        />
-                      ))}
-                    </div>
+                    <p className="text-xs font-semibold text-slate-200">
+                      House issues
+                    </p>
+                    <p className="mt-1 text-[9px] text-slate-500">
+                      Track repairs and problems
+                    </p>
                   </div>
                 </div>
 
-                {/* Task panel */}
-                <div className="relative mt-3 rounded-2xl border border-white/[0.05] bg-[#080F1B]/80 p-3.5">
+                {/* Example house issue */}
+                <div className="relative mt-3 rounded-2xl border border-white/[0.06] bg-[#080F1B]/80 p-3.5">
                   <div className="mb-3 flex items-center justify-between">
-                    <div className="h-1.5 w-16 rounded-full bg-slate-300/40" />
-                    <ClipboardList size={14} className="text-blue-400/70" />
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {[0, 1, 2].map((item) => (
-                      <div key={item} className="flex items-center gap-2.5">
-                        <div className="flex h-4 w-4 items-center justify-center rounded-md bg-blue-500/15">
-                          <Check size={10} className="text-blue-300" />
-                        </div>
-
-                        <div
-                          className={`h-1.5 rounded-full bg-slate-400/25 ${
-                            item === 1 ? "w-24" : "w-32"
-                          }`}
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-blue-400/10 bg-blue-500/[0.08]">
+                        <ClipboardCheck
+                          size={14}
+                          className="text-blue-300"
                         />
                       </div>
-                    ))}
+
+                      <div>
+                        <p className="text-[10px] font-semibold text-slate-200">
+                          House issue
+                        </p>
+                        <p className="mt-0.5 text-[9px] text-slate-500">
+                          Maintenance request
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className="rounded-full border border-blue-400/15 bg-blue-500/[0.08] px-2 py-1 text-[8px] font-medium text-blue-300">
+                      Resolved
+                    </span>
+                  </div>
+
+                  <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/[0.10]">
+                        <Wrench size={14} className="text-blue-300" />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-medium text-slate-300">
+                          Repair house light
+                        </p>
+                        <p className="mt-1 text-[9px] text-slate-500">
+                          Issue reported and handled
+                        </p>
+                      </div>
+
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/15">
+                        <Check size={11} className="text-blue-300" />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Bottom feature strip */}
-                <div className="relative mt-3 grid grid-cols-2 gap-2">
-                  <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] px-2.5 py-2.5">
-                    <ClipboardList size={13} className="shrink-0 text-blue-400" />
+                <div className="relative mt-3 flex items-center justify-between rounded-xl border border-white/[0.05] bg-white/[0.025] px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <House size={13} className="text-blue-400" />
                     <span className="text-[9px] font-medium text-slate-400">
-                      Responsibilities
+                      A better-managed home
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.025] px-2.5 py-2.5">
-                    <Wallet size={13} className="shrink-0 text-blue-400" />
-                    <span className="text-[9px] font-medium text-slate-400">
-                      Finances
-                    </span>
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/10">
+                    <Check size={11} className="text-blue-300" />
                   </div>
                 </div>
               </div>
 
-              {/* Small floating detail */}
+              {/* Floating detail */}
               <div className="absolute -bottom-3 right-5 hidden items-center gap-2 rounded-xl border border-white/[0.08] bg-[#101B2B] px-3 py-2 shadow-xl lg:flex">
                 <Check size={13} className="text-blue-300" />
                 <span className="text-[9px] font-medium text-slate-300">
-                  School organized
+                  House issues organized
                 </span>
               </div>
             </div>
