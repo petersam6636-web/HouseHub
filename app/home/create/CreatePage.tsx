@@ -54,13 +54,13 @@ const getTodayDate = () => {
   return `${today.getFullYear()}-${month}-${day}`;
 };
 
-const createInitialFormData = (): ProjectFormData => ({
+const initialFormData: ProjectFormData = {
   title: "",
   school_name: "",
   location: "",
-  start_date: getTodayDate(),
+  start_date: "",
   academic_year: "",
-});
+};
 
 const bars = [38, 62, 48, 82, 57, 91, 70];
 const rooms = [
@@ -86,7 +86,7 @@ export default function CreateProject() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [formData, setFormData] =
-    useState<ProjectFormData>(createInitialFormData);
+    useState<ProjectFormData>(initialFormData);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isLogoDragging, setIsLogoDragging] = useState(false);
@@ -97,6 +97,14 @@ export default function CreateProject() {
     const timeoutId = window.setTimeout(() => setToast(null), 7000);
     return () => window.clearTimeout(timeoutId);
   }, [toast]);
+
+  useEffect(() => {
+    setFormData((current) =>
+      current.start_date
+        ? current
+        : { ...current, start_date: getTodayDate() }
+    );
+  }, []);
 
   useEffect(() => {
     if (!logoFile) {
@@ -234,7 +242,10 @@ export default function CreateProject() {
 
   const resetFormAfterCreate = () => {
     setStep(0);
-    setFormData(createInitialFormData());
+    setFormData({
+      ...initialFormData,
+      start_date: getTodayDate(),
+    });
     setLogoFile(null);
     setLogoPreview(null);
     setIsLogoDragging(false);
