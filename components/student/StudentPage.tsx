@@ -1,7 +1,7 @@
-
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   ArrowRight,
   GraduationCap,
@@ -14,38 +14,81 @@ import {
   Search,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { ProjectWithRelations, StudentDetailsWithRelations } from "@/types";
-import useApp  from "@/lib/useApp";
+import type {
+  ProjectWithRelations,
+  StudentDetailsWithRelations,
+} from "@/types";
+import useApp from "@/lib/useApp";
 
-export default function StudentsPage({
-  projectId,
-}: {
-  projectId: string;
-}) {
+// Prevent creating a new empty array on every render.
+const EMPTY_STUDENTS: StudentDetailsWithRelations[] = [];
+
+export default function StudentsPage() {
+  // Your dynamic route is [id], so read params.id.
+  const params = useParams<{ id: string | string[] }>();
+
+  const projectId = Array.isArray(params.id)
+    ? params.id[0]
+    : params.id;
+
   const { projects } = useApp();
 
+  const [search, setSearch] = useState("");
+
+  // Find the project using the ID from the URL.
   const project = projects.find(
     (item: ProjectWithRelations) => item.id === projectId
   );
 
-  const [search, setSearch] = useState("");
+  // Get every student belonging to this project.
+  const students = project?.students ?? EMPTY_STUDENTS;
 
-  const students = project?.students ?? [];
-
+  // Search through all students in the project.
   const filteredStudents = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    if (!query) return students;
+    if (!query) {
+      return students;
+    }
 
-    return students.filter((student: StudentDetailsWithRelations) => {
-      return (
-        student.full_name.toLowerCase().includes(query) ||
-        student.index_number?.toLowerCase().includes(query) ||
-        student.email_address?.toLowerCase().includes(query)
-      );
-    });
+    return students.filter(
+      (student: StudentDetailsWithRelations) => {
+        const fullName = student.full_name?.toLowerCase() ?? "";
+        const indexNumber =
+          student.index_number?.toLowerCase() ?? "";
+        const email = student.email_address?.toLowerCase() ?? "";
+
+        return (
+          fullName.includes(query) ||
+          indexNumber.includes(query) ||
+          email.includes(query)
+        );
+      }
+    );
   }, [students, search]);
 
+  // Show loading while the projects are being loaded into useApp.
+  if (projects.length === 0) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10">
+            <GraduationCap className="h-6 w-6 text-blue-400" />
+          </div>
+
+          <h2 className="mt-4 text-lg font-semibold text-white">
+            Loading students
+          </h2>
+
+          <p className="mt-2 text-sm text-slate-400">
+            Please wait while we load your project.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // If the ID is missing or the project doesn't exist.
   if (!project) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
@@ -61,6 +104,14 @@ export default function StudentsPage({
           <p className="mt-2 text-sm text-slate-400">
             We couldn’t find this project in your dashboard.
           </p>
+
+          <Link
+            href="/home"
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
+          >
+            Back to dashboard
+            <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
     );
@@ -124,8 +175,10 @@ export default function StudentsPage({
 
           <div>
             <p className="text-sm font-semibold text-white">
-              {students.length} {students.length === 1 ? "Student" : "Students"}
+              {students.length}{" "}
+              {students.length === 1 ? "Student" : "Students"}
             </p>
+
             <p className="mt-1 text-xs text-slate-500">
               Registered in {project.title}
             </p>
@@ -161,7 +214,6 @@ export default function StudentsPage({
       {/* Student cards */}
       {students.length === 0 ? (
         <section className="relative overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#080f1b] px-6 py-14 text-center sm:px-10">
-          {/* Background decoration */}
           <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-56 -translate-x-1/2 rounded-full bg-blue-500/[0.10] blur-[90px]" />
 
           <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/[0.08]">
@@ -213,12 +265,11 @@ export default function StudentsPage({
         </section>
       ) : (
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredStudents.map((student: StudentDetailsWithRelations) => (
-            <StudentCard
-              key={student.id}
-              student={student}
-            />
-          ))}
+          {filteredStudents.map(
+            (student: StudentDetailsWithRelations) => (
+              <StudentCard key={student.id} student={student} />
+            )
+          )}
         </section>
       )}
     </main>
@@ -232,7 +283,7 @@ function StudentCard({
 }) {
   const image = student.profile_image;
 
-  const initials = student.full_name
+  const initials = (student.full_name ?? "")
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
@@ -292,13 +343,13 @@ function StudentCard({
         {/* Top image shading */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#050b14]/50 to-transparent" />
 
-        {/* Student status label */}
+        {/* Student label */}
         <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#050b14]/60 px-3 py-1.5 text-[10px] font-medium text-slate-200 backdrop-blur-md">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
           Student
         </div>
 
-        {/* Name and index over gradient */}
+        {/* Name and index */}
         <div className="absolute inset-x-0 bottom-0 p-5">
           <h3 className="line-clamp-2 text-xl font-bold tracking-tight text-white">
             {student.full_name}
@@ -355,7 +406,10 @@ function StudentCard({
             </div>
 
             <div className="min-w-0">
-              <p className="text-[10px] text-slate-500">Parent contact</p>
+              <p className="text-[10px] text-slate-500">
+                Parent contact
+              </p>
+
               <p className="mt-0.5 truncate text-xs text-slate-400">
                 {student.mother_contact}
               </p>

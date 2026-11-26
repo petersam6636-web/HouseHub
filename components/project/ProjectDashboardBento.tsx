@@ -22,7 +22,6 @@ import {
 
 import Link from "next/link";
 import type { ReactNode, ElementType } from "react";
-
 import type { ProjectWithRelations } from "@/types";
 import ProjectCharts from "./ProjectCharts";
 
@@ -422,7 +421,7 @@ export default function ProjectDashboardBento({ project }: Props) {
           value={number(students.length)}
           icon={Users}
           detail={`${number(maleStudents)} male · ${number(femaleStudents)} female`}
-          href={`/home/${projectId}/students`}
+          href={`/home/${projectId}/students?id=${projectId}`}
         />
 
         <Metric
@@ -431,7 +430,7 @@ export default function ProjectDashboardBento({ project }: Props) {
           icon={BriefcaseBusiness}
           accent="cyan"
           detail={`${number(dailyJobs.length)} daily · ${number(partTimeJobs.length)} part-time`}
-          href={`/home/${projectId}/jobs`}
+          href={`/home/${projectId}/jobs?id=${projectId}`}
         />
 
         <Metric
@@ -440,7 +439,7 @@ export default function ProjectDashboardBento({ project }: Props) {
           icon={Wallet}
           accent="indigo"
           detail={`${number(completedTransactions.length)} completed`}
-          href={`/home/${projectId}/transactions`}
+          href={`/home/${projectId}/transactions?id=${projectId}`}
         />
 
         <Metric
@@ -448,7 +447,7 @@ export default function ProjectDashboardBento({ project }: Props) {
           value={number(relatedRecords)}
           icon={Layers3}
           detail="All student-related records"
-          href={`/home/${projectId}/records`}
+          href={`/home/${projectId}/records?id=${projectId}`}
         />
       </div>
 
