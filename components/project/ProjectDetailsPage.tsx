@@ -210,73 +210,30 @@ export default function ProjectDetailsPage({
             All projects
           </Link>
 
-          {/* Keep the existing project identity header */}
-          <section className="relative mt-5 overflow-hidden rounded-[28px] border border-blue-400/[0.12] bg-[#0B1424] shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
-            <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-blue-600/[0.12] blur-[100px]" />
+          <section className="mt-6 overflow-hidden rounded-3xl border border-white/[0.07] bg-gradient-to-br from-[#101B2D] to-[#0B1220] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] sm:p-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+              Project details
+            </p>
+            <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
+              {project.title}
+            </h1>
+            <p className="mt-2 text-sm text-slate-400">
+              {project.school_name}
+            </p>
 
-            <div className="relative flex flex-col gap-6 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between lg:p-8">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.7)]" />
-
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">
-                    Project overview
-                  </p>
-                </div>
-
-                <h1 className="mt-3 break-words text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
-                  {project.title}
-                </h1>
-
-                <p className="mt-2 text-sm font-medium text-slate-300">
-                  {project.school_name}
-                </p>
-
-                <div className="mt-5 flex flex-wrap gap-x-5 gap-y-3 text-xs text-slate-400">
-                  <span className="inline-flex items-center gap-2">
-                    <MapPin size={14} className="text-blue-400" />
-                    {project.location || "Location not set"}
-                  </span>
-
-                  <span className="inline-flex items-center gap-2">
-                    <CalendarDays size={14} className="text-blue-400" />
-                    {project.academic_year}
-                  </span>
-
-                  <span className="inline-flex items-center gap-2">
-                    <CalendarDays size={14} className="text-blue-400" />
-                    Starts {formatDate(project.start_date)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex shrink-0 items-center gap-3">
-                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04]">
-                  {project.logo_image ? (
-                    <img
-                      src={project.logo_image}
-                      alt={`${project.school_name} logo`}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xl font-bold text-blue-300">
-                      {project.school_name
-                        .trim()
-                        .charAt(0)
-                        .toUpperCase() || "H"}
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-                    Academic year
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-white">
-                    {project.academic_year}
-                  </p>
-                </div>
-              </div>
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate-400">
+              <span className="inline-flex items-center gap-2">
+                <MapPin size={14} className="text-blue-400" />
+                {project.location || "Location not set"}
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <CalendarDays size={14} className="text-blue-400" />
+                {project.academic_year}
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <CalendarDays size={14} className="text-blue-400" />
+                Starts {formatDate(project.start_date)}
+              </span>
             </div>
           </section>
 

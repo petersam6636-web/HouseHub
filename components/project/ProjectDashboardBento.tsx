@@ -296,6 +296,11 @@ export default function ProjectDashboardBento({ project }: Props) {
       Boolean(student.profile_image)
   ).length;
 
+  const profileCompletionPercentage =
+    students.length > 0
+      ? Math.round((profileCompletionCount / students.length) * 100)
+      : 0;
+
   const totalJobs = dailyJobs.length + partTimeJobs.length;
 
   return (
@@ -724,6 +729,48 @@ export default function ProjectDashboardBento({ project }: Props) {
               {number(students.length)}
             </span>
           </div>
+        </Card>
+
+        {/* Profile completion */}
+        <Card className="lg:col-span-4">
+          <CardHeading
+            title="Profile completion"
+            description="Student profile readiness"
+            icon={Users}
+          />
+
+          <div className="mt-5 flex items-end justify-between gap-3">
+            <div>
+              <p className="text-2xl font-bold text-white">
+                {number(profileCompletionCount)} / {number(students.length)}
+              </p>
+              <p className="mt-2 text-[10px] text-slate-500">
+                Profiles complete
+              </p>
+            </div>
+
+            <span className="text-sm font-semibold text-blue-300">
+              {profileCompletionPercentage}%
+            </span>
+          </div>
+
+          <div
+            className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/[0.06]"
+            role="progressbar"
+            aria-label="Student profile completion"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={profileCompletionPercentage}
+          >
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-blue-600 to-sky-400 transition-all"
+              style={{ width: `${profileCompletionPercentage}%` }}
+            />
+          </div>
+
+          <p className="mt-3 text-[10px] text-slate-500">
+            Complete profiles include an email address and profile image.
+          </p>
         </Card>
 
         {/* Charts */}
