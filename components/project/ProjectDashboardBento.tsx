@@ -17,10 +17,14 @@ import {
   Receipt,
   Users,
   Wallet,
+  ArrowUpRight as OpenArrow,
 } from "lucide-react";
 
+import Link from "next/link";
+import type { ReactNode, ElementType } from "react";
+
 import type { ProjectWithRelations } from "@/types";
-import ProjectCharts from './ProjectCharts';
+import ProjectCharts from "./ProjectCharts";
 
 type Props = {
   project: ProjectWithRelations;
@@ -58,7 +62,7 @@ function Card({
   children,
   className = "",
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }) {
   return (
@@ -77,7 +81,7 @@ function CardHeading({
 }: {
   title: string;
   description?: string;
-  icon: React.ElementType;
+  icon: ElementType;
 }) {
   return (
     <div className="flex items-start justify-between gap-3">
@@ -103,12 +107,14 @@ function Metric({
   icon: Icon,
   accent = "blue",
   detail,
+  href,
 }: {
   label: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: ElementType;
   accent?: "blue" | "cyan" | "indigo";
   detail?: string;
+  href: string;
 }) {
   const accentClasses = {
     blue: "bg-blue-500/[0.10] text-blue-400 border-blue-400/[0.12]",
@@ -117,31 +123,37 @@ function Metric({
   };
 
   return (
-    <Card>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11px] font-medium text-slate-400">
-            {label}
-          </p>
-
-          <p className="mt-3 break-words text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            {value}
-          </p>
-
-          {detail && (
-            <p className="mt-2 text-[10px] leading-4 text-slate-500">
-              {detail}
+    <Link
+      href={href}
+      aria-label={`View ${label.toLowerCase()}`}
+      className="group block min-w-0 cursor-pointer rounded-[24px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050b14]"
+    >
+      <Card className="h-full transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:border-blue-400/30 group-hover:shadow-lg group-hover:shadow-blue-500/[0.08] group-active:translate-y-0">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium text-slate-400 transition-colors group-hover:text-blue-200">
+              {label}
             </p>
-          )}
-        </div>
 
-        <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${accentClasses[accent]}`}
-        >
-          <Icon size={18} />
+            <p className="mt-3 break-words text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              {value}
+            </p>
+
+            {detail && (
+              <p className="mt-2 text-[10px] leading-4 text-slate-500">
+                {detail}
+              </p>
+            )}
+          </div>
+
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-all duration-300 group-hover:scale-105 group-hover:border-blue-400/30 ${accentClasses[accent]}`}
+          >
+            <Icon size={18} />
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </Link>
   );
 }
 
@@ -149,6 +161,8 @@ export default function ProjectDashboardBento({ project }: Props) {
   const students = project.students ?? [];
   const dailyJobs = project.daily_jobs ?? [];
   const partTimeJobs = project.part_time_jobs ?? [];
+
+  const projectId = project.id;
 
   const transactions = students.flatMap(
     (student) => student.transactions ?? []
@@ -263,12 +277,6 @@ export default function ProjectDashboardBento({ project }: Props) {
     isToday(item.feedback_date)
   );
 
-  const todayJobs = dailyJobs.filter((job) => {
-    if (!job.start_time) return false;
-
-    return true;
-  });
-
   const maleStudents = students.filter(
     (student) => student.gender?.toLowerCase() === "male"
   ).length;
@@ -337,6 +345,7 @@ export default function ProjectDashboardBento({ project }: Props) {
           value={number(students.length)}
           icon={Users}
           detail={`${number(maleStudents)} male · ${number(femaleStudents)} female`}
+          href={`/home/${projectId}/students`}
         />
 
         <Metric
@@ -345,6 +354,7 @@ export default function ProjectDashboardBento({ project }: Props) {
           icon={BriefcaseBusiness}
           accent="cyan"
           detail={`${number(dailyJobs.length)} daily · ${number(partTimeJobs.length)} part-time`}
+          href={`/home/${projectId}/jobs`}
         />
 
         <Metric
@@ -353,6 +363,7 @@ export default function ProjectDashboardBento({ project }: Props) {
           icon={Wallet}
           accent="indigo"
           detail={`${number(completedTransactions.length)} completed`}
+          href={`/home/${projectId}/transactions`}
         />
 
         <Metric
@@ -360,6 +371,7 @@ export default function ProjectDashboardBento({ project }: Props) {
           value={number(relatedRecords)}
           icon={Layers3}
           detail="All student-related records"
+          href={`/home/${projectId}/records`}
         />
       </div>
 
