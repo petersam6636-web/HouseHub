@@ -10,8 +10,10 @@ import {
   Users,
   UserPlus,
   UserRound,
+  ArrowUpRight
   Phone,
   Search,
+  Plus,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type {
@@ -216,148 +218,116 @@ export default function StudentsPage() {
     <main className="min-h-[calc(100vh-72px)] w-full px-3 py-6 text-white sm:px-5 sm:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-6xl space-y-7 pb-10">
         {/* Page heading */}
-        <section className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-          <div>
-            <div className="mb-2 flex items-center gap-2 text-xs font-medium text-blue-400">
-              <Users size={14} />
-              <span>Student directory</span>
-            </div>
-
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              Students
-            </h1>
-
-            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
-              Manage your students, view their information, and keep your school
-              community organized.
-            </p>
-          </div>
-
-          <Link
-            href={registerHref}
-            className="
-              group inline-flex min-h-11 items-center justify-center gap-2
-              rounded-xl bg-blue-600 px-5
-              text-sm font-semibold text-white
-              shadow-lg shadow-blue-600/20
-              transition-[transform,background-color,box-shadow]
-              duration-300 ease-out
-              hover:-translate-y-0.5
-              hover:bg-blue-500
-              hover:shadow-xl hover:shadow-blue-500/25
-              active:translate-y-0 active:scale-[0.98]
-              focus-visible:outline-none
-              focus-visible:ring-2 focus-visible:ring-blue-400
-              focus-visible:ring-offset-2 focus-visible:ring-offset-[#050b14]
-            "
-          >
-            <UserPlus size={17} />
-            Register Student
-            <ArrowRight
-              size={16}
-              className="transition-transform duration-300 group-hover:translate-x-0.5"
-            />
-          </Link>
-        </section>
 
         {/* Directory summary and search */}
-        <section className="flex flex-col gap-4 rounded-2xl border border-white/[0.06] bg-[#080f1b]/80 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/10 bg-blue-500/[0.08]">
-              <Users size={19} className="text-blue-400" />
-            </div>
 
-            <div>
-              <p className="text-sm font-semibold text-white">
-                {students.length}{" "}
-                {students.length === 1 ? "Student" : "Students"}
-              </p>
-
-              <p className="mt-1 text-xs text-slate-500">
-                Registered in {project.title}
-              </p>
-            </div>
-          </div>
-
-          {students.length > 0 && (
-            <div className="relative w-full sm:max-w-xs">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-              />
-
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search students..."
-                className="
-                  h-11 w-full rounded-xl
-                  border border-white/[0.07]
-                  bg-[#050b14] pl-9 pr-4
-                  text-sm text-white placeholder:text-slate-600
-                  outline-none
-                  transition-colors duration-300
-                  focus:border-blue-500/40
-                  focus:ring-2 focus:ring-blue-500/10
-                "
-              />
-            </div>
-          )}
-        </section>
 
         {/* Student cards */}
         {students.length === 0 ? (
-          <section className="relative overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#080f1b] px-6 py-14 text-center sm:px-10">
-            <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-56 -translate-x-1/2 rounded-full bg-blue-500/[0.10] blur-[90px]" />
-
-            <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/[0.08]">
-              <GraduationCap size={29} className="text-blue-400" />
-            </div>
-
-            <h2 className="relative mt-6 text-xl font-semibold text-white sm:text-2xl">
-              Your student community starts here
-            </h2>
-
-            <p className="relative mx-auto mt-3 max-w-md text-sm leading-6 text-slate-400">
-              Every great school begins with its students. Register your first
-              student to start building your directory and keeping their
-              information organized in one place.
-            </p>
-
-            <Link
-              href={registerHref}
-              className="
-                group relative mt-7 inline-flex min-h-11 items-center
-                justify-center gap-2 rounded-xl bg-blue-600 px-5
-                text-sm font-semibold text-white
-                shadow-lg shadow-blue-600/20
-                transition-all duration-300
-                hover:-translate-y-0.5 hover:bg-blue-500
-                hover:shadow-xl hover:shadow-blue-500/25
-                active:translate-y-0
-              "
-            >
-              <UserPlus size={17} />
-              Register your first student
-              <ArrowRight
-                size={16}
-                className="transition-transform duration-300 group-hover:translate-x-1"
-              />
-            </Link>
-          </section>
-        ) : filteredStudents.length === 0 ? (
-          <section className="rounded-2xl border border-white/[0.06] bg-[#080f1b] px-6 py-12 text-center">
-            <Search size={25} className="mx-auto text-slate-500" />
-
-            <h2 className="mt-4 text-base font-semibold text-white">
-              No students found
-            </h2>
-
-            <p className="mt-2 text-sm text-slate-400">
-              Try searching with another name, index number, or email.
-            </p>
-          </section>
-        ) : (
+                  <div className="flex flex-1 flex-col items-center justify-center px-5 py-14 text-center">
+                    <AlertCircle size={24} className="text-red-400" />
+                    <p className="mt-4 text-sm font-semibold text-slate-200">
+                      Projects couldn&apos;t be loaded
+                    </p>
+                    <p className="mt-2 max-w-md text-xs leading-5 text-slate-500">
+                      {loadError}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setReloadKey((current) => current + 1)}
+                      className="mt-5 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-blue-500"
+                    >
+                      Try again
+                    </button>
+                  </div>
+                ) : projects.length === 0 ? (
+                  <div className="relative flex flex-1 flex-col items-center justify-center px-5 py-16 text-center">
+                    <div className="relative">
+                      <div className="relative mx-auto mb-5 flex h-[76px] w-[76px] items-center justify-center rounded-[1.6rem] border border-blue-400/20 bg-gradient-to-br from-blue-500/[0.16] to-blue-600/[0.04] shadow-[0_0_45px_rgba(37,99,235,0.12)]">
+                        <GraduationCap
+                          size={32}
+                          strokeWidth={1.5}
+                          className="text-blue-300"
+                        />
+                        <div className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center text-blue-300">
+                          <Plus size={14} />
+                        </div>
+                      </div>
+        
+                      <h3 className="text-xl font-bold tracking-[-0.04em] text-white sm:text-2xl">
+                        No student yet.
+                      </h3>
+                                 <p className="mx-auto mt-3 max-w-[340px] text-xs leading-6 text-slate-500 sm:text-[13px]">
+                                 Add your first student
+                                to organize their academic activities.
+                              </p>
+        
+                      <Link
+                        href={registerHref}
+                        className="group mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-xs font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500"
+                      >
+                        <Plus size={15} />
+                        Create your first student
+                        <ArrowUpRight
+                          size={14}
+                          className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                        />
+                      </Link>
+                    </div>
+                  </div>
+                ) : filteredStudents.length === 0 ? (
+                          <div className="flex flex-1 flex-col items-center justify-center px-5 py-14 text-center">
+                            <AlertCircle size={24} className="text-red-400" />
+                            <p className="mt-4 text-sm font-semibold text-slate-200">
+                              Students couldn&apos;t be loaded
+                            </p>
+                            <p className="mt-2 max-w-md text-xs leading-5 text-slate-500">
+                              {loadError}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setReloadKey((current) => current + 1)}
+                              className="mt-5 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-blue-500"
+                            >
+                              Try again
+                            </button>
+                          </div>
+                        ) : projects.length === 0 ? (
+                          <div className="relative flex flex-1 flex-col items-center justify-center px-5 py-16 text-center">
+                            <div className="relative">
+                              <div className="relative mx-auto mb-5 flex h-[76px] w-[76px] items-center justify-center rounded-[1.6rem] border border-blue-400/20 bg-gradient-to-br from-blue-500/[0.16] to-blue-600/[0.04] shadow-[0_0_45px_rgba(37,99,235,0.12)]">
+                                <GraduationCap
+                                  size={32}
+                                  strokeWidth={1.5}
+                                  className="text-blue-300"
+                                />
+                                <div className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center text-blue-300">
+                                  <Plus size={14} />
+                                </div>
+                              </div>
+                
+                              <h3 className="text-xl font-bold tracking-[-0.04em] text-white sm:text-2xl">
+                                No studnet yet.
+                              </h3>
+                              <p className="mx-auto mt-3 max-w-[340px] text-xs leading-6 text-slate-500 sm:text-[13px]">
+                                 Add your first student
+                                to organize their academic activities.
+                              </p>
+                
+                              <Link
+                                href={registerHref}
+                                className="group mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-xs font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500"
+                              >
+                                <Plus size={15} />
+                                Create your first student
+                                <ArrowUpRight
+                                  size={14}
+                                  className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                />
+                              </Link>
+                            </div>
+                          </div>
+                        )  : (
           <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {filteredStudents.map(
               (student: StudentDetailsWithRelations) => (
