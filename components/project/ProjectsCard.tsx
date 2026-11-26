@@ -207,7 +207,7 @@ function ProjectCard({
 
   return (
     <Link
-      href={`/home/projects/${project.id}`}
+      href={`/home/${project.id}`}
       className="group relative block min-w-0 overflow-hidden rounded-[26px] border border-white/[0.07] bg-[#0B1220] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-blue-400/30 hover:bg-[#0D1728] hover:shadow-[0_20px_60px_-25px_rgba(37,99,235,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
     >
       {/* Decorative futuristic glow */}
