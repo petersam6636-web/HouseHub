@@ -102,6 +102,7 @@ function CardHeading({
 }
 
 
+
 function Metric({
   label,
   value,
@@ -127,28 +128,68 @@ function Metric({
     <Link
       href={href}
       aria-label={`View ${label.toLowerCase()}`}
-      className="group block min-w-0 cursor-pointer rounded-[24px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050b14]"
+      className="
+        group relative block min-w-0 cursor-pointer rounded-[24px]
+        outline-none
+        focus-visible:ring-2 focus-visible:ring-blue-500/70
+        focus-visible:ring-offset-2 focus-visible:ring-offset-[#050b14]
+        transition-transform duration-700
+        ease-[cubic-bezier(0.16,1,0.3,1)]
+        hover:-translate-y-1.5
+        active:translate-y-0
+        motion-reduce:transform-none
+        motion-reduce:transition-none
+      "
     >
+      {/* Soft blue glow behind the card */}
+      <div
+        className="
+          pointer-events-none absolute -inset-1 rounded-[28px]
+          bg-blue-500/[0.08] opacity-0 blur-xl
+          transition-opacity duration-700
+          ease-[cubic-bezier(0.16,1,0.3,1)]
+          group-hover:opacity-100
+          motion-reduce:transition-none
+        "
+      />
+
       <Card
         className="
-          h-full
-          transform-gpu
-          transition-[transform,box-shadow,border-color]
-          duration-500
-          ease-[cubic-bezier(0.22,1,0.36,1)]
-          group-hover:-translate-y-1
-          group-hover:scale-[1.01]
-          group-hover:border-blue-400/30
-          group-hover:shadow-[0_18px_45px_rgba(37,99,235,0.10)]
-          group-active:scale-[0.99]
-          group-active:translate-y-0
-          motion-reduce:transform-none
+          relative h-full overflow-hidden
+          border border-white/[0.06]
+          transition-[background-color,border-color,box-shadow]
+          duration-700
+          ease-[cubic-bezier(0.16,1,0.3,1)]
+          group-hover:border-blue-400/25
+          group-hover:shadow-[0_16px_50px_rgba(37,99,235,0.12)]
+          group-active:shadow-none
           motion-reduce:transition-none
         "
       >
-        <div className="flex items-start justify-between gap-3">
+        {/* Subtle blue highlight that fades in on hover */}
+        <div
+          className="
+            pointer-events-none absolute inset-0
+            bg-gradient-to-br from-blue-500/[0.07]
+            via-transparent to-transparent
+            opacity-0
+            transition-opacity duration-700
+            ease-[cubic-bezier(0.16,1,0.3,1)]
+            group-hover:opacity-100
+            motion-reduce:transition-none
+          "
+        />
+
+        <div className="relative flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-slate-400 transition-colors duration-500 ease-out group-hover:text-blue-200">
+            <p
+              className="
+                text-[11px] font-medium text-slate-400
+                transition-colors duration-700
+                ease-[cubic-bezier(0.16,1,0.3,1)]
+                group-hover:text-blue-200
+              "
+            >
               {label}
             </p>
 
@@ -167,17 +208,23 @@ function Metric({
             className={`
               flex h-10 w-10 shrink-0 items-center justify-center
               rounded-xl border
-              transition-all duration-500
-              ease-[cubic-bezier(0.22,1,0.36,1)]
-              group-hover:scale-105
-              group-hover:-translate-y-0.5
+              transition-[transform,background-color,border-color]
+              duration-700
+              ease-[cubic-bezier(0.16,1,0.3,1)]
+              group-hover:scale-110
+              group-hover:-translate-y-1
               group-hover:border-blue-400/30
               ${accentClasses[accent]}
             `}
           >
             <Icon
               size={18}
-              className="transition-transform duration-500 ease-out group-hover:scale-105"
+              className="
+                transition-transform duration-700
+                ease-[cubic-bezier(0.16,1,0.3,1)]
+                group-hover:rotate-6
+                group-hover:scale-110
+              "
             />
           </div>
         </div>
@@ -185,6 +232,7 @@ function Metric({
     </Link>
   );
 }
+
 
 export default function ProjectDashboardBento({ project }: Props) {
   const students = project.students ?? [];
