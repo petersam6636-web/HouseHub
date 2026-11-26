@@ -45,27 +45,27 @@
   }
 }
 
-  @keyframes loading-float {
-    0%,
-    100% {
-      transform: translate3d(0, 0, 0);
-    }
-
-    50% {
-      transform: translate3d(22px, -18px, 0);
-    }
+@keyframes loading-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
   }
 
-  @keyframes loading-text {
-    0%,
-    100% {
-      opacity: 0.65;
-    }
-
-    50% {
-      opacity: 1;
-    }
+  50% {
+    transform: translate3d(22px, -18px, 0);
   }
+}
+
+@keyframes loading-text {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
 
 * {
   box-sizing: border-box;
