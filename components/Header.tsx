@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -234,11 +235,13 @@ export default function Header() {
               }}
               className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2.5"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 shadow-[0_4px_16px_rgba(37,99,235,0.3)] transition-transform duration-300 hover:scale-105 sm:h-10 sm:w-10 sm:rounded-xl">
-                <House
-                  size={19}
-                  strokeWidth={2.4}
-                  className="text-white"
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-blue-400/20 bg-[#05070D] shadow-[0_4px_16px_rgba(37,99,235,0.3)] transition-transform duration-300 hover:scale-105 sm:h-10 sm:w-10 sm:rounded-xl">
+                <Image
+                  src="/househub_logo.png"
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-contain"
                 />
               </div>
 

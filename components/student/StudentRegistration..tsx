@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -108,7 +109,7 @@ const steps = [
   },
   {
     title: "Identification",
-    description: "Student identification and documents.",
+    description: "Student location and identification documents.",
     icon: FileBadge,
   },
   {
@@ -117,8 +118,8 @@ const steps = [
     icon: Users,
   },
   {
-    title: "Emergency contact",
-    description: "Add a trusted emergency contact.",
+    title: "Emergency & NHI",
+    description: "Add emergency and NHI information.",
     icon: Phone,
   },
   {
@@ -154,10 +155,10 @@ function Field({
 
 function StudentIllustration() {
   return (
-    <div className="relative mx-auto h-full w-full max-w-[380px]">
+    <div className="relative mx-auto h-full w-full max-w-[350px]">
       <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[70px]" />
 
-      <div className="relative flex h-full scale-[0.94] flex-col justify-center gap-2 rounded-[1.75rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-3 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+      <div className="relative flex h-full scale-[0.9] flex-col justify-center gap-2 rounded-[1.75rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-3 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
         <div className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-300">
@@ -432,9 +433,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     if (step === 0) {
       return (
         formData.full_name.trim().length > 0 &&
-        formData.gender.length > 0 &&
-        formData.location.trim().length > 0 &&
-        formData.nhi_number.trim().length > 0
+        formData.gender.length > 0
       );
     }
 
@@ -447,7 +446,10 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     }
 
     if (step === 2) {
-      return images.birth_cer_image !== null;
+      return (
+        formData.location.trim().length > 0 &&
+        images.birth_cer_image !== null
+      );
     }
 
     if (step === 3) {
@@ -460,7 +462,10 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     }
 
     if (step === 4) {
-      return formData.emergency_number.trim().length > 0;
+      return (
+        formData.emergency_number.trim().length > 0 &&
+        formData.nhi_number.trim().length > 0
+      );
     }
 
     if (step === 5) return true;
@@ -793,36 +798,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
             {renderGenderField()}
           </div>
-
-          <Field label="Residential location">
-            <div className="relative">
-              <MapPin
-                size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-              />
-              <input
-                required
-                value={formData.location}
-                onChange={(event) =>
-                  updateField("location", event.target.value)
-                }
-                placeholder="Town, area or community"
-                className={`${inputClass} pl-10`}
-              />
-            </div>
-          </Field>
-
-          <Field label="NHI number">
-            <input
-              required
-              value={formData.nhi_number}
-              onChange={(event) =>
-                updateField("nhi_number", event.target.value)
-              }
-              placeholder="Enter NHI number"
-              className={inputClass}
-            />
-          </Field>
         </div>
       );
     }
@@ -968,10 +943,11 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
         <div className="space-y-4">
           <div>
             <h2 className="text-base font-bold text-white sm:text-lg">
-              Identification documents
+              Location & identification
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Upload the student&apos;s profile picture and identification documents.
+              Add the student&apos;s location and upload their profile picture
+              and birth certificate.
             </p>
           </div>
 
@@ -982,17 +958,29 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
           )}
 
           {imageUpload(
-            "nhi_image",
-            "NHI card image",
-            "Upload the student's NHI card"
-          )}
-
-          {imageUpload(
             "birth_cer_image",
             "Birth certificate image",
             "Upload the birth certificate",
             true
           )}
+
+          <Field label="Residential location">
+            <div className="relative">
+              <MapPin
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+              />
+              <input
+                required
+                value={formData.location}
+                onChange={(event) =>
+                  updateField("location", event.target.value)
+                }
+                placeholder="Town, area or community"
+                className={`${inputClass} pl-10`}
+              />
+            </div>
+          </Field>
 
           <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
             <p className="text-[10px] leading-5 text-slate-500">
@@ -1091,10 +1079,10 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
         <div className="space-y-4">
           <div>
             <h2 className="text-base font-bold text-white sm:text-lg">
-              Emergency contact
+              Emergency & NHI
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Add someone who can be reached quickly if needed.
+              Add a trusted emergency contact and the student&apos;s NHI details.
             </p>
           </div>
 
@@ -1116,6 +1104,24 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               />
             </div>
           </Field>
+
+          <Field label="NHI number">
+            <input
+              required
+              value={formData.nhi_number}
+              onChange={(event) =>
+                updateField("nhi_number", event.target.value)
+              }
+              placeholder="Enter NHI number"
+              className={inputClass}
+            />
+          </Field>
+
+          {imageUpload(
+            "nhi_image",
+            "NHI card image",
+            "Upload the student's NHI card"
+          )}
 
           <div className="rounded-xl border border-blue-400/10 bg-blue-500/[0.04] p-3">
             <div className="flex items-start gap-2.5">
@@ -1216,14 +1222,13 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       </div>
 
       <div className="mx-auto w-full max-w-[1200px]">
-        <button
-          type="button"
-          onClick={() => router.back()}
+        <Link
+          href={`/home/${projectId}`}
           className="mb-4 inline-flex items-center gap-2 text-xs font-medium text-slate-400 transition hover:text-white"
         >
           <ArrowLeft size={15} />
-          Back to project
-        </button>
+          Back to dashboard
+        </Link>
 
         <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl">
           <div className="pointer-events-none absolute -right-32 -top-32 hidden h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px] md:block" />
@@ -1309,8 +1314,8 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
           </div>
 
-          <div className="md:grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] md:items-stretch">
-            <section className="flex min-w-0 flex-col p-4 sm:p-6 lg:p-7 md:h-[560px] md:min-h-0">
+          <div className="md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[500px] md:items-stretch">
+            <section className="flex min-w-0 flex-col p-4 sm:p-5 md:h-full md:min-h-0 md:p-5">
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
                 <form
                   onSubmit={handleSubmit}
@@ -1372,7 +1377,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               </div>
             </section>
 
-            <aside className="relative hidden min-w-0 items-center justify-center px-5 py-7 md:flex lg:px-7">
+            <aside className="relative hidden min-w-0 items-center justify-center px-5 py-5 md:flex md:h-full">
               <div ref={previewRef} className="h-full w-full max-w-[390px]">
                 <StudentIllustration />
               </div>

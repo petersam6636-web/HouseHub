@@ -27,7 +27,7 @@ const copyrightYear = new Date().getFullYear();
 
 export default function Footer() {
   return (
-    <footer className="relative isolate overflow-hidden border-t border-white/[0.06] bg-[#05070D] text-white">
+    <footer className="relative isolate overflow-hidden rounded-[2rem] border-t border-white/[0.06] bg-[#05070D] text-white">
       {/* Background atmosphere */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -bottom-48 left-1/2 h-[420px] w-[700px] -translate-x-1/2 rounded-full bg-blue-600/[0.12] blur-[150px]" />
