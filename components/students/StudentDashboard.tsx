@@ -254,22 +254,6 @@ function StudentDashboardContent() {
 
         {/* Student charts */}
         <section className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-blue-400/15 bg-blue-500/10 text-blue-400">
-              <Activity size={18} />
-            </div>
-
-            <div className="min-w-0">
-              <h2 className="text-lg font-bold tracking-tight text-white">
-                Student analytics
-              </h2>
-
-              <p className="mt-1 text-xs text-slate-500">
-                A visual summary of the student's recorded activity
-              </p>
-            </div>
-          </div>
-
           <StudentCharts
             transactions={student.transactions}
           />

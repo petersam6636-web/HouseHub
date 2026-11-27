@@ -91,14 +91,14 @@ export default function StudentNavigation({
   }, []);
 
   const linkClass = (href: string) =>
-    `group relative flex min-w-0 flex-1 items-center justify-center gap-2
-     rounded-xl px-2.5 py-3 text-xs font-semibold transition-all duration-200
-     sm:px-3 sm:text-sm
-     ${
-       isActive(href)
-         ? "bg-blue-500/15 text-blue-300 ring-1 ring-inset ring-blue-400/25"
-         : "text-slate-400 hover:bg-white/[0.05] hover:text-white"
+    `group flex min-w-0 flex-col items-center gap-2 rounded-2xl py-3
+     text-center outline-none transition-colors focus-visible:ring-2
+     focus-visible:ring-blue-500 ${
+       isActive(href) ? "text-blue-300" : "text-slate-400"
      }`;
+
+  const activeIconClass = (href: string) =>
+    isActive(href) ? "ring-2 ring-inset ring-blue-400/50" : "";
 
   const moreIsActive = moreItems.some((item) => isActive(item.href));
 
@@ -107,14 +107,26 @@ export default function StudentNavigation({
       aria-label="Student navigation"
       className="relative z-30 w-full"
     >
-      <div className="flex w-full items-center gap-1.5 rounded-2xl border border-slate-800/80 bg-[#0b1220]/90 p-1.5 shadow-lg shadow-black/10 backdrop-blur-xl sm:gap-2 sm:p-2">
+      <div className="mx-auto grid w-full max-w-xl grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
         {/* Transactions */}
         <Link
           href={navigationItems[0].href}
           className={linkClass(navigationItems[0].href)}
         >
-          <Receipt className="size-4 shrink-0 sm:size-[18px]" />
-          <span className="truncate">Transactions</span>
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-400/[0.12] bg-indigo-500/[0.08] text-indigo-300 transition-colors group-hover:bg-indigo-500/[0.14] ${activeIconClass(navigationItems[0].href)}`}
+          >
+            <Receipt size={20} />
+          </div>
+          <span
+            className={`text-[10px] font-medium ${
+              isActive(navigationItems[0].href)
+                ? "text-blue-300"
+                : "text-slate-400 group-hover:text-indigo-300"
+            }`}
+          >
+            Transactions
+          </span>
         </Link>
 
         {/* Jobs */}
@@ -122,8 +134,20 @@ export default function StudentNavigation({
           href={navigationItems[1].href}
           className={linkClass(navigationItems[1].href)}
         >
-          <BriefcaseBusiness className="size-4 shrink-0 sm:size-[18px]" />
-          <span className="truncate">Jobs</span>
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/[0.12] bg-cyan-500/[0.08] text-cyan-300 transition-colors group-hover:bg-cyan-500/[0.14] ${activeIconClass(navigationItems[1].href)}`}
+          >
+            <BriefcaseBusiness size={20} />
+          </div>
+          <span
+            className={`text-[10px] font-medium ${
+              isActive(navigationItems[1].href)
+                ? "text-blue-300"
+                : "text-slate-400 group-hover:text-cyan-300"
+            }`}
+          >
+            Jobs
+          </span>
         </Link>
 
         {/* Products: visible from sm and above */}
@@ -133,8 +157,20 @@ export default function StudentNavigation({
             navigationItems[2].href
           )}`}
         >
-          <Package className="size-4 shrink-0 sm:size-[18px]" />
-          <span className="truncate">Products</span>
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/[0.12] bg-blue-500/[0.08] text-blue-400 transition-colors group-hover:bg-blue-500/[0.14] ${activeIconClass(navigationItems[2].href)}`}
+          >
+            <Package size={20} />
+          </div>
+          <span
+            className={`text-[10px] font-medium ${
+              isActive(navigationItems[2].href)
+                ? "text-blue-300"
+                : "text-slate-400 group-hover:text-blue-300"
+            }`}
+          >
+            Products
+          </span>
         </Link>
 
         {/* Feedback: visible from md and above */}
@@ -144,8 +180,20 @@ export default function StudentNavigation({
             navigationItems[3].href
           )}`}
         >
-          <ThumbsUp className="size-4 shrink-0 sm:size-[18px]" />
-          <span className="truncate">Feedback</span>
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/[0.12] bg-violet-500/[0.08] text-violet-300 transition-colors group-hover:bg-violet-500/[0.14] ${activeIconClass(navigationItems[3].href)}`}
+          >
+            <ThumbsUp size={20} />
+          </div>
+          <span
+            className={`text-[10px] font-medium ${
+              isActive(navigationItems[3].href)
+                ? "text-blue-300"
+                : "text-slate-400 group-hover:text-violet-300"
+            }`}
+          >
+            Feedback
+          </span>
         </Link>
 
         {/* Chat: visible from md and above */}
@@ -155,30 +203,52 @@ export default function StudentNavigation({
             navigationItems[4].href
           )}`}
         >
-          <MessageCircle className="size-4 shrink-0 sm:size-[18px]" />
-          <span className="truncate">Chat</span>
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-400/[0.12] bg-sky-500/[0.08] text-sky-300 transition-colors group-hover:bg-sky-500/[0.14] ${activeIconClass(navigationItems[4].href)}`}
+          >
+            <MessageCircle size={20} />
+          </div>
+          <span
+            className={`text-[10px] font-medium ${
+              isActive(navigationItems[4].href)
+                ? "text-blue-300"
+                : "text-slate-400 group-hover:text-sky-300"
+            }`}
+          >
+            Chat
+          </span>
         </Link>
 
         {/* More: visible below md */}
-        <div ref={menuRef} className="relative flex-1 md:hidden">
+        <div ref={menuRef} className="relative md:hidden">
           <button
             type="button"
             aria-expanded={isMoreOpen}
             aria-haspopup="menu"
             onClick={() => setIsMoreOpen((open) => !open)}
-            className={`flex w-full min-w-0 items-center justify-center gap-1.5 rounded-xl px-2.5 py-3 text-xs font-semibold transition-all duration-200 sm:px-3 sm:text-sm ${
+            className={`group flex w-full min-w-0 flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 ${
               moreIsActive || isMoreOpen
-                ? "bg-blue-500/15 text-blue-300 ring-1 ring-inset ring-blue-400/25"
-                : "text-slate-400 hover:bg-white/[0.05] hover:text-white"
+                ? "text-blue-300"
+                : "text-slate-400"
             }`}
           >
-            <MoreHorizontal className="size-4 shrink-0 sm:size-[18px]" />
-            <span>More</span>
-            <ChevronDown
-              className={`hidden size-3.5 shrink-0 transition-transform duration-200 sm:block ${
-                isMoreOpen ? "rotate-180" : ""
+            <div
+              className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/[0.12] bg-blue-500/[0.08] text-blue-400 transition-colors group-hover:bg-blue-500/[0.14] ${
+                moreIsActive || isMoreOpen
+                  ? "ring-2 ring-inset ring-blue-400/50"
+                  : ""
               }`}
-            />
+            >
+              <MoreHorizontal size={20} />
+            </div>
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-400 group-hover:text-blue-300">
+              More
+              <ChevronDown
+                className={`size-3 transition-transform duration-200 ${
+                  isMoreOpen ? "rotate-180" : ""
+                }`}
+              />
+            </span>
           </button>
 
           {/* Dropdown menu */}

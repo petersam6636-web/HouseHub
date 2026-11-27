@@ -101,33 +101,25 @@ const getTransactionLabel = (state: Transaction["state"]) => {
 function MetricCard({
   title,
   value,
-  description,
   icon,
   iconColor,
   iconBackground,
-  onClick,
 }: {
   title: string;
   value: string;
-  description: string;
   icon: React.ReactNode;
   iconColor: string;
   iconBackground: string;
-  onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-800/80 bg-[#0b1220] p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:border-blue-500/40 hover:bg-[#0e1728] focus:outline-none focus:ring-2 focus:ring-blue-500/50 sm:p-5"
-    >
+    <div className="relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-800/80 bg-[#0b1220] p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium text-slate-400 sm:text-sm">
             {title}
           </p>
 
-          <p className="mt-2 break-words text-xl font-bold tracking-tight text-white sm:text-2xl">
+          <p className="mt-2 break-words text-base font-bold tracking-tight text-white sm:text-2xl">
             {value}
           </p>
         </div>
@@ -138,15 +130,7 @@ function MetricCard({
           {icon}
         </div>
       </div>
-
-      <div className="mt-4 flex items-center justify-between gap-2">
-        <p className="text-xs leading-5 text-slate-500">
-          {description}
-        </p>
-
-        <ChevronRight className="size-4 shrink-0 text-slate-600 transition group-hover:translate-x-0.5 group-hover:text-blue-400" />
-      </div>
-    </button>
+    </div>
   );
 }
 
@@ -697,46 +681,38 @@ export default function StudentDashboardOverview({
 
   return (
     <div className="space-y-5">
-      {/* Four interactive metric cards */}
+      {/* Four student metrics */}
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <MetricCard
           title="Current Balance"
           value={formatCurrency(currentBalance)}
-          description="View balance breakdown"
           icon={<Wallet className="size-5" />}
           iconColor="text-blue-400"
           iconBackground="bg-blue-500/10"
-          onClick={() => setActiveMetric("balance")}
         />
 
         <MetricCard
           title="Total Withdrawals"
           value={formatCurrency(totalWithdrawals)}
-          description="View withdrawal history"
           icon={<ArrowUpRight className="size-5" />}
           iconColor="text-blue-400"
           iconBackground="bg-blue-500/10"
-          onClick={() => setActiveMetric("withdrawals")}
         />
 
         <MetricCard
           title="Unread Messages"
           value={String(unreadMessages.length)}
-          description="View unread messages"
           icon={<MessageCircle className="size-5" />}
           iconColor="text-sky-400"
           iconBackground="bg-sky-500/10"
-          onClick={() => setActiveMetric("messages")}
         />
 
         <MetricCard
           title="Fees Assigned"
           value={formatCurrency(totalFees)}
-          description="View assigned fees"
           icon={<FileText className="size-5" />}
           iconColor="text-indigo-400"
           iconBackground="bg-indigo-500/10"
-          onClick={() => setActiveMetric("fees")}
         />
       </div>
 
