@@ -1,18 +1,21 @@
+
 "use client";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   ArrowRight,
+  ArrowUpRight,
   GraduationCap,
   Mail,
   MapPin,
   Users,
   UserPlus,
   UserRound,
-  ArrowUpRight,
   Phone,
   Search,
+  ContactRound,
+  Mars,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type {
@@ -25,7 +28,6 @@ import {
   getErrorMessage,
 } from "@/lib/projectService";
 
-// Prevent creating a new empty array on every render.
 const EMPTY_STUDENTS: StudentDetailsWithRelations[] = [];
 
 export default function StudentsPage() {
@@ -44,6 +46,7 @@ export default function StudentsPage() {
   const cachedProject = projects.find(
     (item: ProjectWithRelations) => item.id === projectId
   );
+
   const project =
     cachedProject?.id === projectId
       ? cachedProject
@@ -92,6 +95,7 @@ export default function StudentsPage() {
         if (cancelled) return;
 
         setLoadedProject(result);
+
         setProjects((currentProjects) => [
           ...currentProjects.filter((item) => item.id !== result.id),
           result,
@@ -127,9 +131,7 @@ export default function StudentsPage() {
   const filteredStudents = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    if (!query) {
-      return students;
-    }
+    if (!query) return students;
 
     return students.filter(
       (student: StudentDetailsWithRelations) => {
@@ -149,64 +151,63 @@ export default function StudentsPage() {
 
   if (isLoading && !project) {
     return (
-      <main className="min-h-[calc(100vh-72px)] w-full px-3 py-6 text-white sm:px-5 sm:py-8 lg:px-8">
-        <div className="mx-auto flex min-h-[calc(100vh-120px)] w-full max-w-6xl items-center justify-center">
-          <section className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#101B2D] to-[#0B1220] p-8 text-center shadow-[0_20px_60px_rgba(0,0,0,0.28)]">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10">
-              <GraduationCap className="h-6 w-6 text-blue-400" />
-            </div>
-            <h1 className="mt-4 text-lg font-semibold text-white">
-              Loading students
-            </h1>
-            <p className="mt-2 text-sm text-slate-400">
-              Please wait while we load your project.
-            </p>
-          </section>
-        </div>
+      <main className="flex min-h-[calc(100vh-72px)] w-full items-center justify-center px-3 py-6 text-white sm:px-5">
+        <section className="w-full max-w-md rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#14243b] to-[#0b1422] p-8 text-center shadow-xl">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
+            <GraduationCap className="h-6 w-6 text-blue-400" />
+          </div>
+          <h1 className="mt-4 text-lg font-semibold text-white">
+            Loading students
+          </h1>
+          <p className="mt-2 text-sm text-slate-400">
+            Please wait while we load your project.
+          </p>
+        </section>
       </main>
     );
   }
 
   if (loadError || !project) {
     return (
-      <main className="min-h-[calc(100vh-72px)] w-full px-3 py-6 text-white sm:px-5 sm:py-8 lg:px-8">
-        <div className="mx-auto flex min-h-[calc(100vh-120px)] w-full max-w-6xl items-center justify-center">
-          <section className="relative w-full max-w-lg overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#101B2D] to-[#0B1220] p-6 text-center shadow-[0_20px_60px_rgba(0,0,0,0.28)] sm:p-8">
-            <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/[0.10] blur-[70px]" />
-            <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10">
-              <GraduationCap className="h-6 w-6 text-blue-400" />
-            </div>
+      <main className="flex min-h-[calc(100vh-72px)] w-full items-center justify-center px-3 py-6 text-white sm:px-5">
+        <section className="relative w-full max-w-lg overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#14243b] to-[#0b1422] p-6 text-center shadow-xl sm:p-8">
+          <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/15 blur-[70px]" />
 
-            <p className="relative mt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
-              Project unavailable
-            </p>
-            <h1 className="relative mt-2 text-lg font-semibold text-white">
-              {loadError ? "Unable to open project" : "Project not found"}
-            </h1>
-            <p className="relative mt-2 text-sm leading-6 text-slate-400">
-              {loadError ??
-                "We couldn’t find this project in your dashboard."}
-            </p>
+          <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
+            <GraduationCap className="h-6 w-6 text-blue-400" />
+          </div>
 
-            {loadError && (
-              <button
-                type="button"
-                onClick={() => setReloadKey((current) => current + 1)}
-                className="relative mt-5 rounded-xl bg-blue-600 px-5 py-3 text-xs font-semibold text-white transition hover:bg-blue-500"
-              >
-                Try again
-              </button>
-            )}
+          <p className="relative mt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+            Project unavailable
+          </p>
 
-            <Link
-              href="/home/project"
-              className="relative mt-5 inline-flex items-center gap-2 text-xs font-medium text-slate-300 transition hover:text-white"
+          <h1 className="relative mt-2 text-lg font-semibold text-white">
+            {loadError ? "Unable to open project" : "Project not found"}
+          </h1>
+
+          <p className="relative mt-2 text-sm leading-6 text-slate-400">
+            {loadError ??
+              "We couldn’t find this project in your dashboard."}
+          </p>
+
+          {loadError && (
+            <button
+              type="button"
+              onClick={() => setReloadKey((current) => current + 1)}
+              className="relative mt-5 rounded-xl bg-blue-600 px-5 py-3 text-xs font-semibold text-white transition hover:bg-blue-500"
             >
-              Back to projects
-              <ArrowRight size={15} />
-            </Link>
-          </section>
-        </div>
+              Try again
+            </button>
+          )}
+
+          <Link
+            href="/home/project"
+            className="relative mt-5 inline-flex items-center gap-2 text-xs font-medium text-slate-300 transition hover:text-white"
+          >
+            Back to projects
+            <ArrowRight size={15} />
+          </Link>
+        </section>
       </main>
     );
   }
@@ -214,26 +215,53 @@ export default function StudentsPage() {
   const registerHref = `/home/${project.id}/students/${project.id}`;
 
   return (
-    <main className="min-h-[calc(100vh-72px)] w-full px-3 py-6 text-white sm:px-5 sm:py-8 lg:px-8">
-      <div className="mx-auto w-full max-w-6xl space-y-7 pb-10">
-        {students.length > 0 && (
-          <section className="flex flex-col gap-4 rounded-2xl border border-white/[0.06] bg-[#080f1b]/80 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/10 bg-blue-500/[0.08]">
-                <Users size={19} className="text-blue-400" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">
-                  {students.length}{" "}
-                  {students.length === 1 ? "Student" : "Students"}
-                </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  Registered in {project.title}
-                </p>
-              </div>
+    <main className="min-h-[calc(100vh-72px)] w-full px-1.5 py-5 text-white sm:px-3 sm:py-7">
+      <div className="mx-auto w-full max-w-6xl space-y-6 pb-10">
+        {/* Page heading and always-visible add student button */}
+        <section className="flex flex-col gap-4 rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[#14243b] via-[#101d30] to-[#0b1422] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.16)] sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
+              <Users size={21} className="text-blue-300" />
             </div>
 
-            <div className="relative w-full sm:max-w-xs">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+                Student directory
+              </p>
+              <h1 className="mt-1 truncate text-lg font-bold tracking-tight text-white sm:text-xl">
+                {project.title}
+              </h1>
+              <p className="mt-1 text-xs text-slate-400">
+                {students.length}{" "}
+                {students.length === 1 ? "student" : "students"} registered
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href={registerHref}
+            className="group inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-[#3b82f6] px-5 py-3 text-xs font-bold text-white shadow-[0_8px_24px_rgba(37,99,235,0.24)] transition duration-300 hover:-translate-y-0.5 hover:from-blue-500 hover:to-blue-400"
+          >
+            <UserPlus size={16} />
+            Add student
+            <ArrowUpRight
+              size={15}
+              className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
+          </Link>
+        </section>
+
+        {/* Search and student count */}
+        {students.length > 0 && (
+          <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <Users size={15} className="text-blue-400" />
+              <span>
+                Showing {filteredStudents.length} of {students.length} students
+              </span>
+            </div>
+
+            <div className="relative w-full sm:max-w-sm">
               <Search
                 size={16}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
@@ -241,31 +269,36 @@ export default function StudentsPage() {
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search students..."
-                className="h-11 w-full rounded-xl border border-white/[0.07] bg-[#050b14] pl-9 pr-4 text-sm text-white outline-none placeholder:text-slate-600 transition-colors focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10"
+                placeholder="Search name, index or email..."
+                className="h-11 w-full rounded-xl border border-white/[0.07] bg-[#0b1422] pl-9 pr-4 text-sm text-white outline-none placeholder:text-slate-600 transition focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10"
               />
             </div>
           </section>
         )}
 
+        {/* Empty directory */}
         {students.length === 0 ? (
-          <section className="relative overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#080f1b] px-6 py-14 text-center sm:px-10">
-            <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-56 -translate-x-1/2 rounded-full bg-blue-500/[0.10] blur-[90px]" />
-            <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/[0.08]">
-              <GraduationCap size={29} className="text-blue-400" />
+          <section className="relative overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#14243b] via-[#101d30] to-[#0b1422] px-6 py-14 text-center sm:px-10">
+            <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-56 -translate-x-1/2 rounded-full bg-blue-500/15 blur-[90px]" />
+
+            <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
+              <GraduationCap size={29} className="text-blue-300" />
             </div>
+
             <h2 className="relative mt-6 text-xl font-semibold text-white sm:text-2xl">
               No students yet
             </h2>
+
             <p className="relative mx-auto mt-3 max-w-md text-sm leading-6 text-slate-400">
               Add your first student to start building your directory.
             </p>
+
             <Link
               href={registerHref}
-              className="group relative mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-xs font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500"
+              className="group relative mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-3 text-xs font-bold text-white shadow-[0_8px_24px_rgba(37,99,235,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:from-blue-500 hover:to-blue-400"
             >
               <UserPlus size={16} />
-              Add student
+              Add your first student
               <ArrowUpRight
                 size={14}
                 className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -273,7 +306,7 @@ export default function StudentsPage() {
             </Link>
           </section>
         ) : filteredStudents.length === 0 ? (
-          <section className="rounded-2xl border border-white/[0.06] bg-[#080f1b] px-6 py-12 text-center">
+          <section className="rounded-2xl border border-white/[0.06] bg-[#0b1422] px-6 py-12 text-center">
             <Search size={25} className="mx-auto text-slate-500" />
             <h2 className="mt-4 text-base font-semibold text-white">
               No students found
@@ -283,7 +316,7 @@ export default function StudentsPage() {
             </p>
           </section>
         ) : (
-          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <section className="flex flex-col gap-4">
             {filteredStudents.map(
               (student: StudentDetailsWithRelations) => (
                 <StudentCard key={student.id} student={student} />
@@ -314,134 +347,160 @@ function StudentCard({
   return (
     <article
       className="
-        group relative isolate min-w-0 overflow-hidden
-        rounded-[24px] border border-white/[0.07]
-        bg-[#080f1b]
-        transition-[transform,border-color,box-shadow]
-        duration-500
-        ease-[cubic-bezier(0.16,1,0.3,1)]
-        hover:-translate-y-1.5
+        group relative isolate grid min-w-0
+        grid-cols-[112px_minmax(0,1fr)]
+        overflow-hidden rounded-[24px]
+        border border-white/[0.07]
+        bg-gradient-to-br from-[#14243b] via-[#101d30] to-[#0b1422]
+        shadow-[0_12px_35px_rgba(0,0,0,0.14)]
+        transition duration-300
+        hover:-translate-y-0.5
         hover:border-blue-400/25
-        hover:shadow-[0_20px_55px_rgba(37,99,235,0.12)]
-        motion-reduce:transform-none
-        motion-reduce:transition-none
+        hover:shadow-[0_18px_45px_rgba(37,99,235,0.12)]
+        sm:grid-cols-[190px_minmax(0,1fr)]
+        lg:grid-cols-[220px_minmax(0,1fr)]
       "
     >
-      {/* Student photo */}
-      <div className="relative h-[280px] overflow-hidden bg-[#0b1625]">
+      {/* Full-height profile image */}
+      <div className="relative min-h-[250px] overflow-hidden bg-[#14243b] sm:min-h-[260px]">
         {image ? (
           <img
             src={image}
-            alt={`${student.full_name} profile`}
+            alt={`${student.full_name ?? "Student"} profile`}
             className="
-              h-full w-full object-cover object-center
+              absolute inset-0 h-full w-full object-cover object-center
               transition-transform duration-700
               ease-[cubic-bezier(0.16,1,0.3,1)]
-              group-hover:scale-[1.06]
-              motion-reduce:transform-none
+              group-hover:scale-[1.04]
             "
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-950/70 via-[#101d30] to-[#050b14]">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full border border-blue-400/20 bg-blue-500/[0.08] text-3xl font-bold tracking-wider text-blue-300">
-              {initials || <UserRound size={35} />}
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#244a78] via-[#183253] to-[#101d30]">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-blue-200/25 bg-blue-300/10 text-xl font-bold tracking-wider text-blue-100 sm:h-20 sm:w-20 sm:text-2xl">
+              {initials || <UserRound size={30} />}
             </div>
           </div>
         )}
 
-        {/* Dark gradient from bottom upward */}
-        <div
-          className="
-            pointer-events-none absolute inset-0
-            bg-gradient-to-t
-            from-[#050b14] from-[5%]
-            via-[#050b14]/75 via-[38%]
-            to-[#050b14]/0 to-[100%]
-          "
-        />
+        {/* Long, soft blue-black gradient blending into the card */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b1422]/0 via-[#0b1422]/10 to-[#0b1422]/75 sm:from-transparent sm:via-[#0b1422]/15 sm:to-[#0b1422]/90" />
 
-        {/* Top image shading */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#050b14]/50 to-transparent" />
+        {/* Bottom blend for the profile image */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#101d30]/75 to-transparent sm:hidden" />
 
-        {/* Student label */}
-        <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#050b14]/60 px-3 py-1.5 text-[10px] font-medium text-slate-200 backdrop-blur-md">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+        <div className="absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#10213a]/75 px-2 py-1 text-[9px] font-semibold text-blue-100 backdrop-blur-md sm:left-3 sm:top-3 sm:px-2.5 sm:text-[10px]">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-300" />
           Student
         </div>
+      </div>
 
-        {/* Name and index */}
-        <div className="absolute inset-x-0 bottom-0 p-5">
-          <h3 className="line-clamp-2 text-xl font-bold tracking-tight text-white">
-            {student.full_name}
+      {/* Student details */}
+      <div className="relative flex min-w-0 flex-col justify-center p-3 sm:p-5 lg:p-6">
+        {/* Soft blue highlight behind the details */}
+        <div className="pointer-events-none absolute -right-10 top-0 h-36 w-36 rounded-full bg-blue-500/[0.08] blur-[60px]" />
+
+        <div className="relative min-w-0">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300 sm:text-[10px]">
+            Student profile
+          </p>
+
+          <h3 className="mt-1.5 break-words text-base font-extrabold leading-tight tracking-tight text-white sm:mt-2 sm:text-xl lg:text-2xl">
+            {student.full_name || "Unnamed student"}
           </h3>
 
-          <p className="mt-2 text-xs font-medium tracking-wide text-blue-200/90">
-            {student.index_number || "Index number not added"}
-          </p>
+          <div className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-lg border border-blue-400/15 bg-blue-500/[0.08] px-2 py-1 sm:mt-3 sm:px-2.5">
+            <GraduationCap size={12} className="shrink-0 text-blue-300" />
+            <span className="truncate text-[10px] font-semibold text-blue-100 sm:text-xs">
+              {student.index_number || "Index number not added"}
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* Student information */}
-      <div className="space-y-3.5 p-5">
-        {student.email_address && (
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-slate-400 transition-colors duration-300 group-hover:bg-blue-500/[0.08] group-hover:text-blue-300">
-              <Mail size={15} />
-            </div>
+        {/* Essential information */}
+        <div className="relative mt-4 grid min-w-0 grid-cols-1 gap-x-5 gap-y-3 sm:mt-5 sm:grid-cols-2 sm:gap-y-4">
+          {student.email_address && (
+            <StudentInfo
+              icon={<Mail size={14} />}
+              label="Email address"
+              value={student.email_address}
+            />
+          )}
 
-            <p className="min-w-0 truncate text-xs text-slate-400">
-              {student.email_address}
-            </p>
-          </div>
-        )}
+          {student.location && (
+            <StudentInfo
+              icon={<MapPin size={14} />}
+              label="Location"
+              value={student.location}
+            />
+          )}
 
-        {student.location && (
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-slate-400 transition-colors duration-300 group-hover:bg-blue-500/[0.08] group-hover:text-blue-300">
-              <MapPin size={15} />
-            </div>
+          {student.gender && (
+            <StudentInfo
+              icon={<UserRound size={14} />}
+              label="Gender"
+              value={student.gender}
+            />
+          )}
 
-            <p className="min-w-0 truncate text-xs text-slate-400">
-              {student.location}
-            </p>
-          </div>
-        )}
-
-        {student.gender && (
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-slate-400 transition-colors duration-300 group-hover:bg-blue-500/[0.08] group-hover:text-blue-300">
-              <UserRound size={15} />
-            </div>
-
-            <p className="text-xs text-slate-400">
-              {student.gender}
-            </p>
-          </div>
-        )}
-
-        {student.mother_contact && (
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-slate-400 transition-colors duration-300 group-hover:bg-blue-500/[0.08] group-hover:text-blue-300">
-              <Phone size={15} />
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-[10px] text-slate-500">
-                Parent contact
-              </p>
-
-              <p className="mt-0.5 truncate text-xs text-slate-400">
-                {student.mother_contact}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Bottom accent */}
-        <div className="pt-1">
-          <div className="h-px w-full bg-gradient-to-r from-blue-500/25 via-white/[0.05] to-transparent" />
+          {student.mother_contact && (
+            <StudentInfo
+              icon={<Phone size={14} />}
+              label="Parent / emergency contact"
+              value={student.mother_contact}
+              important
+            />
+          )}
         </div>
+
+        {/* Bottom detail accent */}
+        <div className="relative mt-4 h-px w-full bg-gradient-to-r from-blue-400/35 via-blue-300/10 to-transparent sm:mt-5" />
       </div>
     </article>
+  );
+}
+
+function StudentInfo({
+  icon,
+  label,
+  value,
+  important = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  important?: boolean;
+}) {
+  return (
+    <div className="flex min-w-0 items-start gap-2.5">
+      <div
+        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${
+          important
+            ? "border-blue-400/20 bg-blue-500/10 text-blue-300"
+            : "border-white/[0.06] bg-white/[0.035] text-slate-400"
+        }`}
+      >
+        {icon}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p
+          className={`text-[9px] font-medium sm:text-[10px] ${
+            important ? "text-blue-200/80" : "text-slate-500"
+          }`}
+        >
+          {label}
+        </p>
+
+        <p
+          className={`mt-1 break-words text-[10px] leading-4 sm:text-xs sm:leading-5 ${
+            important
+              ? "font-semibold text-blue-100"
+              : "text-slate-300"
+          }`}
+        >
+          {value}
+        </p>
+      </div>
+    </div>
   );
 }
