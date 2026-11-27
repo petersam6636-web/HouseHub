@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowDownLeft,
@@ -76,6 +76,7 @@ function BalanceChart({
 
     return items.map((transaction) => {
       const amount = transactionAmount(transaction);
+
       runningBalance +=
         transaction.state === "deposit" ? amount : -amount;
 
@@ -113,9 +114,11 @@ function BalanceChart({
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl border border-white/[0.07] bg-[#080D18] text-slate-500">
             <Wallet size={24} />
           </div>
+
           <h3 className="font-semibold text-white">
             No balance history yet
           </h3>
+
           <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
             Completed deposits and withdrawals will appear here
             when this student has transaction activity.
@@ -131,14 +134,18 @@ function BalanceChart({
   const right = 24;
   const top = 24;
   const bottom = 42;
+
   const plotWidth = width - left - right;
   const plotHeight = height - top - bottom;
 
   const values = chartData.map((item) => item.balance);
+
   const rawMin = Math.min(0, ...values);
   const rawMax = Math.max(0, ...values);
+
   const rawRange = rawMax - rawMin || 1;
   const padding = rawRange * 0.12;
+
   const min = rawMin - padding;
   const max = rawMax + padding;
   const range = max - min || 1;
@@ -197,10 +204,12 @@ function BalanceChart({
           <div className="flex size-11 items-center justify-center rounded-2xl border border-blue-500/15 bg-blue-500/10 text-blue-400">
             <TrendingUp size={20} />
           </div>
+
           <div>
             <h2 className="text-lg font-bold text-white">
               Balance history
             </h2>
+
             <p className="mt-1 text-xs text-slate-500">
               Completed deposits and withdrawals
             </p>
@@ -211,6 +220,7 @@ function BalanceChart({
           <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
             Current balance
           </p>
+
           <p className="mt-1 text-xl font-bold tracking-tight text-white">
             {money(latestBalance)}
           </p>
@@ -233,9 +243,19 @@ function BalanceChart({
                 x2="0"
                 y2="1"
               >
-                <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.01" />
+                <stop
+                  offset="0%"
+                  stopColor="#3B82F6"
+                  stopOpacity="0.25"
+                />
+
+                <stop
+                  offset="100%"
+                  stopColor="#3B82F6"
+                  stopOpacity="0.01"
+                />
               </linearGradient>
+
               <linearGradient
                 id="studentBalanceLine"
                 x1="0"
@@ -250,6 +270,7 @@ function BalanceChart({
 
             {ticks.map((value, index) => {
               const y = top + (index / 4) * plotHeight;
+
               return (
                 <g key={index}>
                   <line
@@ -261,6 +282,7 @@ function BalanceChart({
                     strokeDasharray="4 6"
                     vectorEffect="non-scaling-stroke"
                   />
+
                   <text
                     x={left - 12}
                     y={y + 4}
@@ -274,7 +296,10 @@ function BalanceChart({
               );
             })}
 
-            <path d={areaPath} fill="url(#studentBalanceArea)" />
+            <path
+              d={areaPath}
+              fill="url(#studentBalanceArea)"
+            />
 
             <path
               d={linePath}
@@ -295,10 +320,17 @@ function BalanceChart({
               strokeWidth="3"
               vectorEffect="non-scaling-stroke"
             />
-            <circle cx={last.x} cy={last.y} r="2.5" fill="#BFDBFE" />
+
+            <circle
+              cx={last.x}
+              cy={last.y}
+              r="2.5"
+              fill="#BFDBFE"
+            />
 
             {dateIndexes.map((index, position) => {
               const point = points[index];
+
               if (!point) return null;
 
               const anchor =
@@ -327,12 +359,15 @@ function BalanceChart({
         <div className="mt-2 flex items-center justify-between border-t border-white/[0.06] pt-4">
           <div className="flex items-center gap-2">
             <span className="h-2 w-5 rounded-full bg-blue-500" />
+
             <span className="text-xs text-slate-500">
               Student balance
             </span>
           </div>
+
           <span className="text-[11px] text-slate-600">
-            {chartData.length} transaction{chartData.length === 1 ? "" : "s"} plotted
+            {chartData.length} transaction
+            {chartData.length === 1 ? "" : "s"} plotted
           </span>
         </div>
       </div>
@@ -364,9 +399,24 @@ export default function StudentTransactionsPage() {
   const [description, setDescription] = useState("");
   const [password, setPassword] = useState("");
 
+  const [transactionStep, setTransactionStep] = useState<
+    "password" | "details" | "verification"
+  >("password");
+
+  const [verificationSeconds, setVerificationSeconds] =
+    useState(6);
+
+  const verificationAttempt = useRef(0);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [transactionSuccess, setTransactionSuccess] =
+    useState<{
+      action: TransactionAction;
+      amount: number;
+    } | null>(null);
 
   const transactions = useMemo(() => {
     return [...(student?.transactions ?? [])].sort(
@@ -403,20 +453,140 @@ export default function StudentTransactionsPage() {
     );
 
   const openTransaction = (nextAction: TransactionAction) => {
+    verificationAttempt.current += 1;
+
     setAction(nextAction);
+    setTransactionStep("password");
     setAmount("");
     setDescription("");
     setPassword("");
+    setVerificationSeconds(6);
     setError("");
     setSuccess("");
+    setTransactionSuccess(null);
   };
 
   const closeTransaction = () => {
     if (loading) return;
 
+    verificationAttempt.current += 1;
+
     setAction(null);
+    setTransactionStep("password");
     setPassword("");
     setError("");
+  };
+
+  const cancelPasswordVerification = () => {
+    verificationAttempt.current += 1;
+
+    setTransactionStep("password");
+    setVerificationSeconds(6);
+    setError("");
+  };
+
+  useEffect(() => {
+    if (transactionStep !== "verification") return;
+
+    const interval = window.setInterval(() => {
+      setVerificationSeconds((seconds) => {
+        if (seconds <= 1) {
+          window.clearInterval(interval);
+          return 0;
+        }
+
+        return seconds - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [transactionStep]);
+
+  useEffect(() => {
+    if (
+      transactionStep !== "verification" ||
+      verificationSeconds !== 0
+    ) {
+      return;
+    }
+
+    verificationAttempt.current += 1;
+
+    setTransactionStep("password");
+    setError(
+      "Password verification timed out. Please try again."
+    );
+  }, [transactionStep, verificationSeconds]);
+
+  useEffect(() => {
+    if (!transactionSuccess) return;
+
+    const timeout = window.setTimeout(() => {
+      setTransactionSuccess(null);
+    }, 1600);
+
+    return () => window.clearTimeout(timeout);
+  }, [transactionSuccess]);
+
+  const verifyStudentPassword = async () => {
+    if (!student || !project || !action) return;
+
+    if (!password.trim()) {
+      setError("Enter the student's password to continue.");
+      return;
+    }
+
+    const attempt = ++verificationAttempt.current;
+
+    setError("");
+    setVerificationSeconds(6);
+    setTransactionStep("verification");
+
+    try {
+      const { data, error: functionError } =
+        await supabase.functions.invoke(
+          "student-transaction",
+          {
+            body: {
+              studentId: student.id,
+              projectId: project.id,
+              action,
+              password,
+              verifyOnly: true,
+            },
+          }
+        );
+
+      if (attempt !== verificationAttempt.current) return;
+
+      if (functionError) {
+        throw new Error(
+          functionError.message ||
+            "Could not verify the student's password."
+        );
+      }
+
+      if (data?.verified !== true) {
+        throw new Error(
+          data?.error || "This password is incorrect."
+        );
+      }
+
+      setTransactionStep("details");
+      setVerificationSeconds(6);
+      setError("");
+    } catch (err) {
+      if (attempt !== verificationAttempt.current) return;
+
+      setTransactionStep("password");
+      setVerificationSeconds(6);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "This password is incorrect."
+      );
+    }
   };
 
   const goBack = () => {
@@ -450,7 +620,6 @@ export default function StudentTransactionsPage() {
 
     try {
       /*
-       * SECURITY:
        * The Edge Function must verify the password securely,
        * validate the project/student relationship, and insert
        * the transaction server-side.
@@ -489,24 +658,92 @@ export default function StudentTransactionsPage() {
       const newTransaction =
         data.transaction as Transaction;
 
+      // Use the server-returned transaction immediately,
+      // then refresh the project and complete transaction history.
+      let refreshedProject: Record<string, unknown> = {};
+
+      let refreshedTransactions: Transaction[] = [
+        newTransaction,
+        ...transactions.filter(
+          (transaction) => transaction.id !== newTransaction.id
+        ),
+      ];
+
+      try {
+        const [projectResult, transactionsResult] =
+          await Promise.all([
+            supabase
+              .from("projects")
+              .select("*")
+              .eq("id", project.id)
+              .single(),
+
+            supabase
+              .from("transactions")
+              .select("*")
+              .eq("student_id", student.id)
+              .order("created_at", { ascending: false }),
+          ]);
+
+        if (!projectResult.error && projectResult.data) {
+          refreshedProject =
+            projectResult.data as Record<string, unknown>;
+        }
+
+        if (
+          !transactionsResult.error &&
+          transactionsResult.data
+        ) {
+          const databaseTransactions =
+            transactionsResult.data as Transaction[];
+
+          refreshedTransactions =
+            databaseTransactions.some(
+              (transaction) =>
+                transaction.id === newTransaction.id
+            )
+              ? databaseTransactions
+              : [newTransaction, ...databaseTransactions];
+        }
+      } catch (refreshError) {
+        /*
+         * The transaction has already been saved by the
+         * Edge Function. Keep it in the UI if refresh fails
+         * instead of inviting the housemaster to submit again.
+         */
+        console.error(
+          "Could not refresh transaction data:",
+          refreshError
+        );
+      }
+
+      refreshedTransactions = [
+        ...refreshedTransactions,
+      ].sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() -
+          new Date(a.created_at).getTime()
+      );
+
       setProjects((previousProjects) =>
         previousProjects.map((item) => {
           if (item.id !== project.id) return item;
 
           return {
             ...item,
+            ...refreshedProject,
+
             students: item.students.map(
-              (studentItem: StudentDetailsWithRelations) => {
+              (
+                studentItem: StudentDetailsWithRelations
+              ) => {
                 if (studentItem.id !== student.id) {
                   return studentItem;
                 }
 
                 return {
                   ...studentItem,
-                  transactions: [
-                    newTransaction,
-                    ...studentItem.transactions,
-                  ],
+                  transactions: refreshedTransactions,
                 };
               }
             ),
@@ -514,28 +751,41 @@ export default function StudentTransactionsPage() {
         })
       );
 
-      setSuccess(
-        action === "deposit"
-          ? "Deposit completed successfully."
-          : "Withdrawal completed successfully."
-      );
+      setTransactionSuccess({
+        action,
+        amount: parsedAmount,
+      });
 
+      setSuccess("");
       setAction(null);
+      setTransactionStep("password");
       setPassword("");
       setAmount("");
       setDescription("");
     } catch (err) {
-      setError(
+      const message =
         err instanceof Error
           ? err.message
-          : "Something went wrong."
-      );
+          : "Something went wrong.";
+
+      if (
+        /password|authoriz|verify|credential/i.test(message)
+      ) {
+        setTransactionStep("password");
+      }
+
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!studentId || !projectId || !project || !student) {
+  if (
+    !studentId ||
+    !projectId ||
+    !project ||
+    !student
+  ) {
     return (
       <main className="flex min-h-[70vh] items-center justify-center bg-[#05070D] px-4">
         <div className="w-full max-w-md rounded-3xl border border-white/[0.08] bg-[#0B1220] p-7 text-center">
@@ -577,13 +827,18 @@ export default function StudentTransactionsPage() {
               className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-[#0B1220] px-3 py-2.5 text-sm text-slate-300 transition hover:border-blue-500/30 hover:text-white"
             >
               <ArrowLeft size={17} />
+
               <span className="hidden sm:inline">
                 Student details
               </span>
             </button>
 
             <div className="flex items-center gap-2 rounded-xl border border-blue-500/15 bg-blue-500/[0.07] px-3 py-2">
-              <ShieldCheck size={16} className="text-blue-400" />
+              <ShieldCheck
+                size={16}
+                className="text-blue-400"
+              />
+
               <span className="text-xs font-medium text-blue-300">
                 Secure transactions
               </span>
@@ -593,6 +848,7 @@ export default function StudentTransactionsPage() {
           {/* Student profile */}
           <section className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#0B1220]">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(37,99,235,0.16),transparent_55%)]" />
+
             <div className="absolute -right-24 -top-24 size-72 rounded-full bg-blue-500/[0.06] blur-3xl" />
 
             <div className="relative flex flex-col gap-6 p-5 sm:p-7 lg:min-h-[230px] lg:flex-row lg:items-center lg:gap-8 lg:p-9">
@@ -611,7 +867,9 @@ export default function StudentTransactionsPage() {
                         .trim()
                         .split(/\s+/)
                         .slice(0, 2)
-                        .map((part) => part.charAt(0).toUpperCase())
+                        .map((part) =>
+                          part.charAt(0).toUpperCase()
+                        )
                         .join("")}
                     </div>
                   )}
@@ -647,7 +905,11 @@ export default function StudentTransactionsPage() {
               {/* Available balance */}
               <div className="flex min-h-[150px] w-full shrink-0 flex-col justify-center rounded-3xl border border-blue-400/15 bg-[#080D18]/90 px-5 py-6 sm:px-7 lg:min-h-[175px] lg:w-[340px] lg:px-8">
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-400">
-                  <Wallet size={17} className="text-blue-400" />
+                  <Wallet
+                    size={17}
+                    className="text-blue-400"
+                  />
+
                   Available balance
                 </div>
 
@@ -657,6 +919,7 @@ export default function StudentTransactionsPage() {
 
                 <div className="mt-4 flex items-center gap-2">
                   <span className="size-2 rounded-full bg-blue-400" />
+
                   <p className="text-xs text-slate-500">
                     Based on completed transactions
                   </p>
@@ -676,6 +939,7 @@ export default function StudentTransactionsPage() {
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/[0.12] bg-emerald-500/[0.08] text-emerald-300 transition-colors group-hover:bg-emerald-500/[0.14]">
                   <ArrowDownLeft size={20} />
                 </span>
+
                 <span className="text-[10px] font-medium text-slate-400 group-hover:text-emerald-300">
                   Deposit money
                 </span>
@@ -689,6 +953,7 @@ export default function StudentTransactionsPage() {
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-400/[0.12] bg-indigo-500/[0.08] text-indigo-300 transition-colors group-hover:bg-indigo-500/[0.14]">
                   <ArrowUpRight size={20} />
                 </span>
+
                 <span className="text-[10px] font-medium text-slate-400 group-hover:text-indigo-300">
                   Withdraw money
                 </span>
@@ -700,7 +965,9 @@ export default function StudentTransactionsPage() {
           {success && (
             <div className="flex items-center gap-3 rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4 text-sm text-blue-300">
               <CheckCircle2 size={18} />
+
               {success}
+
               <button
                 onClick={() => setSuccess("")}
                 className="ml-auto text-blue-300/70 hover:text-white"
@@ -717,8 +984,12 @@ export default function StudentTransactionsPage() {
                 <div className="rounded-xl bg-blue-500/10 p-2.5 text-blue-400">
                   <ArrowDownLeft size={19} />
                 </div>
+
                 <div>
-                  <p className="text-xs text-slate-400">Total deposits</p>
+                  <p className="text-xs text-slate-400">
+                    Total deposits
+                  </p>
+
                   <p className="mt-1 text-lg font-bold text-white">
                     {money(deposits)}
                   </p>
@@ -731,8 +1002,12 @@ export default function StudentTransactionsPage() {
                 <div className="rounded-xl bg-slate-500/10 p-2.5 text-slate-300">
                   <ArrowUpRight size={19} />
                 </div>
+
                 <div>
-                  <p className="text-xs text-slate-400">Total withdrawals</p>
+                  <p className="text-xs text-slate-400">
+                    Total withdrawals
+                  </p>
+
                   <p className="mt-1 text-lg font-bold text-white">
                     {money(withdrawals)}
                   </p>
@@ -751,6 +1026,7 @@ export default function StudentTransactionsPage() {
                 <h2 className="text-lg font-bold text-white">
                   Transaction activity
                 </h2>
+
                 <p className="mt-1 text-xs text-slate-400">
                   Every deposit and withdrawal recorded
                 </p>
@@ -830,7 +1106,9 @@ export default function StudentTransactionsPage() {
                               }`}
                             >
                               {isDeposit ? "+" : "-"}
-                              {money(transactionAmount(transaction))}
+                              {money(
+                                transactionAmount(transaction)
+                              )}
                             </p>
                           </div>
 
@@ -858,7 +1136,8 @@ export default function StudentTransactionsPage() {
                                   : "text-slate-400"
                               }
                             >
-                              {transaction.status || "Unknown status"}
+                              {transaction.status ||
+                                "Unknown status"}
                             </span>
                           </div>
 
@@ -877,15 +1156,29 @@ export default function StudentTransactionsPage() {
         </div>
 
         {/* Transaction authorization modal */}
-        {action && (
+        {action && transactionStep !== "verification" && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 backdrop-blur-sm sm:p-5">
-            <div className="w-full max-w-md overflow-hidden rounded-3xl border border-white/[0.1] bg-[#0B1220] shadow-2xl shadow-black/50">
+            <div
+              className="w-full max-w-md overflow-hidden rounded-3xl border border-white/[0.1] bg-[#0B1220] shadow-2xl shadow-black/50"
+              style={{
+                animation: "transactionModalIn 200ms ease-out both",
+              }}
+            >
+              <style>{`
+                @keyframes transactionModalIn {
+                  from { opacity: 0; transform: scale(0); }
+                  to { opacity: 1; transform: scale(1); }
+                }
+              `}</style>
+
               <div className="flex items-center justify-between border-b border-white/[0.07] p-5">
                 <div>
                   <h2 className="text-lg font-bold text-white">
-                    {action === "deposit"
-                      ? "Deposit money"
-                      : "Withdraw money"}
+                    {transactionStep === "password"
+                      ? "Student authorization"
+                      : action === "deposit"
+                        ? "Deposit money"
+                        : "Withdraw money"}
                   </h2>
 
                   <p className="mt-1 text-xs text-slate-400">
@@ -902,130 +1195,267 @@ export default function StudentTransactionsPage() {
                 </button>
               </div>
 
-              <div className="space-y-4 p-5">
-                <div className="rounded-xl border border-blue-500/15 bg-blue-500/[0.06] p-3">
-                  <p className="text-xs text-slate-400">
-                    Current available balance
-                  </p>
+              {transactionStep === "password" ? (
+                <div
+                  key="password-step"
+                  className="space-y-4 p-5"
+                  style={{
+                    animation: "transactionModalIn 200ms ease-out both",
+                  }}
+                >
+                  <div className="rounded-xl border border-blue-500/15 bg-blue-500/[0.06] p-3">
+                    <p className="text-xs text-slate-400">
+                      {action === "deposit"
+                        ? "The housemaster is requesting to deposit money into your student account."
+                        : "The housemaster is requesting to withdraw money from your student account."}
+                    </p>
 
-                  <p className="mt-1 text-lg font-bold text-white">
-                    {money(balance)}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-xs font-medium text-slate-300">
-                    Amount (GHS)
-                  </label>
-
-                  <input
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    value={amount}
-                    onChange={(event) =>
-                      setAmount(event.target.value)
-                    }
-                    placeholder="0.00"
-                    className="w-full rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500/50"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-xs font-medium text-slate-300">
-                    Description
-                  </label>
-
-                  <textarea
-                    value={description}
-                    onChange={(event) =>
-                      setDescription(event.target.value)
-                    }
-                    rows={3}
-                    placeholder={
-                      action === "deposit"
-                        ? "Reason for this deposit..."
-                        : "Reason for this withdrawal..."
-                    }
-                    className="w-full resize-none rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500/50"
-                  />
-                </div>
-
-                <div className="rounded-xl border border-white/[0.07] bg-[#080D18] p-4">
-                  <div className="mb-3 flex items-center gap-2">
-                    <LockKeyhole
-                      size={17}
-                      className="text-blue-400"
-                    />
-
-                    <p className="text-sm font-semibold text-white">
-                      Student authorization
+                    <p className="mt-2 text-xs leading-5 text-blue-300">
+                      Please enter your student password yourself
+                      before continuing. This lets you see what
+                      the password is being used to authorize.
                     </p>
                   </div>
 
-                  <p className="mb-3 text-xs leading-5 text-slate-400">
-                    Ask the student to enter their password
-                    to authorize this transaction.
-                  </p>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium text-slate-300">
+                      Student password
+                    </label>
 
-                  <input
-                    type="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(event) =>
-                      setPassword(event.target.value)
-                    }
-                    placeholder="Student password"
-                    className="w-full rounded-xl border border-white/[0.08] bg-[#0B1220] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500/50"
-                  />
-                </div>
-
-                {error && (
-                  <div className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/[0.07] p-3 text-xs text-red-300">
-                    <AlertCircle
-                      size={16}
-                      className="mt-0.5 shrink-0"
+                    <input
+                      type="password"
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(event) =>
+                        setPassword(event.target.value)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          void verifyStudentPassword();
+                        }
+                      }}
+                      placeholder="Enter your student password"
+                      className="w-full rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500/50"
                     />
-                    {error}
                   </div>
-                )}
 
-                <div className="flex gap-3 pt-1">
-                  <button
-                    onClick={closeTransaction}
-                    disabled={loading}
-                    className="flex-1 rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-sm font-semibold text-slate-300 transition hover:text-white disabled:opacity-40"
-                  >
-                    Cancel
-                  </button>
+                  {error && (
+                    <div className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/[0.07] p-3 text-xs text-red-300">
+                      <AlertCircle
+                        size={16}
+                        className="mt-0.5 shrink-0"
+                      />
 
-                  <button
-                    onClick={submitTransaction}
-                    disabled={loading}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2
-                          size={16}
-                          className="animate-spin"
-                        />
-                        Processing
-                      </>
-                    ) : (
-                      <>
-                        <ShieldCheck size={16} />
-                        Authorize
-                      </>
-                    )}
-                  </button>
+                      {error}
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 pt-1">
+                    <button
+                      onClick={closeTransaction}
+                      className="flex-1 rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-sm font-semibold text-slate-300 transition hover:text-white"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        void verifyStudentPassword()
+                      }
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500"
+                    >
+                      <ShieldCheck size={16} />
+                      Continue
+                    </button>
+                  </div>
                 </div>
+              ) : (
+                <div
+                  key="details-step"
+                  className="space-y-4 p-5"
+                  style={{
+                    animation: "transactionModalIn 200ms ease-out both",
+                  }}
+                >
+                  <div className="rounded-xl border border-blue-500/15 bg-blue-500/[0.06] p-3">
+                    <p className="text-xs text-slate-400">
+                      Current available balance
+                    </p>
 
-                <p className="text-center text-[11px] leading-5 text-slate-500">
-                  The transaction will only be recorded after
-                  the student&apos;s password is verified.
-                </p>
+                    <p className="mt-1 text-lg font-bold text-white">
+                      {money(balance)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs font-medium text-slate-300">
+                      Amount (GHS)
+                    </label>
+
+                    <input
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      value={amount}
+                      onChange={(event) =>
+                        setAmount(event.target.value)
+                      }
+                      placeholder="0.00"
+                      className="w-full rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs font-medium text-slate-300">
+                      Description
+                    </label>
+
+                    <textarea
+                      value={description}
+                      onChange={(event) =>
+                        setDescription(event.target.value)
+                      }
+                      rows={3}
+                      placeholder={
+                        action === "deposit"
+                          ? "Reason for this deposit..."
+                          : "Reason for this withdrawal..."
+                      }
+                      className="w-full resize-none rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500/50"
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/[0.07] p-3 text-xs text-red-300">
+                      <AlertCircle
+                        size={16}
+                        className="mt-0.5 shrink-0"
+                      />
+
+                      {error}
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 pt-1">
+                    <button
+                      onClick={() => {
+                        setTransactionStep("password");
+                        setError("");
+                      }}
+                      disabled={loading}
+                      className="flex-1 rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-sm font-semibold text-slate-300 transition hover:text-white disabled:opacity-40"
+                    >
+                      Back
+                    </button>
+
+                    <button
+                      onClick={submitTransaction}
+                      disabled={loading}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2
+                            size={16}
+                            className="animate-spin"
+                          />
+                          Processing
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck size={16} />
+
+                          {action === "deposit"
+                            ? "Complete deposit"
+                            : "Complete withdrawal"}
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <p className="text-center text-[11px] leading-5 text-slate-500">
+                    The transaction is recorded only after
+                    the amount and description are submitted.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Transaction success popup - closes after 1.6 seconds */}
+        {transactionSuccess && (
+          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/75 p-3 backdrop-blur-sm sm:p-5">
+            <div
+              className="w-full max-w-sm rounded-3xl border border-blue-500/20 bg-[#0B1220] p-6 text-center shadow-2xl shadow-black/50"
+              style={{
+                animation: "transactionModalIn 200ms ease-out both",
+              }}
+            >
+              <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-400">
+                <CheckCircle2 size={27} />
               </div>
+
+              <h3 className="text-base font-bold text-white">
+                {transactionSuccess.action === "deposit"
+                  ? "Deposit successful"
+                  : "Withdrawal successful"}
+              </h3>
+
+              <p className="mt-2 text-2xl font-bold text-white">
+                {money(transactionSuccess.amount)}
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                {transactionSuccess.action === "deposit"
+                  ? "The amount has been added to the student's balance."
+                  : "The amount has been deducted from the student's balance."}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Password verification popup */}
+        {action && transactionStep === "verification" && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 p-3 backdrop-blur-sm sm:p-5">
+            <div
+              className="w-full max-w-sm rounded-3xl border border-white/[0.1] bg-[#0B1220] p-6 text-center shadow-2xl shadow-black/50"
+              style={{
+                animation: "transactionModalIn 200ms ease-out both",
+              }}
+            >
+              <style>{`
+                @keyframes transactionModalIn {
+                  from { opacity: 0; transform: scale(0); }
+                  to { opacity: 1; transform: scale(1); }
+                }
+              `}</style>
+
+              <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-400">
+                <Loader2
+                  size={25}
+                  className="animate-spin"
+                />
+              </div>
+
+              <h3 className="text-base font-bold text-white">
+                Verifying student password
+              </h3>
+
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                Please wait while we securely verify the password.
+              </p>
+
+              <p className="mt-4 text-xs font-medium text-blue-300">
+                {verificationSeconds} seconds remaining
+              </p>
+
+              <button
+                onClick={cancelPasswordVerification}
+                className="mt-5 w-full rounded-xl border border-white/[0.08] bg-[#080D18] px-4 py-3 text-sm font-semibold text-slate-300 transition hover:text-white"
+              >
+                Cancel verification
+              </button>
             </div>
           </div>
         )}
