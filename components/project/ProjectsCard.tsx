@@ -126,6 +126,16 @@ function BalanceDonut({
 
   const expenseLength = circumference * expenseRatio;
   const balanceLength = circumference - expenseLength;
+  const chartGap =
+    expenseLength > 0 && balanceLength > 0 ? 2.5 : 0;
+  const expenseSegmentLength = Math.max(
+    0,
+    expenseLength - chartGap / 2
+  );
+  const balanceSegmentLength = Math.max(
+    0,
+    balanceLength - chartGap / 2
+  );
 
   return (
     <div className="relative h-[150px] w-[150px] shrink-0">
@@ -156,9 +166,9 @@ function BalanceDonut({
             fill="none"
             stroke="#38BDF8"
             strokeWidth="8"
-            strokeLinecap="round"
-            strokeDasharray={`${balanceLength} ${circumference}`}
-            strokeDashoffset={-expenseLength}
+            strokeLinecap="butt"
+            strokeDasharray={`${balanceSegmentLength} ${circumference}`}
+            strokeDashoffset={-(expenseLength + chartGap / 2)}
             className="transition-all duration-1000 ease-out"
           />
         )}
@@ -172,8 +182,8 @@ function BalanceDonut({
             fill="none"
             stroke="#2563EB"
             strokeWidth="8"
-            strokeLinecap="round"
-            strokeDasharray={`${expenseLength} ${circumference}`}
+            strokeLinecap="butt"
+            strokeDasharray={`${expenseSegmentLength} ${circumference}`}
             className="transition-all duration-1000 ease-out"
           />
         )}
@@ -379,15 +389,15 @@ function ProjectCard({
                   </div>
 
                   <span className="text-[10px] text-slate-500">
-                    Total amount
+                    Total balance
                   </span>
                 </div>
 
                 <p
                   className="truncate text-lg font-bold tracking-tight text-white"
-                  title={formatMoney(totalAmount)}
+                  title={formatMoney(balance)}
                 >
-                  {formatMoney(totalAmount)}
+                  {formatMoney(balance)}
                 </p>
               </div>
 

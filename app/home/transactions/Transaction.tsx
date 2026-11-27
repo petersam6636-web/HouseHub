@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArcElement,
@@ -120,8 +121,8 @@ function BalanceChart({
           "rgba(52, 211, 153, 0.82)",
           "rgba(129, 140, 248, 0.82)",
         ],
-        borderColor: ["#34D399", "#818CF8"],
-        borderWidth: 1,
+        borderColor: "#0B1220",
+        borderWidth: 4,
         hoverOffset: 8,
       },
     ],
@@ -784,6 +785,19 @@ export default function StudentTransactionsPage() {
                   Withdraw money
                 </span>
               </button>
+
+              <Link
+                href={`/home/transMessage?studentId=${student.id}&projectId=${project.id}`}
+                className="group flex w-28 flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/[0.12] bg-blue-500/[0.08] text-blue-300 transition-colors group-hover:bg-blue-500/[0.14]">
+                  <Clock3 size={20} />
+                </span>
+
+                <span className="text-[10px] font-medium text-slate-400 group-hover:text-blue-300">
+                  Transactions
+                </span>
+              </Link>
             </div>
           </section>
 
@@ -858,7 +872,7 @@ export default function StudentTransactionsPage() {
                   </h2>
 
                   <p className="mt-1 text-xs text-slate-400">
-                    Every deposit and withdrawal recorded
+                    Latest 3 deposits and withdrawals
                   </p>
                 </div>
 
@@ -894,6 +908,7 @@ export default function StudentTransactionsPage() {
                         transaction.state === "deposit" ||
                         transaction.state === "withdraw"
                     )
+                    .slice(0, 3)
                     .map((transaction) => {
                       const isDeposit =
                         transaction.state === "deposit";
