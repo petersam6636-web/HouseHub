@@ -123,7 +123,7 @@ function BalanceChart({
 
   if (deposits === 0 && withdrawals === 0) {
     return (
-      <section className="overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1220]">
+      <section className="min-w-0 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1220]">
         <div className="flex items-center justify-between gap-4 border-b border-white/[0.07] p-5 sm:p-6">
           <div>
             <h2 className="text-lg font-bold text-white">
@@ -850,138 +850,138 @@ export default function StudentTransactionsPage() {
 
             {/* Transaction activity */}
             <section className="min-w-0 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1220]">
-            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] p-5 sm:p-6">
-              <div>
-                <h2 className="text-lg font-bold text-white">
-                  Transaction activity
-                </h2>
+              <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] p-5 sm:p-6">
+                <div>
+                  <h2 className="text-lg font-bold text-white">
+                    Transaction activity
+                  </h2>
 
-                <p className="mt-1 text-xs text-slate-400">
-                  Every deposit and withdrawal recorded
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.07] bg-[#080D18] p-2.5 text-slate-400">
-                <Clock3 size={18} />
-              </div>
-            </div>
-
-            <div className="divide-y divide-white/[0.06]">
-              {transactions.filter(
-                (transaction) =>
-                  transaction.state === "deposit" ||
-                  transaction.state === "withdraw"
-              ).length === 0 ? (
-                <div className="px-5 py-14 text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/[0.07] bg-[#080D18] text-slate-500">
-                    <Wallet size={24} />
-                  </div>
-
-                  <h3 className="font-semibold text-white">
-                    No transactions yet
-                  </h3>
-
-                  <p className="mx-auto mt-2 max-w-xs text-sm text-slate-400">
-                    Deposits and withdrawals will appear here
-                    with their dates and transaction details.
+                  <p className="mt-1 text-xs text-slate-400">
+                    Every deposit and withdrawal recorded
                   </p>
                 </div>
-              ) : (
-                transactions
-                  .filter(
-                    (transaction) =>
-                      transaction.state === "deposit" ||
-                      transaction.state === "withdraw"
-                  )
-                  .map((transaction) => {
-                    const isDeposit =
-                      transaction.state === "deposit";
 
-                    const isCompleted =
-                      transaction.status === "completed";
+                <div className="rounded-xl border border-white/[0.07] bg-[#080D18] p-2.5 text-slate-400">
+                  <Clock3 size={18} />
+                </div>
+              </div>
 
-                    return (
-                      <article
-                        key={transaction.id}
-                        className="flex gap-3 p-4 transition hover:bg-white/[0.015] sm:gap-4 sm:p-5"
-                      >
-                        <div
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-                            isDeposit
-                              ? "bg-blue-500/10 text-blue-400"
-                              : "bg-slate-500/10 text-slate-300"
-                          }`}
+              <div className="divide-y divide-white/[0.06]">
+                {transactions.filter(
+                  (transaction) =>
+                    transaction.state === "deposit" ||
+                    transaction.state === "withdraw"
+                ).length === 0 ? (
+                  <div className="px-5 py-14 text-center">
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/[0.07] bg-[#080D18] text-slate-500">
+                      <Wallet size={24} />
+                    </div>
+
+                    <h3 className="font-semibold text-white">
+                      No transactions yet
+                    </h3>
+
+                    <p className="mx-auto mt-2 max-w-xs text-sm text-slate-400">
+                      Deposits and withdrawals will appear here
+                      with their dates and transaction details.
+                    </p>
+                  </div>
+                ) : (
+                  transactions
+                    .filter(
+                      (transaction) =>
+                        transaction.state === "deposit" ||
+                        transaction.state === "withdraw"
+                    )
+                    .map((transaction) => {
+                      const isDeposit =
+                        transaction.state === "deposit";
+
+                      const isCompleted =
+                        transaction.status === "completed";
+
+                      return (
+                        <article
+                          key={transaction.id}
+                          className="flex gap-3 p-4 transition hover:bg-white/[0.015] sm:gap-4 sm:p-5"
                         >
-                          {isDeposit ? (
-                            <ArrowDownLeft size={20} />
-                          ) : (
-                            <ArrowUpRight size={20} />
-                          )}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <p className="text-sm font-semibold text-white">
-                              {isDeposit
-                                ? "Money deposited"
-                                : "Money withdrawn"}
-                            </p>
-
-                            <p
-                              className={`text-sm font-bold ${
-                                isDeposit
-                                  ? "text-blue-400"
-                                  : "text-slate-200"
-                              }`}
-                            >
-                              {isDeposit ? "+" : "-"}
-                              {money(
-                                transactionAmount(transaction)
-                              )}
-                            </p>
+                          <div
+                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+                              isDeposit
+                                ? "bg-blue-500/10 text-blue-400"
+                                : "bg-slate-500/10 text-slate-300"
+                            }`}
+                          >
+                            {isDeposit ? (
+                              <ArrowDownLeft size={20} />
+                            ) : (
+                              <ArrowUpRight size={20} />
+                            )}
                           </div>
 
-                          <p className="mt-1 break-words text-sm text-slate-400">
-                            {transaction.description ||
-                              "No description provided"}
-                          </p>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <p className="text-sm font-semibold text-white">
+                                {isDeposit
+                                  ? "Money deposited"
+                                  : "Money withdrawn"}
+                              </p>
 
-                          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                            <span>
-                              {new Date(
-                                transaction.created_at
-                              ).toLocaleString("en-GH", {
-                                dateStyle: "medium",
-                                timeStyle: "short",
-                              })}
-                            </span>
+                              <p
+                                className={`text-sm font-bold ${
+                                  isDeposit
+                                    ? "text-blue-400"
+                                    : "text-slate-200"
+                                }`}
+                              >
+                                {isDeposit ? "+" : "-"}
+                                {money(
+                                  transactionAmount(transaction)
+                                )}
+                              </p>
+                            </div>
 
-                            <span>•</span>
-
-                            <span
-                              className={
-                                isCompleted
-                                  ? "text-blue-400"
-                                  : "text-slate-400"
-                              }
-                            >
-                              {transaction.status ||
-                                "Unknown status"}
-                            </span>
-                          </div>
-
-                          {transaction.reference && (
-                            <p className="mt-2 break-all text-[11px] text-slate-600">
-                              Ref: {transaction.reference}
+                            <p className="mt-1 break-words text-sm text-slate-400">
+                              {transaction.description ||
+                                "No description provided"}
                             </p>
-                          )}
-                        </div>
-                      </article>
-                    );
-                  })
-              )}
-            </div>
-          </section>
+
+                            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                              <span>
+                                {new Date(
+                                  transaction.created_at
+                                ).toLocaleString("en-GH", {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })}
+                              </span>
+
+                              <span>•</span>
+
+                              <span
+                                className={
+                                  isCompleted
+                                    ? "text-blue-400"
+                                    : "text-slate-400"
+                                }
+                              >
+                                {transaction.status ||
+                                  "Unknown status"}
+                              </span>
+                            </div>
+
+                            {transaction.reference && (
+                              <p className="mt-2 break-all text-[11px] text-slate-600">
+                                Ref: {transaction.reference}
+                              </p>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })
+                )}
+              </div>
+            </section>
           </div>
         </div>
 
