@@ -819,7 +819,7 @@ export default function StudentTransactionsPage() {
       <Header />
 
       <main className="px-3 py-5 sm:px-5 sm:py-7">
-        <div className="mx-auto max-w-7xl space-y-6">
+        <div className="mx-auto max-w-6xl space-y-6">
           {/* Header */}
           <header className="flex items-center justify-between gap-3">
             <button
@@ -930,11 +930,11 @@ export default function StudentTransactionsPage() {
 
           {/* Secure transaction actions */}
           <section className="mx-auto w-full max-w-sm">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex justify-center gap-2">
               <button
                 type="button"
                 onClick={() => openTransaction("deposit")}
-                className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="group flex w-28 flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/[0.12] bg-emerald-500/[0.08] text-emerald-300 transition-colors group-hover:bg-emerald-500/[0.14]">
                   <ArrowDownLeft size={20} />
@@ -948,7 +948,7 @@ export default function StudentTransactionsPage() {
               <button
                 type="button"
                 onClick={() => openTransaction("withdraw")}
-                className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="group flex w-28 flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-400/[0.12] bg-indigo-500/[0.08] text-indigo-300 transition-colors group-hover:bg-indigo-500/[0.14]">
                   <ArrowUpRight size={20} />
