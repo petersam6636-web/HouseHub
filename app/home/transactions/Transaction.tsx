@@ -3,6 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  ArcElement,
+  Chart as ChartJS,
+  Legend,
+  Tooltip,
+} from "chart.js";
+import type { ChartOptions } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+import {
   ArrowDownLeft,
   ArrowLeft,
   ArrowUpRight,
@@ -24,6 +32,8 @@ import type {
   Transaction,
   StudentDetailsWithRelations,
 } from "@/types";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 type TransactionAction = "deposit" | "withdraw";
 
@@ -54,45 +64,64 @@ function getBalance(transactions: Transaction[]) {
 }
 
 function BalanceChart({
-  transactions,
+  deposits,
+  withdrawals,
+  balance,
 }: {
-  transactions: Transaction[];
+  deposits: number;
+  withdrawals: number;
+  balance: number;
 }) {
-  const chartData = useMemo(() => {
-    const items = transactions
-      .filter(
-        (transaction) =>
-          completed(transaction) &&
-          (transaction.state === "deposit" ||
-            transaction.state === "withdraw")
-      )
-      .sort(
-        (a, b) =>
-          new Date(a.created_at).getTime() -
-          new Date(b.created_at).getTime()
-      );
+  const chartData = {
+    labels: ["Deposits", "Withdrawals"],
+    datasets: [
+      {
+        data: [deposits, withdrawals],
+        backgroundColor: [
+          "rgba(52, 211, 153, 0.82)",
+          "rgba(129, 140, 248, 0.82)",
+        ],
+        borderColor: ["#34D399", "#818CF8"],
+        borderWidth: 1,
+        hoverOffset: 8,
+      },
+    ],
+  };
 
-    let runningBalance = 0;
+  const chartOptions: ChartOptions<"doughnut"> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "72%",
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          color: "#94A3B8",
+          usePointStyle: true,
+          pointStyle: "circle",
+          padding: 18,
+          font: {
+            size: 12,
+          },
+        },
+      },
+      tooltip: {
+        backgroundColor: "#0B1424",
+        borderColor: "rgba(96, 165, 250, 0.18)",
+        borderWidth: 1,
+        titleColor: "#FFFFFF",
+        bodyColor: "#CBD5E1",
+        padding: 12,
+        cornerRadius: 12,
+        callbacks: {
+          label: (context) =>
+            `${context.label}: ${money(Number(context.raw))}`,
+        },
+      },
+    },
+  };
 
-    return items.map((transaction) => {
-      const amount = transactionAmount(transaction);
-
-      runningBalance +=
-        transaction.state === "deposit" ? amount : -amount;
-
-      const date = new Date(transaction.created_at);
-
-      return {
-        balance: runningBalance,
-        label: date.toLocaleDateString("en-GH", {
-          day: "numeric",
-          month: "short",
-        }),
-      };
-    });
-  }, [transactions]);
-
-  if (chartData.length === 0) {
+  if (deposits === 0 && withdrawals === 0) {
     return (
       <section className="overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1220]">
         <div className="flex items-center justify-between gap-4 border-b border-white/[0.07] p-5 sm:p-6">
@@ -128,77 +157,8 @@ function BalanceChart({
     );
   }
 
-  const width = 760;
-  const height = 300;
-  const left = 86;
-  const right = 24;
-  const top = 24;
-  const bottom = 42;
-
-  const plotWidth = width - left - right;
-  const plotHeight = height - top - bottom;
-
-  const values = chartData.map((item) => item.balance);
-
-  const rawMin = Math.min(0, ...values);
-  const rawMax = Math.max(0, ...values);
-
-  const rawRange = rawMax - rawMin || 1;
-  const padding = rawRange * 0.12;
-
-  const min = rawMin - padding;
-  const max = rawMax + padding;
-  const range = max - min || 1;
-
-  const getX = (index: number) =>
-    chartData.length === 1
-      ? left + plotWidth / 2
-      : left + (index / (chartData.length - 1)) * plotWidth;
-
-  const getY = (value: number) =>
-    top + ((max - value) / range) * plotHeight;
-
-  const points = chartData.map((item, index) => ({
-    x: getX(index),
-    y: getY(item.balance),
-    balance: item.balance,
-    label: item.label,
-  }));
-
-  const linePath = points
-    .map(
-      (point, index) =>
-        `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
-    )
-    .join(" ");
-
-  const first = points[0];
-  const last = points[points.length - 1];
-
-  const areaPath = [
-    linePath,
-    `L ${last.x} ${top + plotHeight}`,
-    `L ${first.x} ${top + plotHeight}`,
-    "Z",
-  ].join(" ");
-
-  const ticks = Array.from(
-    { length: 5 },
-    (_, index) => max - (index / 4) * range
-  );
-
-  const dateIndexes = Array.from(
-    new Set([
-      0,
-      Math.floor((chartData.length - 1) / 2),
-      chartData.length - 1,
-    ])
-  );
-
-  const latestBalance = chartData[chartData.length - 1].balance;
-
   return (
-    <section className="overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1220]">
+    <section className="min-w-0 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1220]">
       <div className="flex flex-col gap-4 border-b border-white/[0.07] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div className="flex items-center gap-3">
           <div className="flex size-11 items-center justify-center rounded-2xl border border-blue-500/15 bg-blue-500/10 text-blue-400">
@@ -222,153 +182,18 @@ function BalanceChart({
           </p>
 
           <p className="mt-1 text-xl font-bold tracking-tight text-white">
-            {money(latestBalance)}
+            {money(balance)}
           </p>
         </div>
       </div>
 
-      <div className="p-3 sm:p-5">
-        <div className="w-full overflow-hidden">
-          <svg
-            viewBox={`0 0 ${width} ${height}`}
-            role="img"
-            aria-label="Student balance history chart"
-            className="h-auto w-full"
-          >
-            <defs>
-              <linearGradient
-                id="studentBalanceArea"
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop
-                  offset="0%"
-                  stopColor="#3B82F6"
-                  stopOpacity="0.25"
-                />
-
-                <stop
-                  offset="100%"
-                  stopColor="#3B82F6"
-                  stopOpacity="0.01"
-                />
-              </linearGradient>
-
-              <linearGradient
-                id="studentBalanceLine"
-                x1="0"
-                y1="0"
-                x2="1"
-                y2="0"
-              >
-                <stop offset="0%" stopColor="#2563EB" />
-                <stop offset="100%" stopColor="#60A5FA" />
-              </linearGradient>
-            </defs>
-
-            {ticks.map((value, index) => {
-              const y = top + (index / 4) * plotHeight;
-
-              return (
-                <g key={index}>
-                  <line
-                    x1={left}
-                    x2={width - right}
-                    y1={y}
-                    y2={y}
-                    stroke="rgba(148,163,184,0.12)"
-                    strokeDasharray="4 6"
-                    vectorEffect="non-scaling-stroke"
-                  />
-
-                  <text
-                    x={left - 12}
-                    y={y + 4}
-                    textAnchor="end"
-                    fill="#64748B"
-                    fontSize="11"
-                  >
-                    {money(value)}
-                  </text>
-                </g>
-              );
-            })}
-
-            <path
-              d={areaPath}
-              fill="url(#studentBalanceArea)"
-            />
-
-            <path
-              d={linePath}
-              fill="none"
-              stroke="url(#studentBalanceLine)"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-            />
-
-            <circle
-              cx={last.x}
-              cy={last.y}
-              r="7"
-              fill="#0B1220"
-              stroke="#60A5FA"
-              strokeWidth="3"
-              vectorEffect="non-scaling-stroke"
-            />
-
-            <circle
-              cx={last.x}
-              cy={last.y}
-              r="2.5"
-              fill="#BFDBFE"
-            />
-
-            {dateIndexes.map((index, position) => {
-              const point = points[index];
-
-              if (!point) return null;
-
-              const anchor =
-                position === 0
-                  ? "start"
-                  : position === dateIndexes.length - 1
-                    ? "end"
-                    : "middle";
-
-              return (
-                <text
-                  key={`${index}-${position}`}
-                  x={point.x}
-                  y={height - 12}
-                  textAnchor={anchor}
-                  fill="#64748B"
-                  fontSize="11"
-                >
-                  {point.label}
-                </text>
-              );
-            })}
-          </svg>
-        </div>
-
-        <div className="mt-2 flex items-center justify-between border-t border-white/[0.06] pt-4">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-5 rounded-full bg-blue-500" />
-
-            <span className="text-xs text-slate-500">
-              Student balance
-            </span>
-          </div>
-
-          <span className="text-[11px] text-slate-600">
-            {chartData.length} transaction
-            {chartData.length === 1 ? "" : "s"} plotted
-          </span>
+      <div className="p-4 sm:p-5">
+        <div className="mx-auto h-64 w-full max-w-sm">
+          <Doughnut
+            data={chartData}
+            options={chartOptions}
+            aria-label="Completed deposits and withdrawals"
+          />
         </div>
       </div>
     </section>
@@ -979,36 +804,36 @@ export default function StudentTransactionsPage() {
 
           {/* Summary */}
           <section className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.07] bg-[#0B1220] p-5">
+            <div className="flex min-h-[112px] items-center rounded-2xl border border-white/[0.07] bg-[#0B1220] p-5 sm:p-6">
               <div className="flex items-center gap-3">
                 <div className="rounded-xl bg-blue-500/10 p-2.5 text-blue-400">
                   <ArrowDownLeft size={19} />
                 </div>
 
                 <div>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-sm text-slate-400">
                     Total deposits
                   </p>
 
-                  <p className="mt-1 text-lg font-bold text-white">
+                  <p className="mt-1 text-xl font-bold text-white sm:text-2xl">
                     {money(deposits)}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/[0.07] bg-[#0B1220] p-5">
+            <div className="flex min-h-[112px] items-center rounded-2xl border border-white/[0.07] bg-[#0B1220] p-5 sm:p-6">
               <div className="flex items-center gap-3">
                 <div className="rounded-xl bg-slate-500/10 p-2.5 text-slate-300">
                   <ArrowUpRight size={19} />
                 </div>
 
                 <div>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-sm text-slate-400">
                     Total withdrawals
                   </p>
 
-                  <p className="mt-1 text-lg font-bold text-white">
+                  <p className="mt-1 text-xl font-bold text-white sm:text-2xl">
                     {money(withdrawals)}
                   </p>
                 </div>
@@ -1016,11 +841,15 @@ export default function StudentTransactionsPage() {
             </div>
           </section>
 
-          {/* Chart */}
-          <BalanceChart transactions={transactions} />
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <BalanceChart
+              deposits={deposits}
+              withdrawals={withdrawals}
+              balance={balance}
+            />
 
-          {/* Transaction activity */}
-          <section className="overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1220]">
+            {/* Transaction activity */}
+            <section className="min-w-0 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1220]">
             <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] p-5 sm:p-6">
               <div>
                 <h2 className="text-lg font-bold text-white">
@@ -1153,6 +982,7 @@ export default function StudentTransactionsPage() {
               )}
             </div>
           </section>
+          </div>
         </div>
 
         {/* Transaction authorization modal */}
