@@ -286,7 +286,7 @@ export default function FeaturesHouseHub() {
               </span>
             </div>
 
-            <h2 className="max-w-3xl text-2xl font-bold leading-tight tracking-[-0.04em] text-white sm:text-3xl lg:text-[2.7rem]">
+            <h2 className="max-w-3xl text-[2.15rem] font-bold leading-tight tracking-[-0.04em] text-white sm:text-4xl md:text-[2.65rem] lg:text-5xl">
               Everything your school needs,
               <br className="hidden sm:block" />
               <span className="bg-gradient-to-r from-blue-300 to-blue-500 bg-clip-text text-transparent">

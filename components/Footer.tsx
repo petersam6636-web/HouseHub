@@ -54,7 +54,7 @@ export default function Footer() {
                   </span>
                 </div>
 
-                <h2 className="text-3xl font-extrabold leading-tight tracking-[-0.045em] text-white sm:text-4xl lg:text-5xl">
+                <h2 className="text-[2.15rem] font-extrabold leading-tight tracking-[-0.045em] text-white sm:text-4xl md:text-[2.65rem] lg:text-5xl">
                   Make room for
                   <br className="hidden sm:block" />
 
