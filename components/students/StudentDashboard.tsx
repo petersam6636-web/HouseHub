@@ -199,7 +199,9 @@ function StudentDashboardContent() {
         setIsLoading(false);
       } catch (error) {
         if (cancelled) return;
-        setLoadError(getErrorMessage(error));
+        setLoadError(
+          getErrorMessage(error, "Unable to load this project."),
+        );
         setIsLoading(false);
       }
     }
@@ -296,7 +298,7 @@ function StudentDashboardContent() {
       (total, transaction) => total + Math.abs(transaction.amount ?? 0),
       0,
     );
-  const transactionHref = `/home/transactions?studentId=${encodeURIComponent(student.id)}`;
+  const transactionHref = `/home/transactions?studentId=${encodeURIComponent(student.id)}&projectId=${encodeURIComponent(project.id)}`;
   const latestTransactions = [...transactions]
     .sort((left, right) => getTransactionTime(right) - getTransactionTime(left))
     .slice(0, 5);

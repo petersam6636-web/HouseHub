@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "include": [
+    "components/students/StudentDashboard.tsx",
+    "components/students/StudentDashboardOverview.tsx",
+    "app/home/transactions/Transaction.tsx",
+    "app/home/transactions/page.tsx"
+  ],
+  "exclude": ["node_modules", ".next", "supabase/functions"]
+}

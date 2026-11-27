@@ -16,10 +16,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  RefreshCw,
 } from "lucide-react";
 
-import { useApp } from "@/lib/useApp";
+import useApp from "@/lib/useApp";
 import { supabase } from "@/lib/supabase-client";
 import type {
   Transaction,
@@ -73,25 +72,27 @@ function BalanceChart({
           new Date(b.created_at).getTime()
       );
 
-    let balance = 0;
-
-    return [
-      { balance: 0, label: "Start" },
-      ...items.map((transaction) => {
+    return items.reduce(
+      (chart, transaction) => {
         const amount = transactionAmount(transaction);
+        const previousBalance = chart[chart.length - 1].balance;
+        const balance =
+          previousBalance +
+          (transaction.state === "deposit" ? amount : -amount);
 
-        balance +=
-          transaction.state === "deposit" ? amount : -amount;
-
-        return {
-          balance,
-          label: new Date(transaction.created_at).toLocaleDateString(
-            "en-GH",
-            { day: "numeric", month: "short" }
-          ),
-        };
-      }),
-    ];
+        return [
+          ...chart,
+          {
+            balance,
+            label: new Date(transaction.created_at).toLocaleDateString(
+              "en-GH",
+              { day: "numeric", month: "short" }
+            ),
+          },
+        ];
+      },
+      [{ balance: 0, label: "Start" }]
+    );
   }, [transactions]);
 
   const values = chartData.map((item) => item.balance);
@@ -451,7 +452,7 @@ export default function StudentTransactionsPage() {
                 </p>
 
                 <p className="mt-1 truncate text-xs text-slate-500">
-                  {project.name}
+                  {project.title}
                 </p>
               </div>
             </div>
@@ -497,7 +498,7 @@ export default function StudentTransactionsPage() {
                 Deposit money
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                Add money to the student's balance
+                Add money to the student&apos;s balance
               </p>
             </div>
 
@@ -844,7 +845,7 @@ export default function StudentTransactionsPage() {
 
               <p className="text-center text-[11px] leading-5 text-slate-500">
                 The transaction will only be recorded after
-                the student's password is verified.
+                the student&apos;s password is verified.
               </p>
             </div>
           </div>
