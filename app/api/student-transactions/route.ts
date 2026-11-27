@@ -103,38 +103,6 @@ export async function POST(request: Request) {
     return errorResponse("Enter a valid transaction amount.", 400);
   }
 
-  const { data: transactions, error: transactionsError } =
-    await supabase
-      .from("transactions")
-      .select("state, amount, status")
-      .eq("student_id", studentId);
-
-  if (transactionsError) {
-    console.error("Could not load student balance for transaction.", transactionsError);
-    return errorResponse("Could not verify the student's balance.", 500);
-  }
-
-  const balanceInCents = (transactions ?? []).reduce(
-    (balance, transaction) => {
-      if (transaction.status !== "completed") return balance;
-
-      const transactionAmountInCents = Math.round(
-        Number(transaction.amount ?? 0) * 100
-      );
-
-      if (transaction.state === "deposit") {
-        return balance + transactionAmountInCents;
-      }
-
-      if (transaction.state === "withdraw") {
-        return balance - transactionAmountInCents;
-      }
-
-      return balance;
-    },
-    0
-  );
-
   const amountInCents = Math.round(amount * 100);
 
   if (amountInCents < 1) {
@@ -144,32 +112,50 @@ export async function POST(request: Request) {
     );
   }
 
-  if (
-    action === "withdraw" &&
-    amountInCents > balanceInCents
-  ) {
-    return errorResponse(
-      "The student does not have enough balance.",
-      409
+  const { data: transactionResult, error: transactionError } =
+    await supabase.rpc("apply_student_transaction", {
+      p_project_id: projectId,
+      p_student_id: studentId,
+      p_action: action,
+      p_amount: Number((amountInCents / 100).toFixed(2)),
+      p_description: description.trim() || null,
+    });
+
+  if (transactionError) {
+    if (
+      transactionError.code === "P0001" &&
+      transactionError.message === "INSUFFICIENT_BALANCE"
+    ) {
+      return errorResponse(
+        "The student does not have enough balance.",
+        409
+      );
+    }
+
+    if (transactionError.code === "42501") {
+      return errorResponse(
+        "You do not have permission to change this student's balance.",
+        403
+      );
+    }
+
+    console.error(
+      "Could not apply student balance transaction.",
+      transactionError
     );
-  }
-
-  const { data: transaction, error: insertError } = await supabase
-    .from("transactions")
-    .insert({
-      student_id: studentId,
-      state: action,
-      amount: Number(amount.toFixed(2)),
-      description: description.trim() || null,
-      status: "completed",
-    })
-    .select("*")
-    .single();
-
-  if (insertError || !transaction) {
-    console.error("Could not save student transaction.", insertError);
     return errorResponse("Could not save the transaction.", 500);
   }
 
-  return Response.json({ transaction }, { status: 201 });
+  if (
+    !isRecord(transactionResult) ||
+    !isRecord(transactionResult.transaction) ||
+    !Array.isArray(transactionResult.amounts)
+  ) {
+    console.error(
+      "Student balance transaction returned an invalid response."
+    );
+    return errorResponse("Could not confirm the transaction.", 500);
+  }
+
+  return Response.json(transactionResult, { status: 201 });
 }

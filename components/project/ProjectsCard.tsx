@@ -20,9 +20,9 @@ import {
 
 import type {
   ProjectWithRelations,
-  Amount,
   Transaction,
 } from "@/types";
+import { getStudentBalance } from "@/lib/studentBalance";
 
 const currencyFormatter = new Intl.NumberFormat("en-GH", {
   style: "currency",
@@ -34,34 +34,11 @@ function formatMoney(value: number) {
   return currencyFormatter.format(value);
 }
 
-function getAmountValue(amount: Amount) {
-  const value = amount.amount;
-
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (typeof value === "string") {
-    const parsed = Number(value);
-
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return 0;
-}
-
-function getProjectTotalAmount(project: ProjectWithRelations) {
-  return project.students.reduce((total, student) => {
-    const studentAmount = student.amounts.reduce(
-      (amountTotal, amount) =>
-        amountTotal + getAmountValue(amount),
-      0
-    );
-
-    return total + studentAmount;
-  }, 0);
+function getProjectBalance(project: ProjectWithRelations) {
+  return project.students.reduce(
+    (total, student) => total + getStudentBalance(student.amounts),
+    0
+  );
 }
 
 function isCountableExpense(transaction: Transaction) {
@@ -103,11 +80,11 @@ function formatDate(date: string | null) {
 }
 
 function BalanceDonut({
-  totalAmount,
+  totalFunds,
   expenses,
   balance,
 }: {
-  totalAmount: number;
+  totalFunds: number;
   expenses: number;
   balance: number;
 }) {
@@ -115,8 +92,8 @@ function BalanceDonut({
   const circumference = 2 * Math.PI * radius;
 
   const expenseRatio =
-    totalAmount > 0
-      ? Math.min(expenses / totalAmount, 1)
+    totalFunds > 0
+      ? Math.min(expenses / totalFunds, 1)
       : expenses > 0
         ? 1
         : 0;
@@ -215,15 +192,15 @@ function ProjectCard({
   const router = useRouter();
   const { authenticatedId, setProjects } = useApp();
 
-  const totalAmount = getProjectTotalAmount(project);
+  const balance = getProjectBalance(project);
   const expenses = getProjectExpenses(project);
-  const balance = totalAmount - expenses;
+  const totalFunds = balance + expenses;
 
   const studentCount = project.students.length;
 
   const expensePercentage =
-    totalAmount > 0
-      ? Math.min((expenses / totalAmount) * 100, 100)
+    totalFunds > 0
+      ? Math.min((expenses / totalFunds) * 100, 100)
       : expenses > 0
         ? 100
         : 0;
@@ -353,7 +330,7 @@ function ProjectCard({
             {/* Donut chart */}
             <div className="flex flex-col items-center">
               <BalanceDonut
-                totalAmount={totalAmount}
+                totalFunds={totalFunds}
                 expenses={expenses}
                 balance={balance}
               />

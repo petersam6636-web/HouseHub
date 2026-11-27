@@ -23,6 +23,7 @@ import type {
   StudentDetailsWithRelations,
   Transaction,
 } from "@/types";
+import { getStudentBalance } from "@/lib/studentBalance";
 
 type StudentDashboardOverviewProps = {
   student: StudentDetailsWithRelations;
@@ -558,7 +559,7 @@ export default function StudentDashboardOverview({
     [completedTransactions],
   );
 
-  const currentBalance = totalDeposits - totalWithdrawals;
+  const currentBalance = getStudentBalance(student.amounts);
 
   const unreadMessages = messages.filter(
     (message) =>

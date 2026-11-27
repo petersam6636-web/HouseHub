@@ -36,6 +36,7 @@ export type StudentFee = {
 export type Amount = {
   id: string;
   student_id: string;
+  amount: number | string | null;
 
   [key: string]: unknown;
 };

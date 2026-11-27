@@ -28,8 +28,10 @@ import {
 
 import Header from "@/components/Header";
 import useApp from "@/lib/useApp";
+import { getStudentBalance } from "@/lib/studentBalance";
 import { supabase } from "@/lib/supabase-client";
 import type {
+  Amount,
   Transaction,
   StudentDetailsWithRelations,
 } from "@/types";
@@ -51,6 +53,7 @@ type StudentTransactionApiRequest = {
 type StudentTransactionApiResponse = {
   verified?: boolean;
   transaction?: Transaction;
+  amounts?: Amount[];
   error?: string;
 };
 
@@ -89,19 +92,6 @@ const completed = (transaction: Transaction) =>
 
 const transactionAmount = (transaction: Transaction) =>
   Number(transaction.amount ?? 0);
-
-function getBalance(transactions: Transaction[]) {
-  return transactions.reduce((balance, transaction) => {
-    if (!completed(transaction)) return balance;
-
-    const amount = transactionAmount(transaction);
-
-    if (transaction.state === "deposit") return balance + amount;
-    if (transaction.state === "withdraw") return balance - amount;
-
-    return balance;
-  }, 0);
-}
 
 function BalanceChart({
   deposits,
@@ -291,7 +281,7 @@ export default function StudentTransactionsPage() {
     );
   }, [student?.transactions]);
 
-  const balance = getBalance(transactions);
+  const balance = getStudentBalance(student?.amounts);
 
   const deposits = transactions
     .filter(
@@ -484,6 +474,8 @@ export default function StudentTransactionsPage() {
       }
 
       const newTransaction = data.transaction;
+      const refreshedStudentAmounts =
+        data.amounts ?? student.amounts ?? [];
 
       // Use the server-returned transaction immediately,
       // then refresh the project and complete transaction history.
@@ -570,6 +562,7 @@ export default function StudentTransactionsPage() {
 
                 return {
                   ...studentItem,
+                  amounts: refreshedStudentAmounts,
                   transactions: refreshedTransactions,
                 };
               }
