@@ -44,16 +44,6 @@ export async function POST(request: Request) {
   const amount = payload.amount;
   const description = payload.description;
 
-  if (
-    !isVerificationRequest &&
-    (typeof amount !== "number" ||
-      !Number.isFinite(amount) ||
-      amount < 0.01 ||
-      typeof description !== "string")
-  ) {
-    return errorResponse("Enter a valid transaction amount.", 400);
-  }
-
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -102,6 +92,15 @@ export async function POST(request: Request) {
 
   if (isVerificationRequest) {
     return Response.json({ verified: true });
+  }
+
+  if (
+    typeof amount !== "number" ||
+    !Number.isFinite(amount) ||
+    amount < 0.01 ||
+    typeof description !== "string"
+  ) {
+    return errorResponse("Enter a valid transaction amount.", 400);
   }
 
   const { data: transactions, error: transactionsError } =
