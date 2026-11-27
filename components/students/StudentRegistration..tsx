@@ -155,7 +155,7 @@ function Field({
 
 function StudentIllustration() {
   return (
-    <div className="relative mx-auto h-full w-full max-w-[615px]">
+    <div className="relative mx-auto h-full w-full max-w-[625px]">
       <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[70px]" />
 
       <div className="relative flex h-full scale-[0.9] flex-col justify-center gap-2 rounded-[1.75rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-3 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
@@ -1269,16 +1269,16 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
           </div>
 
-          <div className="md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[540px] md:items-stretch">
-            <section className="flex min-w-0 flex-col p-4 sm:p-5 md:h-full md:min-h-0 md:p-5">
-              <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
+          <div className="md:grid md:min-h-[550px] md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-stretch">
+            <section className="flex min-w-0 flex-col p-4 sm:p-5 md:min-h-[550px] md:p-5">
+              <div className="flex flex-1 flex-col rounded-2xl border border-white/[0.07] bg-[#070D16]/65 md:min-h-[510px]">
                 <form
                   onSubmit={handleSubmit}
-                  className="flex min-h-0 flex-1 flex-col"
+                  className="flex flex-1 flex-col"
                 >
                   <div
                     ref={formContentRef}
-                    className="flex-1 px-4 py-5 sm:px-5 sm:py-6 md:min-h-0 md:overflow-y-auto md:overscroll-contain"
+                    className="flex-1 px-4 py-5 sm:px-5 sm:py-6"
                   >
                     {renderStep()}
                   </div>
@@ -1332,8 +1332,8 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               </div>
             </section>
 
-            <aside className="relative hidden min-w-0 items-center justify-center px-5 py-5 md:flex md:h-[508px] md:self-center">
-              <div ref={previewRef} className="h-full w-full max-w-[615px]">
+            <aside className="relative hidden min-w-0 items-center justify-center px-5 py-5 md:flex md:h-[518px] md:self-center md:px-4">
+              <div ref={previewRef} className="h-full w-full max-w-[625px]">
                 <StudentIllustration />
               </div>
             </aside>

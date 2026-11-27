@@ -2,12 +2,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import useApp from "@/lib/useApp";
+import DeleteConfirmationMenu from "@/components/DeleteConfirmationMenu";
+import { supabase } from "@/lib/supabase-client";
+import { fetchProjectsForUser } from "@/lib/projectService";
 import {
   Plus,
   CalendarDays,
   Users,
-  ArrowUpRight,
   Wallet,
   Building2,
   GraduationCap,
@@ -204,6 +207,9 @@ function ProjectCard({
 }: {
   project: ProjectWithRelations;
 }) {
+  const router = useRouter();
+  const { authenticatedId, setProjects } = useApp();
+
   const totalAmount = getProjectTotalAmount(project);
   const expenses = getProjectExpenses(project);
   const balance = totalAmount - expenses;
@@ -217,10 +223,42 @@ function ProjectCard({
         ? 100
         : 0;
 
+  async function handleDeleteProject() {
+    if (!authenticatedId) {
+      throw new Error("Sign in to delete this project.");
+    }
+
+    const { data, error } = await supabase
+      .from("projects")
+      .delete()
+      .eq("id", project.id)
+      .eq("user_id", authenticatedId)
+      .select("id");
+
+    if (error) throw error;
+    if (!data?.length) {
+      throw new Error("The project could not be deleted.");
+    }
+
+    try {
+      const remainingProjects = await fetchProjectsForUser(authenticatedId);
+      setProjects(remainingProjects);
+    } catch (error) {
+      console.error(
+        "Project was deleted, but the project list could not be refreshed.",
+        error
+      );
+      setProjects((currentProjects) =>
+        currentProjects.filter((item) => item.id !== project.id)
+      );
+    }
+
+    router.replace("/home/project");
+  }
+
   return (
-    <Link
-      href={`/home/${project.id}`}
-      className="group relative block min-w-0 overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#0A1220] transition-all duration-500 hover:-translate-y-1.5 hover:border-blue-400/30 hover:shadow-[0_24px_80px_-30px_rgba(37,99,235,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+    <article
+      className="group relative block min-w-0 overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#0A1220] transition-all duration-500 hover:-translate-y-1.5 hover:border-blue-400/30 hover:shadow-[0_24px_80px_-30px_rgba(37,99,235,0.45)]"
     >
       {/* Futuristic background effects */}
       <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-blue-500/[0.07] blur-[90px] transition duration-700 group-hover:bg-blue-500/[0.16]" />
@@ -229,6 +267,14 @@ function ProjectCard({
 
       {/* Top accent line */}
       <div className="absolute left-8 right-8 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent opacity-50 transition-opacity duration-500 group-hover:opacity-100" />
+
+      <Link
+        href={`/home/${project.id}`}
+        aria-label={`Open ${project.title}`}
+        className="absolute inset-0 z-10 rounded-[28px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+      >
+        <span className="sr-only">Open project {project.title}</span>
+      </Link>
 
       <div className="relative p-5 sm:p-6">
         {/* Project header */}
@@ -266,12 +312,7 @@ function ProjectCard({
             </div>
           </div>
 
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-slate-500 transition-all duration-300 group-hover:border-blue-400/25 group-hover:bg-blue-500/10 group-hover:text-blue-300">
-            <ArrowUpRight
-              size={17}
-              className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            />
-          </div>
+          <div className="h-9 w-9 shrink-0" aria-hidden="true" />
         </div>
 
         {/* Project metadata */}
@@ -398,7 +439,16 @@ function ProjectCard({
 
         {/* Bottom project summary */}
       </div>
-    </Link>
+
+      <div className="absolute right-5 top-5 z-20">
+        <DeleteConfirmationMenu
+          entity="project"
+          confirmationPhrase="delete my project"
+          description="This will permanently delete this project and its associated data."
+          onDelete={handleDeleteProject}
+        />
+      </div>
+    </article>
   );
 }
 
