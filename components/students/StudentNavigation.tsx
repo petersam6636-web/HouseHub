@@ -33,7 +33,7 @@ export default function StudentNavigation({
   const navigationItems = [
     {
       label: "Transactions",
-      href: `/home/students/transactions${query}`,
+      href: `/home/transactions?studentId=${studentId}&projectId=${projectId}`,
       icon: Receipt,
     },
     {
