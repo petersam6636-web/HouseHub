@@ -317,7 +317,7 @@ export default function StudentsPage() {
         </Link>
 
         {/* Project heading */}
-        <section className="flex items-center justify-between gap-3 rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#102440] via-[#0A192D] to-[#061020] p-5 sm:p-6">
+        <section className="flex min-h-[180px] items-center justify-between gap-3 rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#102440] via-[#0A192D] to-[#061020] p-6 sm:min-h-[200px] sm:p-8">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10">
               <Users size={18} className="text-blue-300" />
@@ -389,7 +389,7 @@ export default function StudentsPage() {
             </p>
           </section>
         ) : (
-          <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <section className="grid grid-cols-1 gap-4">
             {filteredStudents.map((student) => (
               <StudentCard
                 key={student.id}
@@ -438,24 +438,24 @@ function StudentCard({
       <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/[0.10] blur-[75px]" />
 
       {/* Portrait section */}
-      <div className="relative flex min-h-[230px] shrink-0 items-center justify-center overflow-hidden border-b border-blue-300/[0.08] bg-gradient-to-br from-[#102440] via-[#0B1B30] to-[#061020] sm:min-h-[330px] sm:w-[38%] sm:border-b-0 sm:border-r">
+      <div className="relative flex min-h-[230px] shrink-0 items-center justify-center overflow-hidden border-b border-blue-300/[0.08] bg-gradient-to-br from-[#102440] via-[#0B1B30] to-[#061020] sm:min-h-[330px] sm:w-[38%] sm:border-b-0 sm:border-r lg:min-h-[350px]">
         {/* Soft background glow */}
         <div className="pointer-events-none absolute h-48 w-48 rounded-full bg-blue-500/[0.12] blur-[55px]" />
 
         {/* Decorative outer ring */}
-        <div className="absolute h-[174px] w-[174px] rotate-[-35deg] rounded-full border-[5px] border-blue-500 border-t-transparent shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-transform duration-500 group-hover:rotate-[-20deg] sm:h-[190px] sm:w-[190px]" />
+        <div className="absolute h-[174px] w-[174px] rotate-[-35deg] rounded-full border-[5px] border-blue-500 border-t-transparent shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-transform duration-500 group-hover:rotate-[-20deg] sm:h-[190px] sm:w-[190px] lg:h-[210px] lg:w-[210px]" />
 
         {/* Secondary ring */}
-        <div className="absolute h-[154px] w-[154px] rounded-full border-[3px] border-blue-300/20 sm:h-[170px] sm:w-[170px]" />
+        <div className="absolute h-[154px] w-[154px] rounded-full border-[3px] border-blue-300/20 sm:h-[170px] sm:w-[170px] lg:h-[190px] lg:w-[190px]" />
 
         {/* Student portrait */}
-        <div className="relative h-[142px] w-[142px] overflow-hidden rounded-full border-[5px] border-[#071426] bg-[#102440] shadow-[0_12px_35px_rgba(0,0,0,0.35)] sm:h-[158px] sm:w-[158px]">
+        <div className="relative h-[142px] w-[142px] overflow-hidden rounded-full border-[5px] border-[#071426] bg-[#102440] shadow-[0_12px_35px_rgba(0,0,0,0.35)] sm:h-[158px] sm:w-[158px] lg:h-[178px] lg:w-[178px]">
           {image ? (
             <Image
               src={image}
               alt={`${studentName} profile`}
               fill
-              sizes="(min-width: 640px) 160px, 145px"
+              sizes="(min-width: 1024px) 180px, (min-width: 640px) 160px, 145px"
               unoptimized
               className="object-cover object-center transition duration-500 group-hover:scale-105"
             />

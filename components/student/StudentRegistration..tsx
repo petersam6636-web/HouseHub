@@ -155,7 +155,7 @@ function Field({
 
 function StudentIllustration() {
   return (
-    <div className="relative mx-auto h-full w-full max-w-[390px]">
+    <div className="relative mx-auto h-full w-full max-w-[410px]">
       <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[70px]" />
 
       <div className="relative flex h-full scale-[0.9] flex-col justify-center gap-2 rounded-[1.75rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-3 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
@@ -794,7 +794,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             />
           </Field>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-4">
             <Field label="Index number" optional>
               <input
                 value={formData.index_number}
@@ -985,8 +985,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
           </Field>
 
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-          </div>
         </div>
       );
     }
@@ -1214,11 +1212,11 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
       <div className="mx-auto w-full max-w-[1200px]">
         <Link
-          href={`/home/${projectId}`}
+          href="/home/students"
           className="mb-4 inline-flex items-center gap-2 text-xs font-medium text-slate-400 transition hover:text-white"
         >
           <ArrowLeft size={15} />
-          Back to dashboard
+          Back to students
         </Link>
 
         <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl">
@@ -1305,7 +1303,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
           </div>
 
-          <div className="md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[508px] md:items-stretch">
+          <div className="md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[600px] md:items-stretch">
             <section className="flex min-w-0 flex-col p-4 sm:p-5 md:h-full md:min-h-0 md:p-5">
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
                 <form
@@ -1368,8 +1366,8 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               </div>
             </section>
 
-            <aside className="relative hidden min-w-0 items-center justify-center px-5 py-5 md:flex md:h-full">
-              <div ref={previewRef} className="h-full w-full max-w-[390px]">
+            <aside className="relative hidden min-w-0 items-center justify-center px-5 py-5 md:flex md:h-[508px] md:self-center">
+              <div ref={previewRef} className="h-full w-full max-w-[410px]">
                 <StudentIllustration />
               </div>
             </aside>
