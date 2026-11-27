@@ -117,7 +117,12 @@ const steps = [
     icon: Users,
   },
   {
-    title: "Emergency & review",
+    title: "Emergency contact",
+    description: "Add a trusted emergency contact.",
+    icon: Phone,
+  },
+  {
+    title: "Review & register",
     description: "Review the information before registration.",
     icon: ClipboardCheck,
   },
@@ -149,11 +154,11 @@ function Field({
 
 function StudentIllustration() {
   return (
-    <div className="relative mx-auto h-full min-h-[620px] w-full max-w-[420px]">
-      <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[80px]" />
+    <div className="relative mx-auto h-full w-full max-w-[380px]">
+      <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[70px]" />
 
-      <div className="relative flex h-full min-h-[620px] flex-col justify-center rounded-[2rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-4 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
-        <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-3 py-3">
+      <div className="relative flex h-full scale-[0.94] flex-col justify-center gap-2 rounded-[1.75rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-3 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+        <div className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-300">
               <GraduationCap size={18} />
@@ -170,16 +175,16 @@ function StudentIllustration() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-blue-400/[0.13] bg-[#080F1C]/90 p-4">
-          <div className="mb-4 flex items-center justify-between">
+        <div className="rounded-2xl border border-blue-400/[0.13] bg-[#080F1C]/90 p-3">
+          <div className="mb-3 flex items-center justify-between">
             <div className="h-2 w-24 rounded-full bg-slate-300/50" />
             <div className="rounded-full border border-blue-400/20 bg-blue-500/10 px-2.5 py-1">
               <div className="h-1.5 w-10 rounded-full bg-blue-300/70" />
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="relative flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-2xl border border-blue-400/20 bg-gradient-to-br from-blue-500/20 to-blue-500/[0.04]">
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-blue-400/20 bg-gradient-to-br from-blue-500/20 to-blue-500/[0.04]">
               <UserRound size={33} className="text-blue-300/80" />
 
               <div className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-lg border border-[#0B1220] bg-blue-500">
@@ -194,11 +199,11 @@ function StudentIllustration() {
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-2">
+          <div className="mt-3 grid grid-cols-2 gap-2">
             {[0, 1].map((item) => (
               <div
                 key={item}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"
+                className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-2.5"
               >
                 <div className="mb-3 flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
                   {item === 0 ? (
@@ -214,8 +219,8 @@ function StudentIllustration() {
           </div>
         </div>
 
-        <div className="mt-3 rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-4">
-          <div className="mb-3 flex items-center justify-between">
+        <div className="rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-3">
+          <div className="mb-2 flex items-center justify-between">
             <div className="h-2 w-24 rounded-full bg-slate-300/50" />
             <FileBadge size={15} className="text-blue-400/70" />
           </div>
@@ -224,9 +229,9 @@ function StudentIllustration() {
             {["ID", "NHI", "Birth"].map((label) => (
               <div
                 key={label}
-                className="flex flex-col items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"
+                className="flex flex-col items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.025] p-2"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-blue-400/15 bg-blue-500/[0.08]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-blue-400/15 bg-blue-500/[0.08]">
                   <FileBadge size={15} className="text-blue-300/80" />
                 </div>
                 <span className="text-[9px] font-medium text-slate-400">
@@ -237,17 +242,17 @@ function StudentIllustration() {
           </div>
         </div>
 
-        <div className="mt-3 rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-4">
-          <div className="mb-3 flex items-center justify-between">
+        <div className="rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-3">
+          <div className="mb-2 flex items-center justify-between">
             <div className="h-2 w-28 rounded-full bg-slate-300/50" />
             <Users size={15} className="text-blue-400/70" />
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {[0, 1].map((item) => (
               <div
                 key={item}
-                className="flex items-center gap-3 rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5"
+                className="flex items-center gap-3 rounded-xl border border-white/[0.04] bg-white/[0.02] p-2"
               >
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
                   <UserRound size={13} className="text-blue-300/70" />
@@ -292,7 +297,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
   const previewRef = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState(0);
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [formData, setFormData] =
     useState<StudentFormData>(initialFormData);
   const [images, setImages] = useState<StudentImages>(initialImages);
@@ -314,15 +318,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       previewUrls.forEach((url) => URL.revokeObjectURL(url));
       previewUrls.clear();
     };
-  }, []);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 639px)");
-    const updateScreenSize = () => setIsSmallScreen(mediaQuery.matches);
-
-    updateScreenSize();
-    mediaQuery.addEventListener("change", updateScreenSize);
-    return () => mediaQuery.removeEventListener("change", updateScreenSize);
   }, []);
 
   useEffect(() => {
@@ -437,7 +432,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     if (step === 0) {
       return (
         formData.full_name.trim().length > 0 &&
-        (isSmallScreen || formData.gender.length > 0) &&
+        formData.gender.length > 0 &&
         formData.location.trim().length > 0 &&
         formData.nhi_number.trim().length > 0
       );
@@ -447,8 +442,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       return (
         formData.password.trim().length >= 4 &&
         confirmPassword.trim().length >= 4 &&
-        formData.password === confirmPassword &&
-        (!isSmallScreen || formData.gender.length > 0)
+        formData.password === confirmPassword
       );
     }
 
@@ -469,8 +463,10 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       return formData.emergency_number.trim().length > 0;
     }
 
+    if (step === 5) return true;
+
     return false;
-  }, [step, formData, images, confirmPassword, isSmallScreen]);
+  }, [step, formData, images, confirmPassword]);
 
   const nextStep = () => {
     if (!isStepValid) {
@@ -482,7 +478,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     }
 
     setToast(null);
-    setStep((current) => Math.min(current + 1, 4));
+    setStep((current) => Math.min(current + 1, 5));
   };
 
   const previousStep = () => {
@@ -783,18 +779,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             />
           </Field>
 
-          <Field label="NHI number">
-            <input
-              required
-              value={formData.nhi_number}
-              onChange={(event) =>
-                updateField("nhi_number", event.target.value)
-              }
-              placeholder="Enter NHI number"
-              className={inputClass}
-            />
-          </Field>
-
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Index number" optional>
               <input
@@ -807,7 +791,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               />
             </Field>
 
-            {!isSmallScreen && renderGenderField()}
+            {renderGenderField()}
           </div>
 
           <Field label="Residential location">
@@ -826,6 +810,18 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
                 className={`${inputClass} pl-10`}
               />
             </div>
+          </Field>
+
+          <Field label="NHI number">
+            <input
+              required
+              value={formData.nhi_number}
+              onChange={(event) =>
+                updateField("nhi_number", event.target.value)
+              }
+              placeholder="Enter NHI number"
+              className={inputClass}
+            />
           </Field>
         </div>
       );
@@ -860,8 +856,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               />
             </div>
           </Field>
-
-          {isSmallScreen && renderGenderField()}
 
           <Field label="Student security password">
             <div className="relative">
@@ -1092,35 +1086,62 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       );
     }
 
+    if (step === 4) {
+      return (
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-base font-bold text-white sm:text-lg">
+              Emergency contact
+            </h2>
+            <p className="mt-1 text-[11px] leading-5 text-slate-500">
+              Add someone who can be reached quickly if needed.
+            </p>
+          </div>
+
+          <Field label="Emergency contact number">
+            <div className="relative">
+              <Phone
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+              />
+              <input
+                required
+                type="tel"
+                value={formData.emergency_number}
+                onChange={(event) =>
+                  updateField("emergency_number", event.target.value)
+                }
+                placeholder="Emergency contact number"
+                className={`${inputClass} pl-10`}
+              />
+            </div>
+          </Field>
+
+          <div className="rounded-xl border border-blue-400/10 bg-blue-500/[0.04] p-3">
+            <div className="flex items-start gap-2.5">
+              <ShieldCheck
+                size={15}
+                className="mt-0.5 shrink-0 text-blue-300"
+              />
+              <p className="text-[10px] leading-5 text-slate-400">
+                Choose a trusted contact who can be reached in an emergency.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-4">
         <div>
           <h2 className="text-base font-bold text-white sm:text-lg">
-            Emergency & review
+            Review & register
           </h2>
           <p className="mt-1 text-[11px] leading-5 text-slate-500">
-            Add an emergency contact and check the registration details.
+            Check the details before completing registration.
           </p>
         </div>
-
-        <Field label="Emergency contact number">
-          <div className="relative">
-            <Phone
-              size={15}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-            />
-            <input
-              required
-              type="tel"
-              value={formData.emergency_number}
-              onChange={(event) =>
-                updateField("emergency_number", event.target.value)
-              }
-              placeholder="Emergency contact number"
-              className={`${inputClass} pl-10`}
-            />
-          </div>
-        </Field>
 
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
           <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-slate-200">
@@ -1280,7 +1301,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
             <div className="mt-3 flex items-center justify-between sm:hidden">
               <span className="text-[10px] font-medium text-blue-300">
-                Step {step + 1} of 5
+                Step {step + 1} of 6
               </span>
               <span className="text-[10px] text-slate-500">
                 {steps[step].title}
@@ -1289,15 +1310,15 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
           </div>
 
           <div className="md:grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] md:items-stretch">
-            <section className="flex min-w-0 flex-col p-4 sm:p-6 lg:p-7">
-              <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
+            <section className="flex min-w-0 flex-col p-4 sm:p-6 lg:p-7 md:h-[560px] md:min-h-0">
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
                 <form
                   onSubmit={handleSubmit}
-                  className="flex h-full flex-1 flex-col"
+                  className="flex min-h-0 flex-1 flex-col"
                 >
                   <div
                     ref={formContentRef}
-                    className="min-h-[620px] flex-1 px-4 py-5 sm:px-5 sm:py-6"
+                    className="flex-1 px-4 py-5 sm:px-5 sm:py-6 md:min-h-0 md:overflow-y-auto md:overscroll-contain"
                   >
                     {renderStep()}
                   </div>
@@ -1319,7 +1340,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
                       </button>
                     )}
 
-                    {step < 4 ? (
+                    {step < 5 ? (
                       <button
                         type="button"
                         onClick={nextStep}
@@ -1351,8 +1372,8 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               </div>
             </section>
 
-            <aside className="relative hidden min-w-0 items-stretch justify-center px-5 py-8 md:flex lg:px-7">
-              <div ref={previewRef} className="h-full w-full max-w-[430px]">
+            <aside className="relative hidden min-w-0 items-center justify-center px-5 py-7 md:flex lg:px-7">
+              <div ref={previewRef} className="h-full w-full max-w-[390px]">
                 <StudentIllustration />
               </div>
             </aside>

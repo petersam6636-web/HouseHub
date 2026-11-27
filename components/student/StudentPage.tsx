@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import {
   ArrowRight,
   ArrowUpRight,
+  Eye,
   GraduationCap,
   Mail,
   MapPin,
@@ -15,13 +16,16 @@ import {
   UserRound,
   Phone,
   Search,
+  ShieldAlert,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+
 import type {
   ProjectWithRelations,
   StudentDetailsWithRelations,
 } from "@/types";
+
 import useApp from "@/lib/useApp";
 import {
   fetchProjectForUser,
@@ -39,6 +43,7 @@ export default function StudentsPage() {
   const [search, setSearch] = useState("");
   const [loadedProject, setLoadedProject] =
     useState<ProjectWithRelations | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -97,15 +102,23 @@ export default function StudentsPage() {
         setLoadedProject(result);
 
         setProjects((currentProjects) => [
-          ...currentProjects.filter((item) => item.id !== result.id),
+          ...currentProjects.filter(
+            (item) => item.id !== result.id
+          ),
           result,
         ]);
       } catch (error) {
-        console.error("Unable to load project students.", error);
+        console.error(
+          "Unable to load project students.",
+          error
+        );
 
         if (!cancelled) {
           setLoadError(
-            getErrorMessage(error, "Unable to load project students.")
+            getErrorMessage(
+              error,
+              "Unable to load project students."
+            )
           );
         }
       } finally {
@@ -135,14 +148,27 @@ export default function StudentsPage() {
 
     return students.filter(
       (student: StudentDetailsWithRelations) => {
-        const name = student.full_name?.toLowerCase() ?? "";
-        const index = student.index_number?.toLowerCase() ?? "";
-        const email = student.email_address?.toLowerCase() ?? "";
+        const name =
+          student.full_name?.toLowerCase() ?? "";
+
+        const index =
+          student.index_number?.toLowerCase() ?? "";
+
+        const email =
+          student.email_address?.toLowerCase() ?? "";
+
+        const location =
+          student.location?.toLowerCase() ?? "";
+
+        const emergencyContact =
+          student.mother_contact?.toLowerCase() ?? "";
 
         return (
           name.includes(query) ||
           index.includes(query) ||
-          email.includes(query)
+          email.includes(query) ||
+          location.includes(query) ||
+          emergencyContact.includes(query)
         );
       }
     );
@@ -158,7 +184,10 @@ export default function StudentsPage() {
       <main className="flex min-h-[calc(100dvh-72px)] items-center justify-center px-3 py-4 text-white">
         <section className="w-full max-w-sm rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#172943] via-[#101e32] to-[#0b1422] p-7 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
-            <GraduationCap size={22} className="text-blue-300" />
+            <GraduationCap
+              size={22}
+              className="text-blue-300"
+            />
           </div>
 
           <h1 className="mt-4 text-base font-semibold">
@@ -181,7 +210,10 @@ export default function StudentsPage() {
           <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/15 blur-[70px]" />
 
           <div className="relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
-            <GraduationCap size={22} className="text-blue-300" />
+            <GraduationCap
+              size={22}
+              className="text-blue-300"
+            />
           </div>
 
           <p className="relative mt-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
@@ -189,7 +221,9 @@ export default function StudentsPage() {
           </p>
 
           <h1 className="relative mt-2 text-lg font-semibold">
-            {loadError ? "Unable to open project" : "Project not found"}
+            {loadError
+              ? "Unable to open project"
+              : "Project not found"}
           </h1>
 
           <p className="relative mt-2 text-sm leading-6 text-slate-400">
@@ -200,7 +234,9 @@ export default function StudentsPage() {
           {loadError && (
             <button
               type="button"
-              onClick={() => setReloadKey((value) => value + 1)}
+              onClick={() =>
+                setReloadKey((value) => value + 1)
+              }
               className="relative mt-5 rounded-xl bg-blue-600 px-5 py-3 text-xs font-semibold text-white transition hover:bg-blue-500"
             >
               Try again
@@ -219,13 +255,13 @@ export default function StudentsPage() {
     );
   }
 
-  /* Empty directory: centered without unnecessary page content */
+  /* Empty directory */
   if (students.length === 0) {
     return (
       <main className="flex min-h-[calc(100dvh-72px)] w-full items-center justify-center overflow-hidden px-3 py-4 text-white sm:px-5">
         <section className="relative w-full max-w-[560px] overflow-hidden rounded-[28px] border border-blue-400/[0.11] bg-gradient-to-br from-[#111e30] via-[#0d1726] to-[#090f19] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:rounded-[32px] sm:p-8">
-          {/* Blue glow */}
           <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-400/[0.18] blur-[80px]" />
+
           <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-blue-500/[0.10] blur-[80px]" />
 
           <div className="relative flex flex-col items-center text-center">
@@ -242,9 +278,9 @@ export default function StudentsPage() {
             </h1>
 
             <p className="mt-3 max-w-sm text-xs leading-6 text-slate-300/75 sm:text-sm">
-              Start building your class directory by adding your first
-              student. Their profile and essential information will appear
-              here.
+              Start building your class directory by adding
+              your first student. Their profile and essential
+              information will appear here.
             </p>
 
             <Link
@@ -253,6 +289,7 @@ export default function StudentsPage() {
             >
               <UserPlus size={16} />
               Add your first student
+
               <ArrowUpRight
                 size={14}
                 className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -260,7 +297,10 @@ export default function StudentsPage() {
             </Link>
 
             <div className="mt-5 flex items-center gap-2 text-[10px] text-slate-400">
-              <Users size={13} className="text-blue-300" />
+              <Users
+                size={13}
+                className="text-blue-300"
+              />
               No student profiles added yet
             </div>
           </div>
@@ -272,11 +312,14 @@ export default function StudentsPage() {
   return (
     <main className="w-full px-1.5 py-3 text-white sm:px-3 sm:py-5">
       <div className="mx-auto w-full max-w-6xl space-y-4">
-        {/* Compact project heading */}
+        {/* Project heading */}
         <section className="flex items-center justify-between gap-3 rounded-[22px] border border-white/[0.07] bg-gradient-to-r from-[#172943] via-[#101e32] to-[#0b1422] p-3.5 sm:p-4">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10">
-              <Users size={18} className="text-blue-300" />
+              <Users
+                size={18}
+                className="text-blue-300"
+              />
             </div>
 
             <div className="min-w-0">
@@ -290,7 +333,9 @@ export default function StudentsPage() {
 
               <p className="mt-0.5 text-[10px] text-slate-400">
                 {students.length}{" "}
-                {students.length === 1 ? "student" : "students"}
+                {students.length === 1
+                  ? "student"
+                  : "students"}
               </p>
             </div>
           </div>
@@ -301,7 +346,11 @@ export default function StudentsPage() {
             className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-3.5 text-xs font-bold text-white shadow-[0_8px_22px_rgba(37,99,235,0.2)] transition hover:brightness-110 sm:px-4"
           >
             <UserPlus size={15} />
-            <span className="hidden sm:inline">Add student</span>
+
+            <span className="hidden sm:inline">
+              Add student
+            </span>
+
             <span className="sm:hidden">Add</span>
           </Link>
         </section>
@@ -309,8 +358,13 @@ export default function StudentsPage() {
         {/* Search and count */}
         <section className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2 text-[11px] text-slate-400">
-            <Users size={14} className="text-blue-400" />
-            Showing {filteredStudents.length} of {students.length}
+            <Users
+              size={14}
+              className="text-blue-400"
+            />
+
+            Showing {filteredStudents.length} of{" "}
+            {students.length}
           </p>
 
           <div className="relative w-full sm:max-w-xs">
@@ -321,14 +375,16 @@ export default function StudentsPage() {
 
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
               placeholder="Search students..."
               className="h-10 w-full rounded-xl border border-white/[0.07] bg-[#0b1422] pl-9 pr-3 text-xs text-white outline-none placeholder:text-slate-600 transition focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10"
             />
           </div>
         </section>
 
-        {/* No search results */}
+        {/* Search results */}
         {filteredStudents.length === 0 ? (
           <section className="flex min-h-[220px] flex-col items-center justify-center rounded-[24px] border border-white/[0.06] bg-gradient-to-br from-[#14243a] to-[#0b1422] px-5 py-8 text-center">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/[0.08] text-blue-300">
@@ -340,13 +396,18 @@ export default function StudentsPage() {
             </h2>
 
             <p className="mt-2 max-w-xs text-xs leading-5 text-slate-400">
-              Try searching with another name, index number, or email.
+              Try searching with another name, index number,
+              email, location, or emergency contact.
             </p>
           </section>
         ) : (
           <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {filteredStudents.map((student) => (
-              <StudentCard key={student.id} student={student} />
+              <StudentCard
+                key={student.id}
+                student={student}
+                projectId={project.id}
+              />
             ))}
           </section>
         )}
@@ -355,11 +416,17 @@ export default function StudentsPage() {
   );
 }
 
-/* Student profile card */
+/* =========================================================
+   PREMIUM HOUSEHUB STUDENT CARD
+   Full image + navy glassmorphism + blue accent
+========================================================= */
+
 function StudentCard({
   student,
+  projectId,
 }: {
   student: StudentDetailsWithRelations;
+  projectId: string;
 }) {
   const image = student.profile_image;
 
@@ -371,153 +438,199 @@ function StudentCard({
     .join("")
     .toUpperCase();
 
+  const studentName =
+    student.full_name || "Unnamed student";
+
+  const studentLocation =
+    student.location || "Location not provided";
+
+  const emergencyContact =
+    student.mother_contact || "";
+
+  const viewHref =
+    `/home/${projectId}/students/view?id=${student.id}`;
+
+  const emergencyPhone =
+    emergencyContact.replace(/[^\d+]/g, "");
+
   return (
-    <article className="group relative flex min-h-[500px] min-w-0 flex-col overflow-hidden rounded-[28px] border border-white/[0.09] bg-gradient-to-br from-[#152238]/95 via-[#101a2b]/95 to-[#0b1220]/95 shadow-[0_18px_48px_rgba(0,0,0,0.3)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-blue-400/20 hover:shadow-[0_24px_60px_rgba(0,0,0,0.38)]">
-      <div className="relative h-[260px] shrink-0 overflow-hidden bg-[#172943] sm:h-[280px]">
+    <article className="group relative isolate flex min-h-[520px] min-w-0 flex-col overflow-hidden rounded-[30px] border border-white/[0.12] bg-[#07111f] shadow-[0_20px_60px_rgba(0,0,0,0.38)] transition duration-500 hover:-translate-y-1 hover:border-blue-400/30 hover:shadow-[0_28px_75px_rgba(0,0,0,0.48)] sm:min-h-[550px]">
+      {/* Full-card background image */}
+      <div className="absolute inset-0">
         {image ? (
           <Image
             src={image}
-            alt={`${student.full_name ?? "Student"} profile`}
+            alt={`${studentName} profile`}
             fill
             sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
             unoptimized
-            className="object-cover object-center transition duration-500 group-hover:scale-[1.03]"
+            className="object-cover object-center transition duration-700 ease-out group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#3976b8] via-[#204875] to-[#112239]">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-100/20 bg-blue-200/10 text-lg font-bold text-blue-100 sm:h-16 sm:w-16 sm:text-2xl">
-              {initials || <UserRound size={25} />}
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#183b68] via-[#102746] to-[#07111f]">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full border border-blue-300/20 bg-blue-200/[0.08] text-3xl font-bold tracking-wider text-blue-100 shadow-2xl backdrop-blur-xl">
+              {initials || <UserRound size={36} />}
             </div>
           </div>
         )}
-
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b1220]/10 via-transparent to-[#0b1220]/95" />
-
-        <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#0b1422]/65 px-3 py-1.5 text-[9px] font-semibold text-blue-100 shadow-lg backdrop-blur-xl">
-          <GraduationCap size={13} className="text-blue-300" />
-          Student
-        </div>
       </div>
 
-      <div className="relative -mt-7 flex flex-1 flex-col rounded-t-[26px] border-t border-white/[0.08] bg-gradient-to-br from-[#152238]/95 via-[#101a2b]/95 to-[#0b1220]/95 px-5 pb-5 pt-4 backdrop-blur-2xl">
-        <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-blue-500/[0.10] blur-[60px]" />
+      {/* Cinematic dark gradient */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#030812]/25 via-[#06101d]/5 via-[35%] to-[#030812]/95" />
 
-        <div className="relative min-w-0">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-blue-300">
-                Student profile
+      {/* HouseHub blue atmospheric glow */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(37,99,235,0.24),transparent_60%)] opacity-90" />
+
+      {/* Top glass badges */}
+      <div className="relative z-10 flex items-start justify-between gap-3 p-4 sm:p-5">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.14] bg-[#07111f]/55 px-3 py-2 shadow-lg backdrop-blur-2xl">
+          <GraduationCap
+            size={14}
+            className="text-blue-300"
+          />
+
+          <span className="text-[10px] font-semibold tracking-wide text-white/90">
+            Student profile
+          </span>
+        </div>
+
+        {student.index_number && (
+          <div className="max-w-[45%] truncate rounded-full border border-white/[0.14] bg-[#07111f]/55 px-3 py-2 text-[10px] font-semibold text-white/90 shadow-lg backdrop-blur-2xl">
+            {student.index_number}
+          </div>
+        )}
+      </div>
+
+      {/* Bottom glass information panel */}
+      <div className="relative z-10 mt-auto border-t border-white/[0.12] bg-gradient-to-b from-[#081321]/55 via-[#06101d]/80 to-[#030812]/95 px-4 pb-4 pt-6 backdrop-blur-[24px] sm:px-5 sm:pb-5 sm:pt-7">
+        {/* Student name */}
+        <div className="relative">
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-blue-300">
+                HouseHub student
               </p>
 
-              <h2 className="mt-1 break-words text-lg font-extrabold leading-tight tracking-tight text-white">
-                {student.full_name || "Unnamed student"}
+              <h2 className="mt-2 break-words text-[22px] font-bold leading-tight tracking-tight text-white drop-shadow-lg sm:text-[25px]">
+                {studentName}
               </h2>
             </div>
 
-            <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-300/15 bg-blue-400/[0.08] text-blue-300">
-              <GraduationCap size={17} />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-blue-300/20 bg-blue-400/[0.10] text-blue-200 shadow-lg backdrop-blur-xl">
+              <UserRound size={18} />
             </div>
           </div>
 
-          <div className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-lg border border-blue-300/15 bg-blue-400/[0.08] px-2.5 py-1.5">
-            <span className="text-[9px] font-semibold uppercase tracking-wide text-blue-200/75">
-              Index
-            </span>
-            <span className="truncate text-[10px] font-semibold text-blue-100">
-              {student.index_number || "Not added"}
-            </span>
+          {/* Student location */}
+          <div className="mt-3 flex items-start gap-2.5">
+            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border border-blue-300/20 bg-blue-400/[0.10] text-blue-200">
+              <MapPin size={14} />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="text-[8px] font-semibold uppercase tracking-[0.15em] text-blue-200/70">
+                Location
+              </p>
+
+              <p className="mt-0.5 break-words text-[12px] font-medium leading-5 text-white/90">
+                {studentLocation}
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="relative mt-5 grid min-w-0 grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
-          {student.email_address && (
-            <StudentInfo
-              icon={<Mail size={13} />}
-              label="Email"
-              value={student.email_address}
+        {/* Emergency contact */}
+        <div className="mt-4 overflow-hidden rounded-[18px] border border-blue-300/[0.18] bg-blue-500/[0.10] shadow-[0_8px_28px_rgba(0,0,0,0.16)] backdrop-blur-2xl">
+          <div className="flex items-center gap-2 border-b border-blue-300/[0.10] px-3.5 py-2.5">
+            <ShieldAlert
+              size={14}
+              className="shrink-0 text-blue-300"
             />
-          )}
 
-          {student.location && (
-            <StudentInfo
-              icon={<MapPin size={13} />}
-              label="Location"
-              value={student.location}
-            />
-          )}
+            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-blue-200">
+              Emergency contact
+            </p>
+          </div>
 
-          {student.gender && (
-            <StudentInfo
-              icon={<UserRound size={13} />}
-              label="Gender"
-              value={student.gender}
-            />
-          )}
+          <div className="flex items-center justify-between gap-3 px-3.5 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[8px] font-medium text-blue-100/60">
+                Parent / guardian
+              </p>
 
-          {student.mother_contact && (
-            <StudentInfo
-              icon={<Phone size={13} />}
-              label="Parent / emergency contact"
-              value={student.mother_contact}
-              important
-            />
-          )}
+              <p className="mt-1 break-words text-[13px] font-bold leading-5 text-white">
+                {emergencyContact || "Not provided"}
+              </p>
+            </div>
+
+            {emergencyContact && (
+              <a
+                href={`tel:${emergencyPhone}`}
+                aria-label={`Call emergency contact ${emergencyContact}`}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-blue-300/20 bg-blue-400/[0.14] text-blue-200 transition hover:bg-blue-400/25 hover:text-white"
+              >
+                <Phone size={16} />
+              </a>
+            )}
+          </div>
         </div>
 
-        {student.email_address && (
-          <a
-            href={`mailto:${student.email_address}`}
-            className="relative mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-[0_8px_24px_rgba(37,99,235,0.24)] transition hover:bg-blue-500"
-          >
-            <Mail size={14} />
-            Email student
-            <ArrowRight size={14} />
-          </a>
-        )}
+        {/* Additional information */}
+        <div className="mt-4 grid grid-cols-2 gap-2.5">
+          <StudentInfo
+            icon={<Mail size={13} />}
+            label="Email address"
+            value={student.email_address || "Not provided"}
+          />
+
+          <StudentInfo
+            icon={<UserRound size={13} />}
+            label="Gender"
+            value={student.gender || "Not provided"}
+          />
+        </div>
+
+        {/* View profile button */}
+        <Link
+          href={viewHref}
+          className="group/view mt-5 inline-flex min-h-[46px] w-full items-center justify-center gap-2.5 rounded-full bg-white px-5 py-3 text-[12px] font-bold text-[#07111f] shadow-[0_8px_28px_rgba(0,0,0,0.22)] transition duration-300 hover:bg-blue-50 hover:shadow-[0_10px_35px_rgba(37,99,235,0.22)]"
+        >
+          <Eye size={16} />
+
+          View
+
+          <ArrowRight
+            size={15}
+            className="transition-transform duration-300 group-hover/view:translate-x-1"
+          />
+        </Link>
       </div>
     </article>
   );
 }
 
+/* Student information item */
 function StudentInfo({
   icon,
   label,
   value,
-  important = false,
 }: {
   icon: ReactNode;
   label: string;
   value: string;
-  important?: boolean;
 }) {
   return (
-    <div className="flex min-w-0 items-start gap-2">
-      <div
-        className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border ${
-          important
-            ? "border-blue-300/20 bg-blue-400/[0.10] text-blue-200"
-            : "border-white/[0.06] bg-white/[0.035] text-slate-400"
-        }`}
-      >
+    <div className="flex min-w-0 items-start gap-2.5 rounded-[15px] border border-white/[0.09] bg-white/[0.045] px-3 py-3 backdrop-blur-xl">
+      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.045] text-blue-200/80">
         {icon}
       </div>
 
       <div className="min-w-0 flex-1">
-        <p
-          className={`text-[8px] font-medium sm:text-[9px] ${
-            important ? "text-blue-200/80" : "text-slate-500"
-          }`}
-        >
+        <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-slate-400">
           {label}
         </p>
 
-        <p
-          className={`mt-0.5 break-words text-[9px] leading-4 sm:text-[11px] sm:leading-[18px] ${
-            important
-              ? "font-semibold text-blue-100"
-              : "text-slate-300"
-          }`}
-        >
+        <p className="mt-1 break-words text-[10px] font-medium leading-[17px] text-white/90">
           {value}
         </p>
       </div>
