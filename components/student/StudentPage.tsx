@@ -225,7 +225,7 @@ export default function StudentsPage() {
         <section className="relative w-full max-w-[560px] overflow-hidden rounded-[28px] border border-blue-400/[0.11] bg-gradient-to-br from-[#111e30] via-[#0d1726] to-[#090f19] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:rounded-[32px] sm:p-8">
           {/* Blue glow */}
           <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-400/[0.18] blur-[80px]" />
-          <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-sky-500/[0.10] blur-[80px]" />
+          <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-blue-500/[0.10] blur-[80px]" />
 
           <div className="relative flex flex-col items-center text-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-blue-300/20 bg-blue-400/[0.10] text-blue-200 shadow-[0_10px_30px_rgba(37,99,235,0.12)] sm:h-16 sm:w-16">
