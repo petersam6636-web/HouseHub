@@ -300,9 +300,11 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
   const [toast, setToast] = useState<Toast | null>(null);
 
   useEffect(() => {
+    const previewUrls = previewUrlsRef.current;
+
     return () => {
-      previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-      previewUrlsRef.current.clear();
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+      previewUrls.clear();
     };
   }, []);
 

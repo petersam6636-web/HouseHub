@@ -13,7 +13,6 @@ import {
   ArrowUpRight,
   Phone,
   Search,
-  Plus,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type {
