@@ -147,19 +147,24 @@ export default function StudentsPage() {
     );
   }, [students, search]);
 
+  const registerHref = project
+    ? `/home/${project.id}/students/${project.id}`
+    : "/home/project";
+
+  /* Loading state */
   if (isLoading && !project) {
     return (
-      <main className="flex min-h-[calc(100vh-72px)] items-center justify-center px-3 py-6 text-white">
-        <section className="w-full max-w-md rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#172943] to-[#0b1422] p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
-            <GraduationCap className="h-6 w-6 text-blue-300" />
+      <main className="flex min-h-[calc(100dvh-72px)] items-center justify-center px-3 py-4 text-white">
+        <section className="w-full max-w-sm rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#172943] via-[#101e32] to-[#0b1422] p-7 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
+            <GraduationCap size={22} className="text-blue-300" />
           </div>
 
-          <h1 className="mt-4 text-lg font-semibold">
+          <h1 className="mt-4 text-base font-semibold">
             Loading students
           </h1>
 
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-xs leading-5 text-slate-400">
             Please wait while we load your project.
           </p>
         </section>
@@ -167,17 +172,18 @@ export default function StudentsPage() {
     );
   }
 
+  /* Error state */
   if (loadError || !project) {
     return (
-      <main className="flex min-h-[calc(100vh-72px)] items-center justify-center px-3 py-6 text-white">
-        <section className="relative w-full max-w-lg overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#172943] to-[#0b1422] p-6 text-center sm:p-8">
+      <main className="flex min-h-[calc(100dvh-72px)] items-center justify-center px-3 py-4 text-white">
+        <section className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#172943] via-[#101e32] to-[#0b1422] p-6 text-center sm:p-8">
           <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/15 blur-[70px]" />
 
-          <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
-            <GraduationCap className="h-6 w-6 text-blue-300" />
+          <div className="relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
+            <GraduationCap size={22} className="text-blue-300" />
           </div>
 
-          <p className="relative mt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+          <p className="relative mt-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
             Project unavailable
           </p>
 
@@ -187,7 +193,7 @@ export default function StudentsPage() {
 
           <p className="relative mt-2 text-sm leading-6 text-slate-400">
             {loadError ??
-              "We couldn’t find this project in your dashboard."}
+              "We couldn't find this project in your dashboard."}
           </p>
 
           {loadError && (
@@ -205,99 +211,44 @@ export default function StudentsPage() {
             className="relative mt-5 inline-flex items-center gap-2 text-xs font-medium text-slate-300 transition hover:text-white"
           >
             Back to projects
-            <ArrowRight size={15} />
+            <ArrowRight size={14} />
           </Link>
         </section>
       </main>
     );
   }
 
-  const registerHref = `/home/${project.id}/students/${project.id}`;
+  /* Empty directory: centered without unnecessary page content */
+  if (students.length === 0) {
+    return (
+      <main className="flex min-h-[calc(100dvh-72px)] w-full items-center justify-center overflow-hidden px-3 py-4 text-white sm:px-5">
+        <section className="relative w-full max-w-[560px] overflow-hidden rounded-[28px] border border-blue-400/[0.13] bg-gradient-to-br from-[#1d385b] via-[#12243b] to-[#0a1422] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:rounded-[32px] sm:p-8">
+          {/* Blue glow */}
+          <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-400/[0.18] blur-[80px]" />
+          <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-sky-500/[0.10] blur-[80px]" />
 
-  return (
-    <main className="min-h-[calc(100vh-72px)] w-full px-1.5 py-5 text-white sm:px-3 sm:py-7">
-      <div className="mx-auto w-full max-w-6xl space-y-6 pb-10">
-        {/* Project heading and add student action */}
-        <section className="flex flex-col gap-4 rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[#172943] via-[#101e32] to-[#0b1422] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.16)] sm:flex-row sm:items-center sm:justify-between sm:p-5">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
-              <Users size={21} className="text-blue-300" />
+          <div className="relative flex flex-col items-center text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-blue-300/20 bg-blue-400/[0.10] text-blue-200 shadow-[0_10px_30px_rgba(37,99,235,0.12)] sm:h-16 sm:w-16">
+              <GraduationCap size={27} />
             </div>
 
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
-                Student directory
-              </p>
-
-              <h1 className="mt-1 truncate text-lg font-bold tracking-tight sm:text-xl">
-                {project.title}
-              </h1>
-
-              <p className="mt-1 text-xs text-slate-400">
-                {students.length}{" "}
-                {students.length === 1 ? "student" : "students"} registered
-              </p>
-            </div>
-          </div>
-
-          {/* Always visible, even when students already exist */}
-          <Link
-            href={registerHref}
-            className="group inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-[#3b82f6] px-5 py-3 text-xs font-bold text-white shadow-[0_8px_24px_rgba(37,99,235,0.24)] transition duration-300 hover:-translate-y-0.5 hover:from-blue-500 hover:to-blue-400"
-          >
-            <UserPlus size={16} />
-            Add student
-            <ArrowUpRight
-              size={15}
-              className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            />
-          </Link>
-        </section>
-
-        {/* Search */}
-        {students.length > 0 && (
-          <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="flex items-center gap-2 text-xs text-slate-400">
-              <Users size={15} className="text-blue-400" />
-              Showing {filteredStudents.length} of {students.length} students
+            <p className="mt-5 text-[9px] font-bold uppercase tracking-[0.2em] text-blue-300 sm:text-[10px]">
+              Student directory
             </p>
 
-            <div className="relative w-full sm:max-w-sm">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-              />
+            <h1 className="mt-2 text-xl font-extrabold tracking-tight text-white sm:text-2xl">
+              Your student space is ready
+            </h1>
 
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search name, index or email..."
-                className="h-11 w-full rounded-xl border border-white/[0.07] bg-[#0b1422] pl-9 pr-4 text-sm text-white outline-none placeholder:text-slate-600 transition focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10"
-              />
-            </div>
-          </section>
-        )}
-
-        {/* Empty directory */}
-        {students.length === 0 ? (
-          <section className="relative overflow-hidden rounded-[28px] border border-white/[0.07] bg-gradient-to-br from-[#172943] via-[#101e32] to-[#0b1422] px-6 py-14 text-center sm:px-10">
-            <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-56 -translate-x-1/2 rounded-full bg-blue-500/15 blur-[90px]" />
-
-            <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
-              <GraduationCap size={29} className="text-blue-300" />
-            </div>
-
-            <h2 className="relative mt-6 text-xl font-semibold sm:text-2xl">
-              No students yet
-            </h2>
-
-            <p className="relative mx-auto mt-3 max-w-md text-sm leading-6 text-slate-400">
-              Add your first student to start building your directory.
+            <p className="mt-3 max-w-sm text-xs leading-6 text-slate-300/75 sm:text-sm">
+              Start building your class directory by adding your first
+              student. Their profile and essential information will appear
+              here.
             </p>
 
             <Link
               href={registerHref}
-              className="group relative mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-3 text-xs font-bold text-white shadow-[0_8px_24px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:from-blue-500 hover:to-blue-400"
+              className="group mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400 px-5 py-3 text-xs font-bold text-white shadow-[0_10px_30px_rgba(37,99,235,0.25)] transition hover:brightness-110 sm:w-auto sm:min-w-[210px]"
             >
               <UserPlus size={16} />
               Add your first student
@@ -306,21 +257,93 @@ export default function StudentsPage() {
                 className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               />
             </Link>
-          </section>
-        ) : filteredStudents.length === 0 ? (
-          <section className="rounded-2xl border border-white/[0.06] bg-[#0b1422] px-6 py-12 text-center">
-            <Search size={25} className="mx-auto text-slate-500" />
 
-            <h2 className="mt-4 text-base font-semibold">
+            <div className="mt-5 flex items-center gap-2 text-[10px] text-slate-400">
+              <Users size={13} className="text-blue-300" />
+              No student profiles added yet
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="w-full px-1.5 py-3 text-white sm:px-3 sm:py-5">
+      <div className="mx-auto w-full max-w-6xl space-y-4">
+        {/* Compact project heading */}
+        <section className="flex items-center justify-between gap-3 rounded-[22px] border border-white/[0.07] bg-gradient-to-r from-[#172943] via-[#101e32] to-[#0b1422] p-3.5 sm:p-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10">
+              <Users size={18} className="text-blue-300" />
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
+                Student directory
+              </p>
+
+              <h1 className="mt-1 truncate text-base font-bold tracking-tight sm:text-lg">
+                {project.title}
+              </h1>
+
+              <p className="mt-0.5 text-[10px] text-slate-400">
+                {students.length}{" "}
+                {students.length === 1 ? "student" : "students"}
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href={registerHref}
+            aria-label="Add student"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-3.5 text-xs font-bold text-white shadow-[0_8px_22px_rgba(37,99,235,0.2)] transition hover:brightness-110 sm:px-4"
+          >
+            <UserPlus size={15} />
+            <span className="hidden sm:inline">Add student</span>
+            <span className="sm:hidden">Add</span>
+          </Link>
+        </section>
+
+        {/* Search and count */}
+        <section className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-center gap-2 text-[11px] text-slate-400">
+            <Users size={14} className="text-blue-400" />
+            Showing {filteredStudents.length} of {students.length}
+          </p>
+
+          <div className="relative w-full sm:max-w-xs">
+            <Search
+              size={15}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+            />
+
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search students..."
+              className="h-10 w-full rounded-xl border border-white/[0.07] bg-[#0b1422] pl-9 pr-3 text-xs text-white outline-none placeholder:text-slate-600 transition focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10"
+            />
+          </div>
+        </section>
+
+        {/* No search results */}
+        {filteredStudents.length === 0 ? (
+          <section className="flex min-h-[220px] flex-col items-center justify-center rounded-[24px] border border-white/[0.06] bg-gradient-to-br from-[#14243a] to-[#0b1422] px-5 py-8 text-center">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/15 bg-blue-500/[0.08] text-blue-300">
+              <Search size={19} />
+            </div>
+
+            <h2 className="mt-4 text-sm font-semibold text-white">
               No students found
             </h2>
 
-            <p className="mt-2 text-sm text-slate-400">
-              Try another name, index number, or email.
+            <p className="mt-2 max-w-xs text-xs leading-5 text-slate-400">
+              Try searching with another name, index number, or email.
             </p>
           </section>
         ) : (
-          <section className="flex flex-col gap-4">
+          <section className="grid grid-cols-1 gap-3.5">
             {filteredStudents.map((student) => (
               <StudentCard key={student.id} student={student} />
             ))}
@@ -348,69 +371,68 @@ function StudentCard({
     .toUpperCase();
 
   return (
-    <article className="group relative isolate grid min-w-0 grid-cols-[112px_minmax(0,1fr)] overflow-hidden rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[#172943] via-[#101e32] to-[#0b1422] shadow-[0_12px_35px_rgba(0,0,0,0.14)] transition duration-300 hover:-translate-y-0.5 hover:border-blue-400/25 hover:shadow-[0_18px_45px_rgba(37,99,235,0.12)] sm:grid-cols-[190px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)]">
-      {/* Full-height profile photo */}
-      <div className="relative min-h-[250px] overflow-hidden bg-[#172943] sm:min-h-[270px]">
+    <article className="relative grid min-w-0 grid-cols-[88px_minmax(0,1fr)] overflow-hidden rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#18304d] via-[#112239] to-[#0b1422] shadow-[0_12px_35px_rgba(0,0,0,0.16)] sm:grid-cols-[150px_minmax(0,1fr)] sm:rounded-[26px] lg:grid-cols-[175px_minmax(0,1fr)]">
+      {/* Profile image */}
+      <div className="relative min-h-[190px] overflow-hidden bg-[#172943] sm:min-h-[205px]">
         {image ? (
           <img
             src={image}
             alt={`${student.full_name ?? "Student"} profile`}
-            className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
+            className="absolute inset-0 h-full w-full object-cover object-center"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#28558a] via-[#183253] to-[#101e32]">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-blue-200/25 bg-blue-300/10 text-xl font-bold tracking-wider text-blue-100 sm:h-20 sm:w-20 sm:text-2xl">
-              {initials || <UserRound size={30} />}
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#3976b8] via-[#204875] to-[#112239]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-100/20 bg-blue-200/10 text-lg font-bold text-blue-100 sm:h-16 sm:w-16 sm:text-2xl">
+              {initials || <UserRound size={25} />}
             </div>
           </div>
         )}
 
-        {/* Long blue-black gradient blending into the card */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#101e32]/20 to-[#101e32]/90" />
+        {/* Gradient that blends photo into the card */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#112239]/20 to-[#112239]/95" />
 
-        {/* Soft lower gradient */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#101e32]/70 to-transparent sm:hidden" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#112239]/60 to-transparent" />
 
-        <div className="absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#10213a]/75 px-2 py-1 text-[9px] font-semibold text-blue-100 backdrop-blur-md sm:left-3 sm:top-3 sm:px-2.5 sm:text-[10px]">
+        <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full border border-white/15 bg-[#10213a]/75 px-2 py-1 text-[8px] font-semibold text-blue-100 backdrop-blur-md sm:left-3 sm:top-3 sm:text-[9px]">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-300" />
           Student
         </div>
       </div>
 
       {/* Student information */}
-      <div className="relative flex min-w-0 flex-col justify-center p-3 sm:p-5 lg:p-6">
-        <div className="pointer-events-none absolute -right-10 top-0 h-36 w-36 rounded-full bg-blue-500/[0.08] blur-[60px]" />
+      <div className="relative flex min-w-0 flex-col justify-center p-3 sm:p-4 lg:p-5">
+        <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-blue-400/[0.10] blur-[60px]" />
 
         <div className="relative min-w-0">
-          <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300 sm:text-[10px]">
+          <p className="text-[8px] font-bold uppercase tracking-[0.16em] text-blue-300 sm:text-[9px]">
             Student profile
           </p>
 
-          <h3 className="mt-1.5 break-words text-base font-extrabold leading-tight tracking-tight text-white sm:mt-2 sm:text-xl lg:text-2xl">
+          <h2 className="mt-1 break-words text-base font-extrabold leading-tight tracking-tight text-white sm:text-xl">
             {student.full_name || "Unnamed student"}
-          </h3>
+          </h2>
 
-          <div className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-lg border border-blue-400/15 bg-blue-500/[0.08] px-2 py-1 sm:mt-3 sm:px-2.5">
-            <GraduationCap size={12} className="shrink-0 text-blue-300" />
-            <span className="truncate text-[10px] font-semibold text-blue-100 sm:text-xs">
+          <div className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-lg border border-blue-300/15 bg-blue-400/[0.08] px-2 py-1">
+            <GraduationCap size={11} className="shrink-0 text-blue-300" />
+            <span className="truncate text-[9px] font-semibold text-blue-100 sm:text-[10px]">
               {student.index_number || "Index number not added"}
             </span>
           </div>
         </div>
 
-        {/* Essential student details */}
-        <div className="relative mt-4 grid min-w-0 grid-cols-1 gap-x-5 gap-y-3 sm:mt-5 sm:grid-cols-2 sm:gap-y-4">
+        {/* Essential information */}
+        <div className="relative mt-3 grid min-w-0 grid-cols-1 gap-x-4 gap-y-2.5 sm:mt-4 sm:grid-cols-2 sm:gap-y-3">
           {student.email_address && (
             <StudentInfo
-              icon={<Mail size={14} />}
-              label="Email address"
+              icon={<Mail size={13} />}
+              label="Email"
               value={student.email_address}
             />
           )}
 
           {student.location && (
             <StudentInfo
-              icon={<MapPin size={14} />}
+              icon={<MapPin size={13} />}
               label="Location"
               value={student.location}
             />
@@ -418,7 +440,7 @@ function StudentCard({
 
           {student.gender && (
             <StudentInfo
-              icon={<UserRound size={14} />}
+              icon={<UserRound size={13} />}
               label="Gender"
               value={student.gender}
             />
@@ -426,15 +448,13 @@ function StudentCard({
 
           {student.mother_contact && (
             <StudentInfo
-              icon={<Phone size={14} />}
+              icon={<Phone size={13} />}
               label="Parent / emergency contact"
               value={student.mother_contact}
               important
             />
           )}
         </div>
-
-        <div className="relative mt-4 h-px w-full bg-gradient-to-r from-blue-400/35 via-blue-300/10 to-transparent sm:mt-5" />
       </div>
     </article>
   );
@@ -452,11 +472,11 @@ function StudentInfo({
   important?: boolean;
 }) {
   return (
-    <div className="flex min-w-0 items-start gap-2.5">
+    <div className="flex min-w-0 items-start gap-2">
       <div
-        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${
+        className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border ${
           important
-            ? "border-blue-400/20 bg-blue-500/10 text-blue-300"
+            ? "border-blue-300/20 bg-blue-400/[0.10] text-blue-200"
             : "border-white/[0.06] bg-white/[0.035] text-slate-400"
         }`}
       >
@@ -465,7 +485,7 @@ function StudentInfo({
 
       <div className="min-w-0 flex-1">
         <p
-          className={`text-[9px] font-medium sm:text-[10px] ${
+          className={`text-[8px] font-medium sm:text-[9px] ${
             important ? "text-blue-200/80" : "text-slate-500"
           }`}
         >
@@ -473,7 +493,7 @@ function StudentInfo({
         </p>
 
         <p
-          className={`mt-1 break-words text-[10px] leading-4 sm:text-xs sm:leading-5 ${
+          className={`mt-0.5 break-words text-[9px] leading-4 sm:text-[11px] sm:leading-[18px] ${
             important
               ? "font-semibold text-blue-100"
               : "text-slate-300"

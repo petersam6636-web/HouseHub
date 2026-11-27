@@ -25,6 +25,8 @@ import {
   Hash,
   Phone,
   ClipboardCheck,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -150,7 +152,6 @@ function StudentIllustration() {
       <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[80px]" />
 
       <div className="relative rounded-[2rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-4 shadow-[0_25px_80px_rgba(0,0,0,0.6)]">
-        {/* Illustration header */}
         <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-3 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-300">
@@ -168,7 +169,6 @@ function StudentIllustration() {
           </div>
         </div>
 
-        {/* Student profile wireframe */}
         <div className="rounded-2xl border border-blue-400/[0.13] bg-[#080F1C]/90 p-4">
           <div className="mb-4 flex items-center justify-between">
             <div className="h-2 w-24 rounded-full bg-slate-300/50" />
@@ -213,7 +213,6 @@ function StudentIllustration() {
           </div>
         </div>
 
-        {/* Documents wireframe */}
         <div className="mt-3 rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="h-2 w-24 rounded-full bg-slate-300/50" />
@@ -237,7 +236,6 @@ function StudentIllustration() {
           </div>
         </div>
 
-        {/* Parent details */}
         <div className="mt-3 rounded-2xl border border-blue-400/[0.12] bg-[#080F1C]/90 p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="h-2 w-28 rounded-full bg-slate-300/50" />
@@ -266,7 +264,6 @@ function StudentIllustration() {
         </div>
       </div>
 
-      {/* Floating completion card */}
       <div className="absolute -bottom-4 -left-3 flex items-center gap-3 rounded-2xl border border-blue-400/15 bg-[#101827]/95 px-4 py-3 shadow-[0_12px_35px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:-left-5">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15">
           <ShieldCheck size={17} className="text-blue-300" />
@@ -300,6 +297,10 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
   const [previews, setPreviews] =
     useState<StudentPreviewUrls>(initialPreviews);
   const previewUrlsRef = useRef(new Set<string>());
+
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
@@ -402,10 +403,12 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
     const previewUrl = URL.createObjectURL(file);
     const previousPreviewUrl = previews[field];
+
     if (previousPreviewUrl) {
       URL.revokeObjectURL(previousPreviewUrl);
       previewUrlsRef.current.delete(previousPreviewUrl);
     }
+
     previewUrlsRef.current.add(previewUrl);
 
     setToast(null);
@@ -424,19 +427,21 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       return (
         formData.full_name.trim().length > 0 &&
         formData.gender.length > 0 &&
-        formData.location.trim().length > 0
+        formData.location.trim().length > 0 &&
+        formData.nhi_number.trim().length > 0
       );
     }
 
     if (step === 1) {
-      return formData.password.trim().length >= 4;
+      return (
+        formData.password.trim().length >= 4 &&
+        confirmPassword.trim().length >= 4 &&
+        formData.password === confirmPassword
+      );
     }
 
     if (step === 2) {
-      return (
-        formData.nhi_number.trim().length > 0 &&
-        images.birth_cer_image !== null
-      );
+      return images.birth_cer_image !== null;
     }
 
     if (step === 3) {
@@ -453,7 +458,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     }
 
     return false;
-  }, [step, formData, images]);
+  }, [step, formData, images, confirmPassword]);
 
   const nextStep = () => {
     if (!isStepValid) {
@@ -522,6 +527,14 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       setToast({
         type: "error",
         message: "Please complete the required fields.",
+      });
+      return;
+    }
+
+    if (formData.password !== confirmPassword) {
+      setToast({
+        type: "error",
+        message: "The passwords do not match.",
       });
       return;
     }
@@ -618,6 +631,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       setProjects((currentProjects) =>
         currentProjects.filter((project) => project.id !== projectId)
       );
+
       router.replace(`/home/${projectId}/students?id=${projectId}`);
     } catch (error) {
       let cleanupErrorMessage: string | null = null;
@@ -729,12 +743,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </p>
           </div>
 
-          {imageUpload(
-            "profile_image",
-            "Student profile picture",
-            "PNG, JPG or WEBP · max 5 MB"
-          )}
-
           <Field label="Full name">
             <input
               required
@@ -742,7 +750,19 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               onChange={(event) =>
                 updateField("full_name", event.target.value)
               }
-              placeholder="Enter student&apos;s full name"
+              placeholder="Enter student's full name"
+              className={inputClass}
+            />
+          </Field>
+
+          <Field label="NHI number">
+            <input
+              required
+              value={formData.nhi_number}
+              onChange={(event) =>
+                updateField("nhi_number", event.target.value)
+              }
+              placeholder="Enter NHI number"
               className={inputClass}
             />
           </Field>
@@ -833,18 +853,88 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
                 size={15}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
               />
+
               <input
                 required
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 value={formData.password}
                 onChange={(event) =>
                   updateField("password", event.target.value)
                 }
                 placeholder="Create a security password"
-                className={`${inputClass} pl-10`}
+                className={`${inputClass} pl-10 pr-12`}
               />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPassword((previous) => !previous)
+                }
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-blue-300"
+              >
+                {showPassword ? (
+                  <EyeOff size={16} />
+                ) : (
+                  <Eye size={16} />
+                )}
+              </button>
             </div>
+          </Field>
+
+          <Field label="Confirm security password">
+            <div className="relative">
+              <LockKeyhole
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+              />
+
+              <input
+                required
+                type={showConfirmPassword ? "text" : "password"}
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(event) =>
+                  setConfirmPassword(event.target.value)
+                }
+                placeholder="Confirm the security password"
+                className={`${inputClass} pl-10 pr-12`}
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowConfirmPassword((previous) => !previous)
+                }
+                aria-label={
+                  showConfirmPassword
+                    ? "Hide confirm password"
+                    : "Show confirm password"
+                }
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-blue-300"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff size={16} />
+                ) : (
+                  <Eye size={16} />
+                )}
+              </button>
+            </div>
+
+            {confirmPassword.length > 0 && (
+              <p
+                className={`mt-2 text-[10px] ${
+                  formData.password === confirmPassword
+                    ? "text-blue-300"
+                    : "text-red-300"
+                }`}
+              >
+                {formData.password === confirmPassword
+                  ? "Passwords match"
+                  : "Passwords do not match"}
+              </p>
+            )}
           </Field>
 
           <div className="rounded-xl border border-blue-400/10 bg-blue-500/[0.04] p-3">
@@ -871,21 +961,15 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               Identification documents
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Provide the student&apos;s identification details and documents.
+              Upload the student&apos;s profile picture and identification documents.
             </p>
           </div>
 
-          <Field label="NHI number">
-            <input
-              required
-              value={formData.nhi_number}
-              onChange={(event) =>
-                updateField("nhi_number", event.target.value)
-              }
-              placeholder="Enter NHI number"
-              className={inputClass}
-            />
-          </Field>
+          {imageUpload(
+            "profile_image",
+            "Student profile picture",
+            "PNG, JPG or WEBP · max 5 MB"
+          )}
 
           {imageUpload(
             "nhi_image",
@@ -928,19 +1012,19 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
 
             <div className="space-y-3">
-              <Field label="Mother&apos;s full name">
+              <Field label="Mother's full name">
                 <input
                   required
                   value={formData.mother_name}
                   onChange={(event) =>
                     updateField("mother_name", event.target.value)
                   }
-                  placeholder="Enter mother&apos;s name"
+                  placeholder="Enter mother's name"
                   className={inputClass}
                 />
               </Field>
 
-              <Field label="Mother&apos;s contact">
+              <Field label="Mother's contact">
                 <input
                   required
                   type="tel"
@@ -962,19 +1046,19 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
 
             <div className="space-y-3">
-              <Field label="Father&apos;s full name">
+              <Field label="Father's full name">
                 <input
                   required
                   value={formData.father_name}
                   onChange={(event) =>
                     updateField("father_name", event.target.value)
                   }
-                  placeholder="Enter father&apos;s name"
+                  placeholder="Enter father's name"
                   className={inputClass}
                 />
               </Field>
 
-              <Field label="Father&apos;s contact">
+              <Field label="Father's contact">
                 <input
                   required
                   type="tel"
@@ -1089,7 +1173,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       ref={containerRef}
       className="relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden px-3 py-5 text-white sm:px-5 sm:py-6"
     >
-      {/* Background atmosphere */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[-12rem] top-1/2 h-80 w-80 -translate-y-1/2 rounded-full bg-blue-600/[0.07] blur-[110px]" />
         <div className="absolute right-[-10rem] top-[-6rem] h-80 w-80 rounded-full bg-blue-500/[0.06] blur-[110px]" />
@@ -1108,7 +1191,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
         <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl">
           <div className="pointer-events-none absolute -right-32 -top-32 hidden h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px] md:block" />
 
-          {/* Heading */}
           <div className="mb-5 mt-5 px-4 text-center sm:px-6">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
               <GraduationCap size={12} className="text-blue-400" />
@@ -1127,7 +1209,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </p>
           </div>
 
-          {/* Five-step progress */}
           <div className="mx-auto mb-5 w-full max-w-3xl px-4 sm:px-6">
             <div className="flex items-center">
               {steps.map((item, index) => {
@@ -1192,7 +1273,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
           </div>
 
           <div className="md:grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-            {/* Form */}
             <section className="min-w-0 p-4 sm:p-6 lg:p-7">
               <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
                 <form onSubmit={handleSubmit}>
@@ -1203,7 +1283,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
                     {renderStep()}
                   </div>
 
-                  {/* Navigation */}
                   <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.012] px-4 py-3.5 sm:px-5">
                     {step === 0 ? (
                       <span className="text-[9px] text-slate-600 sm:text-[10px]">
@@ -1253,7 +1332,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               </div>
             </section>
 
-            {/* New student illustration */}
             <aside className="relative hidden min-w-0 items-center justify-center px-5 py-8 md:flex lg:px-7">
               <div ref={previewRef} className="w-full max-w-[430px]">
                 <StudentIllustration />
@@ -1263,7 +1341,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
         </div>
       </div>
 
-      {/* Toast */}
       {toast && (
         <div
           role={toast.type === "error" ? "alert" : "status"}
@@ -1299,7 +1376,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
         </div>
       )}
 
-      {/* Full-screen loading */}
       {isSubmitting && (
         <div
           role="status"
