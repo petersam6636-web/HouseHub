@@ -414,6 +414,8 @@ function StudentCard({
 }: {
   student: StudentDetailsWithRelations;
 }) {
+    const searchParams = useSearchParams();
+  const projectId = searchParams.get("id");
   const image = student.profile_image;
 
   const initials = (student.full_name ?? "")
@@ -430,7 +432,7 @@ function StudentCard({
 
   const emergencyPhone = emergencyContact.replace(/[^\d+]/g, "");
 
-  const viewHref = `/home/students/view?id=${student.id}`;
+  const viewHref = `/home/students/view?id=${student.id}&projectId=${projectId}`;
 
   return (
     <article className="group relative isolate flex min-w-0 flex-col overflow-hidden rounded-[26px] border border-blue-300/[0.12] bg-[#071426] shadow-[0_18px_55px_rgba(0,0,0,0.28)] transition duration-300 hover:border-blue-400/30 hover:shadow-[0_24px_65px_rgba(0,0,0,0.38)] sm:min-h-[470px] sm:flex-row">

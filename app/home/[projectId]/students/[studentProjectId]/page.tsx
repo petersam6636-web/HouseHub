@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Loading from "@/components/Loading";
-import StudentRegisterPage from "@/components/student/StudentRegistration.";
+import StudentRegisterPage from "@/components/students/StudentRegistration.";
 
 type StudentRegistrationRouteProps = {
   params: Promise<{

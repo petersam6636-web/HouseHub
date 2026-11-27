@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Header from "@/components/Header";
-import StudentPage from "@/components/student/StudentPage";
+import StudentPage from "@/components/students/StudentPage";
 
 export default function StudentsRoute() {
   return (

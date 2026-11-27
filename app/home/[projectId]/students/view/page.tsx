@@ -1,4 +1,6 @@
-import ViewStudent from './View';
-export default function page(){
-    return  <ViewStudent />
+
+import StudentDashboard from "@/components/home/students/StudentDashboard";
+
+export default function Page() {
+  return <StudentDashboard />;
 }
