@@ -929,18 +929,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             )}
           </Field>
 
-          <div className="rounded-xl border border-blue-400/10 bg-blue-500/[0.04] p-3">
-            <div className="flex items-start gap-2.5">
-              <ShieldCheck
-                size={15}
-                className="mt-0.5 shrink-0 text-blue-300"
-              />
-              <p className="text-[10px] leading-5 text-slate-400">
-                This password will be used to authorize important student
-                transactions. It is not a student login account.
-              </p>
-            </div>
-          </div>
+
         </div>
       );
     }
@@ -1115,14 +1104,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             "Upload the student's NHI card"
           )}
 
-          <div className="rounded-xl border border-blue-400/10 bg-blue-500/[0.04] p-3">
-            <div className="flex items-start gap-2.5">
-              <ShieldCheck
-                size={15}
-                className="mt-0.5 shrink-0 text-blue-300"
-              />
-            </div>
-          </div>
+
         </div>
       );
     }
