@@ -306,7 +306,7 @@ export default function StudentsPage() {
   }
 
   return (
-    <main className="w-full px-1.5 py-3 text-white sm:px-3 sm:py-5">
+    <main className="w-full px-3 py-3 text-white sm:px-5 sm:py-5 lg:px-8">
       <div className="mx-auto w-full max-w-6xl space-y-4">
         <Link
           href={`/home/${project.id}`}
@@ -317,7 +317,7 @@ export default function StudentsPage() {
         </Link>
 
         {/* Project heading */}
-        <section className="flex min-h-[180px] items-center justify-between gap-3 rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#102440] via-[#0A192D] to-[#061020] p-6 sm:min-h-[200px] sm:p-8">
+        <section className="flex min-h-[180px] flex-col items-start justify-start gap-4 rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#102440] via-[#0A192D] to-[#061020] p-6 sm:min-h-[200px] sm:p-8">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10">
               <Users size={18} className="text-blue-300" />
@@ -435,12 +435,12 @@ function StudentCard({
   const viewHref = `/home/students/view?id=${student.id}&projectId=${projectId}`;
 
   return (
-    <article className="group relative isolate flex min-w-0 flex-col overflow-hidden rounded-[26px] border border-blue-300/[0.12] bg-[#071426] shadow-[0_18px_55px_rgba(0,0,0,0.28)] transition duration-300 hover:border-blue-400/30 hover:shadow-[0_24px_65px_rgba(0,0,0,0.38)] sm:min-h-[470px] sm:flex-row">
+    <article className="group relative isolate flex min-w-0 flex-col overflow-hidden rounded-[26px] border border-blue-300/[0.12] bg-[#071426] shadow-[0_18px_55px_rgba(0,0,0,0.28)] transition duration-300 hover:border-blue-400/30 hover:shadow-[0_24px_65px_rgba(0,0,0,0.38)] sm:min-h-[440px] sm:flex-row">
       {/* Subtle blue atmosphere */}
       <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/[0.10] blur-[75px]" />
 
       {/* Portrait section */}
-      <div className="relative flex min-h-[230px] shrink-0 items-center justify-center overflow-hidden border-b border-blue-300/[0.08] bg-gradient-to-br from-[#102440] via-[#0B1B30] to-[#061020] sm:min-h-[330px] sm:w-[38%] sm:border-b-0 sm:border-r lg:min-h-[350px]">
+      <div className="relative flex min-h-[230px] shrink-0 items-center justify-center overflow-hidden border-b border-blue-300/[0.08] bg-gradient-to-br from-[#102440] via-[#0B1B30] to-[#061020] sm:min-h-[300px] sm:w-[32%] sm:border-b-0 sm:border-r">
         {/* Soft background glow */}
         <div className="pointer-events-none absolute h-48 w-48 rounded-full bg-blue-500/[0.12] blur-[55px]" />
 
@@ -570,7 +570,7 @@ function StudentCard({
           className="group/view mt-4 inline-flex min-h-[46px] w-full items-center justify-center gap-2.5 rounded-xl bg-blue-600 px-5 py-3 text-[12px] font-bold text-white shadow-[0_8px_25px_rgba(37,99,235,0.20)] transition duration-300 hover:bg-blue-500 hover:shadow-[0_10px_30px_rgba(37,99,235,0.30)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#071426]"
         >
           <Eye size={16} />
-          View Profile
+          View Details
           <ArrowRight
             size={15}
             className="transition-transform duration-300 group-hover/view:translate-x-1"
