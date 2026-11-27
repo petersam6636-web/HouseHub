@@ -203,6 +203,14 @@ export default function StudentsPage() {
   if (loadError || !project) {
     return (
       <main className="flex min-h-[calc(100dvh-72px)] items-center justify-center px-3 py-4 text-white">
+        <Link
+          href={projectId ? `/home/${projectId}` : "/home/project"}
+          className="fixed left-3 top-[88px] z-40 inline-flex h-10 items-center gap-2 rounded-xl border border-blue-400/15 bg-[#0A192D]/95 px-3 text-xs font-medium text-slate-300 shadow-lg backdrop-blur transition hover:border-blue-400/30 hover:text-white sm:left-6"
+        >
+          <ArrowLeft size={15} />
+          {projectId ? "Back to dashboard" : "Back to projects"}
+        </Link>
+
         <section className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-blue-400/10 bg-gradient-to-br from-[#102440] via-[#0A192D] to-[#061020] p-6 text-center sm:p-8">
           <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/15 blur-[70px]" />
 
@@ -233,13 +241,6 @@ export default function StudentsPage() {
             </button>
           )}
 
-          <Link
-            href={projectId ? `/home/${projectId}` : "/home/project"}
-            className="relative mt-5 inline-flex items-center gap-2 text-xs font-medium text-slate-300 transition hover:text-white"
-          >
-            <ArrowLeft size={14} />
-            {projectId ? "Back to dashboard" : "Back to projects"}
-          </Link>
         </section>
       </main>
     );
@@ -248,15 +249,15 @@ export default function StudentsPage() {
   if (students.length === 0) {
     return (
       <main className="flex min-h-[calc(100dvh-72px)] w-full items-center justify-center overflow-hidden px-3 py-4 text-white sm:px-5">
-        <div className="w-full max-w-[560px]">
-          <Link
-            href={`/home/${project.id}`}
-            className="mb-4 inline-flex items-center gap-2 text-xs font-medium text-slate-400 transition hover:text-white"
-          >
-            <ArrowLeft size={15} />
-            Back to dashboard
-          </Link>
+        <Link
+          href={`/home/${project.id}`}
+          className="fixed left-3 top-[88px] z-40 inline-flex h-10 items-center gap-2 rounded-xl border border-blue-400/15 bg-[#0A192D]/95 px-3 text-xs font-medium text-slate-300 shadow-lg backdrop-blur transition hover:border-blue-400/30 hover:text-white sm:left-6"
+        >
+          <ArrowLeft size={15} />
+          Back to dashboard
+        </Link>
 
+        <div className="w-full max-w-[560px]">
           <section className="relative overflow-hidden rounded-[28px] border border-blue-400/[0.11] bg-gradient-to-br from-[#102440] via-[#0A192D] to-[#061020] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:rounded-[32px] sm:p-8">
             <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-400/[0.16] blur-[80px]" />
 
@@ -316,7 +317,7 @@ export default function StudentsPage() {
         </Link>
 
         {/* Project heading */}
-        <section className="flex items-center justify-between gap-3 rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#102440] via-[#0A192D] to-[#061020] p-3.5 sm:p-4">
+        <section className="flex items-center justify-between gap-3 rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#102440] via-[#0A192D] to-[#061020] p-5 sm:p-6">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10">
               <Users size={18} className="text-blue-300" />
@@ -405,7 +406,7 @@ export default function StudentsPage() {
 /* =========================================================
    HOUSEHUB STUDENT PROFILE CARD
    Navy + blue identity card
-   Vertical below 740px, horizontal from 740px
+   Vertical below sm, horizontal from sm
 ========================================================= */
 
 function StudentCard({
@@ -432,29 +433,29 @@ function StudentCard({
   const viewHref = `/home/students/view?id=${student.id}`;
 
   return (
-    <article className="group relative isolate flex min-w-0 flex-col overflow-hidden rounded-[26px] border border-blue-300/[0.12] bg-[#071426] shadow-[0_18px_55px_rgba(0,0,0,0.28)] transition duration-300 hover:border-blue-400/30 hover:shadow-[0_24px_65px_rgba(0,0,0,0.38)] min-[740px]:flex-row">
+    <article className="group relative isolate flex min-w-0 flex-col overflow-hidden rounded-[26px] border border-blue-300/[0.12] bg-[#071426] shadow-[0_18px_55px_rgba(0,0,0,0.28)] transition duration-300 hover:border-blue-400/30 hover:shadow-[0_24px_65px_rgba(0,0,0,0.38)] sm:min-h-[470px] sm:flex-row">
       {/* Subtle blue atmosphere */}
       <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-500/[0.10] blur-[75px]" />
 
       {/* Portrait section */}
-      <div className="relative flex min-h-[230px] shrink-0 items-center justify-center overflow-hidden border-b border-blue-300/[0.08] bg-gradient-to-br from-[#102440] via-[#0B1B30] to-[#061020] min-[740px]:min-h-[300px] min-[740px]:w-[38%] min-[740px]:border-b-0 min-[740px]:border-r">
+      <div className="relative flex min-h-[230px] shrink-0 items-center justify-center overflow-hidden border-b border-blue-300/[0.08] bg-gradient-to-br from-[#102440] via-[#0B1B30] to-[#061020] sm:min-h-[330px] sm:w-[38%] sm:border-b-0 sm:border-r">
         {/* Soft background glow */}
         <div className="pointer-events-none absolute h-48 w-48 rounded-full bg-blue-500/[0.12] blur-[55px]" />
 
         {/* Decorative outer ring */}
-        <div className="absolute h-[174px] w-[174px] rotate-[-35deg] rounded-full border-[5px] border-blue-500 border-t-transparent shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-transform duration-500 group-hover:rotate-[-20deg] min-[740px]:h-[190px] min-[740px]:w-[190px]" />
+        <div className="absolute h-[174px] w-[174px] rotate-[-35deg] rounded-full border-[5px] border-blue-500 border-t-transparent shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-transform duration-500 group-hover:rotate-[-20deg] sm:h-[190px] sm:w-[190px]" />
 
         {/* Secondary ring */}
-        <div className="absolute h-[154px] w-[154px] rounded-full border-[3px] border-blue-300/20 min-[740px]:h-[170px] min-[740px]:w-[170px]" />
+        <div className="absolute h-[154px] w-[154px] rounded-full border-[3px] border-blue-300/20 sm:h-[170px] sm:w-[170px]" />
 
         {/* Student portrait */}
-        <div className="relative h-[142px] w-[142px] overflow-hidden rounded-full border-[5px] border-[#071426] bg-[#102440] shadow-[0_12px_35px_rgba(0,0,0,0.35)] min-[740px]:h-[158px] min-[740px]:w-[158px]">
+        <div className="relative h-[142px] w-[142px] overflow-hidden rounded-full border-[5px] border-[#071426] bg-[#102440] shadow-[0_12px_35px_rgba(0,0,0,0.35)] sm:h-[158px] sm:w-[158px]">
           {image ? (
             <Image
               src={image}
               alt={`${studentName} profile`}
               fill
-              sizes="(min-width: 740px) 160px, 145px"
+              sizes="(min-width: 640px) 160px, 145px"
               unoptimized
               className="object-cover object-center transition duration-500 group-hover:scale-105"
             />
@@ -467,14 +468,14 @@ function StudentCard({
 
         {/* Index badge */}
         {student.index_number && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-blue-300/20 bg-[#071426]/85 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-blue-100 backdrop-blur-xl min-[740px]:bottom-5">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-blue-300/20 bg-[#071426]/85 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-blue-100 backdrop-blur-xl sm:bottom-5">
             {student.index_number}
           </div>
         )}
       </div>
 
       {/* Information section */}
-      <div className="relative z-10 flex min-w-0 flex-1 flex-col p-4 sm:p-5 min-[740px]:justify-center min-[740px]:p-6">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col p-4 sm:justify-center sm:p-6">
         {/* Student identity */}
         <div className="flex min-w-0 items-start justify-between gap-3">
           <div className="min-w-0 flex-1">

@@ -155,7 +155,7 @@ function Field({
 
 function StudentIllustration() {
   return (
-    <div className="relative mx-auto h-full w-full max-w-[350px]">
+    <div className="relative mx-auto h-full w-full max-w-[390px]">
       <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[70px]" />
 
       <div className="relative flex h-full scale-[0.9] flex-col justify-center gap-2 rounded-[1.75rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-3 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
@@ -641,6 +641,16 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
       await new Promise((resolve) => window.setTimeout(resolve, 900));
 
+      previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      previewUrlsRef.current.clear();
+      setFormData(initialFormData);
+      setImages(initialImages);
+      setPreviews(initialPreviews);
+      setConfirmPassword("");
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+      setStep(0);
+
       setProjects((currentProjects) =>
         currentProjects.filter((project) => project.id !== projectId)
       );
@@ -809,9 +819,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             <h2 className="text-base font-bold text-white sm:text-lg">
               Account details
             </h2>
-            <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Add the student&apos;s contact details and transaction security password.
-            </p>
           </div>
 
           <Field label="Email address" optional>
@@ -945,10 +952,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             <h2 className="text-base font-bold text-white sm:text-lg">
               Location & identification
             </h2>
-            <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Add the student&apos;s location and upload their profile picture
-              and birth certificate.
-            </p>
           </div>
 
           {imageUpload(
@@ -983,9 +986,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
           </Field>
 
           <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-            <p className="text-[10px] leading-5 text-slate-500">
-              Images must be PNG, JPG or WEBP and no larger than 5 MB each.
-            </p>
           </div>
         </div>
       );
@@ -998,9 +998,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             <h2 className="text-base font-bold text-white sm:text-lg">
               Parent & guardian
             </h2>
-            <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Keep each parent&apos;s name and contact information together.
-            </p>
           </div>
 
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
@@ -1081,9 +1078,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             <h2 className="text-base font-bold text-white sm:text-lg">
               Emergency & NHI
             </h2>
-            <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Add a trusted emergency contact and the student&apos;s NHI details.
-            </p>
           </div>
 
           <Field label="Emergency contact number">
@@ -1129,9 +1123,6 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
                 size={15}
                 className="mt-0.5 shrink-0 text-blue-300"
               />
-              <p className="text-[10px] leading-5 text-slate-400">
-                Choose a trusted contact who can be reached in an emergency.
-              </p>
             </div>
           </div>
         </div>
@@ -1314,7 +1305,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
           </div>
 
-          <div className="md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[500px] md:items-stretch">
+          <div className="md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[508px] md:items-stretch">
             <section className="flex min-w-0 flex-col p-4 sm:p-5 md:h-full md:min-h-0 md:p-5">
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
                 <form
