@@ -429,7 +429,7 @@ function StudentCard({
           </div>
         </div>
 
-        <div className="relative mt-5 grid min-w-0 grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+        <div className="relative mt-5 grid min-w-0 grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
           {student.email_address && (
             <StudentInfo
               icon={<Mail size={13} />}
