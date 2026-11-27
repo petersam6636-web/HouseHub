@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     icon: "/househub_logo.png",
     apple: "/househub_logo.png",
   },
+  themeColor: "#05070D",
 };
 
 export const viewport: Viewport = {
