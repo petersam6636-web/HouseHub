@@ -6,6 +6,7 @@
   "include": [
     "components/students/StudentDashboard.tsx",
     "components/students/StudentDashboardOverview.tsx",
+    "app/api/student-transactions/route.ts",
     "app/home/transactions/Transaction.tsx",
     "app/home/transactions/page.tsx"
   ],

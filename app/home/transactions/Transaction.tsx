@@ -37,6 +37,45 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 type TransactionAction = "deposit" | "withdraw";
 
+type StudentTransactionApiRequest = {
+  studentId: string;
+  projectId: string;
+  action: TransactionAction;
+  password: string;
+  verifyOnly: boolean;
+  amount?: number;
+  description?: string;
+};
+
+type StudentTransactionApiResponse = {
+  verified?: boolean;
+  transaction?: Transaction;
+  error?: string;
+};
+
+async function requestStudentTransaction(
+  body: StudentTransactionApiRequest
+): Promise<StudentTransactionApiResponse> {
+  const response = await fetch("/api/student-transactions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const result =
+    (await response.json()) as StudentTransactionApiResponse;
+
+  if (!response.ok) {
+    throw new Error(
+      result.error || "Could not process the transaction."
+    );
+  }
+
+  return result;
+}
+
 const money = (value: number) =>
   new Intl.NumberFormat("en-GH", {
     style: "currency",
@@ -368,33 +407,18 @@ export default function StudentTransactionsPage() {
     setTransactionStep("verification");
 
     try {
-      const { data, error: functionError } =
-        await supabase.functions.invoke(
-          "student-transaction",
-          {
-            body: {
-              studentId: student.id,
-              projectId: project.id,
-              action,
-              password,
-              verifyOnly: true,
-            },
-          }
-        );
+      const data = await requestStudentTransaction({
+        studentId: student.id,
+        projectId: project.id,
+        action,
+        password,
+        verifyOnly: true,
+      });
 
       if (attempt !== verificationAttempt.current) return;
 
-      if (functionError) {
-        throw new Error(
-          functionError.message ||
-            "Could not verify the student's password."
-        );
-      }
-
       if (data?.verified !== true) {
-        throw new Error(
-          data?.error || "This password is incorrect."
-        );
+        throw new Error("This password is incorrect.");
       }
 
       setTransactionStep("details");
@@ -444,44 +468,21 @@ export default function StudentTransactionsPage() {
     setError("");
 
     try {
-      /*
-       * The Edge Function must verify the password securely,
-       * validate the project/student relationship, and insert
-       * the transaction server-side.
-       *
-       * Never compare student.password in this component.
-       */
-
-      const { data, error: functionError } =
-        await supabase.functions.invoke(
-          "student-transaction",
-          {
-            body: {
-              studentId: student.id,
-              projectId: project.id,
-              action,
-              amount: parsedAmount,
-              description: description.trim(),
-              password,
-            },
-          }
-        );
-
-      if (functionError) {
-        throw new Error(
-          functionError.message ||
-            "Could not authorize the transaction."
-        );
-      }
+      const data = await requestStudentTransaction({
+        studentId: student.id,
+        projectId: project.id,
+        action,
+        amount: parsedAmount,
+        description: description.trim(),
+        password,
+        verifyOnly: false,
+      });
 
       if (!data?.transaction) {
-        throw new Error(
-          data?.error || "Transaction was not completed."
-        );
+        throw new Error("Transaction was not completed.");
       }
 
-      const newTransaction =
-        data.transaction as Transaction;
+      const newTransaction = data.transaction;
 
       // Use the server-returned transaction immediately,
       // then refresh the project and complete transaction history.
@@ -532,8 +533,8 @@ export default function StudentTransactionsPage() {
         }
       } catch (refreshError) {
         /*
-         * The transaction has already been saved by the
-         * Edge Function. Keep it in the UI if refresh fails
+         * The transaction has already been saved by the API.
+         * Keep it in the UI if refresh fails
          * instead of inviting the housemaster to submit again.
          */
         console.error(
