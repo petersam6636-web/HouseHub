@@ -41,20 +41,17 @@ function getProjectBalance(project: ProjectWithRelations) {
   );
 }
 
-function isCountableExpense(transaction: Transaction) {
-  return (
-    transaction.state === "withdraw" &&
-    (transaction.status === "completed" ||
-      transaction.status === null)
-  );
+function getTransactionAmount(transaction: Transaction) {
+  const amount = Number(transaction.amount ?? 0);
+  return Number.isFinite(amount) ? amount : 0;
 }
 
 function getProjectExpenses(project: ProjectWithRelations) {
   return project.students.reduce((total, student) => {
     const studentExpenses = (student.transactions ?? []).reduce(
       (expenseTotal, transaction) =>
-        isCountableExpense(transaction)
-          ? expenseTotal + (transaction.amount ?? 0)
+        transaction.state === "withdraw"
+          ? expenseTotal + getTransactionAmount(transaction)
           : expenseTotal,
       0
     );
