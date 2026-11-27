@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
+import Header from "@/components/Header";
 import { supabase } from "@/lib/supabase-client";
 import { getErrorMessage } from "@/lib/errorMessage";
 import useApp from "@/lib/useApp";
@@ -148,10 +149,10 @@ function Field({
 
 function StudentIllustration() {
   return (
-    <div className="relative mx-auto w-full max-w-[420px]">
+    <div className="relative mx-auto h-full min-h-[620px] w-full max-w-[420px]">
       <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[80px]" />
 
-      <div className="relative rounded-[2rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33] via-[#0B1220] to-[#080D17] p-4 shadow-[0_25px_80px_rgba(0,0,0,0.6)]">
+      <div className="relative flex h-full min-h-[620px] flex-col justify-center rounded-[2rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-4 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
         <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-3 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-300">
@@ -291,6 +292,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
   const previewRef = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState(0);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [formData, setFormData] =
     useState<StudentFormData>(initialFormData);
   const [images, setImages] = useState<StudentImages>(initialImages);
@@ -312,6 +314,15 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       previewUrls.forEach((url) => URL.revokeObjectURL(url));
       previewUrls.clear();
     };
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 639px)");
+    const updateScreenSize = () => setIsSmallScreen(mediaQuery.matches);
+
+    updateScreenSize();
+    mediaQuery.addEventListener("change", updateScreenSize);
+    return () => mediaQuery.removeEventListener("change", updateScreenSize);
   }, []);
 
   useEffect(() => {
@@ -426,7 +437,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     if (step === 0) {
       return (
         formData.full_name.trim().length > 0 &&
-        formData.gender.length > 0 &&
+        (isSmallScreen || formData.gender.length > 0) &&
         formData.location.trim().length > 0 &&
         formData.nhi_number.trim().length > 0
       );
@@ -436,7 +447,8 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       return (
         formData.password.trim().length >= 4 &&
         confirmPassword.trim().length >= 4 &&
-        formData.password === confirmPassword
+        formData.password === confirmPassword &&
+        (!isSmallScreen || formData.gender.length > 0)
       );
     }
 
@@ -458,7 +470,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     }
 
     return false;
-  }, [step, formData, images, confirmPassword]);
+  }, [step, formData, images, confirmPassword, isSmallScreen]);
 
   const nextStep = () => {
     if (!isStepValid) {
@@ -523,7 +535,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       return;
     }
 
-    if (!isStepValid) {
+    if (!isStepValid || !formData.gender.trim()) {
       setToast({
         type: "error",
         message: "Please complete the required fields.",
@@ -730,6 +742,22 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     );
   };
 
+  const renderGenderField = () => (
+    <Field label="Gender">
+      <select
+        required
+        value={formData.gender}
+        onChange={(event) => updateField("gender", event.target.value)}
+        className={`${inputClass} [color-scheme:dark]`}
+      >
+        <option value="">Select gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    </Field>
+  );
+
   const renderStep = () => {
     if (step === 0) {
       return (
@@ -779,21 +807,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               />
             </Field>
 
-            <Field label="Gender">
-              <select
-                required
-                value={formData.gender}
-                onChange={(event) =>
-                  updateField("gender", event.target.value)
-                }
-                className={`${inputClass} [color-scheme:dark]`}
-              >
-                <option value="">Select gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </Field>
+            {!isSmallScreen && renderGenderField()}
           </div>
 
           <Field label="Residential location">
@@ -846,6 +860,8 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               />
             </div>
           </Field>
+
+          {isSmallScreen && renderGenderField()}
 
           <Field label="Student security password">
             <div className="relative">
@@ -1149,7 +1165,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
   if (!projectId) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-[#070B12] px-4 text-white">
+      <main className="flex min-h-[calc(100dvh-72px)] items-center justify-center bg-[#070B12] px-4 text-white">
         <div className="max-w-sm rounded-2xl border border-red-400/15 bg-[#111827] p-6 text-center">
           <AlertCircle className="mx-auto mb-3 text-red-300" size={24} />
           <h1 className="text-sm font-semibold">Project ID missing</h1>
@@ -1171,7 +1187,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
   return (
     <main
       ref={containerRef}
-      className="relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden px-3 py-5 text-white sm:px-5 sm:py-6"
+      className="relative flex min-h-[calc(100dvh-72px)] w-full items-start justify-center overflow-x-hidden px-3 py-5 text-white sm:px-5 sm:py-6 md:items-center"
     >
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[-12rem] top-1/2 h-80 w-80 -translate-y-1/2 rounded-full bg-blue-600/[0.07] blur-[110px]" />
@@ -1272,13 +1288,16 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
           </div>
 
-          <div className="md:grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-            <section className="min-w-0 p-4 sm:p-6 lg:p-7">
-              <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
-                <form onSubmit={handleSubmit}>
+          <div className="md:grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] md:items-stretch">
+            <section className="flex min-w-0 flex-col p-4 sm:p-6 lg:p-7">
+              <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex h-full flex-1 flex-col"
+                >
                   <div
                     ref={formContentRef}
-                    className="min-h-[390px] px-4 py-5 sm:min-h-[410px] sm:px-5 sm:py-6"
+                    className="min-h-[620px] flex-1 px-4 py-5 sm:px-5 sm:py-6"
                   >
                     {renderStep()}
                   </div>
@@ -1332,8 +1351,8 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               </div>
             </section>
 
-            <aside className="relative hidden min-w-0 items-center justify-center px-5 py-8 md:flex lg:px-7">
-              <div ref={previewRef} className="w-full max-w-[430px]">
+            <aside className="relative hidden min-w-0 items-stretch justify-center px-5 py-8 md:flex lg:px-7">
+              <div ref={previewRef} className="h-full w-full max-w-[430px]">
                 <StudentIllustration />
               </div>
             </aside>
@@ -1415,5 +1434,10 @@ export default function StudentRegisterPage({
 }: {
   projectId: string;
 }) {
-  return <StudentRegisterForm projectId={projectId} />;
+  return (
+    <>
+      <Header />
+      <StudentRegisterForm projectId={projectId} />
+    </>
+  );
 }

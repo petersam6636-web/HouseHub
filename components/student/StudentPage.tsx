@@ -222,7 +222,7 @@ export default function StudentsPage() {
   if (students.length === 0) {
     return (
       <main className="flex min-h-[calc(100dvh-72px)] w-full items-center justify-center overflow-hidden px-3 py-4 text-white sm:px-5">
-        <section className="relative w-full max-w-[560px] overflow-hidden rounded-[28px] border border-blue-400/[0.13] bg-gradient-to-br from-[#1d385b] via-[#12243b] to-[#0a1422] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:rounded-[32px] sm:p-8">
+        <section className="relative w-full max-w-[560px] overflow-hidden rounded-[28px] border border-blue-400/[0.11] bg-gradient-to-br from-[#111e30] via-[#0d1726] to-[#090f19] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:rounded-[32px] sm:p-8">
           {/* Blue glow */}
           <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-400/[0.18] blur-[80px]" />
           <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-sky-500/[0.10] blur-[80px]" />
@@ -248,7 +248,7 @@ export default function StudentsPage() {
 
             <Link
               href={registerHref}
-              className="group mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400 px-5 py-3 text-xs font-bold text-white shadow-[0_10px_30px_rgba(37,99,235,0.25)] transition hover:brightness-110 sm:w-auto sm:min-w-[210px]"
+              className="group mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-xs font-bold text-white shadow-[0_10px_30px_rgba(37,99,235,0.25)] transition hover:bg-blue-500 sm:w-auto sm:min-w-[210px]"
             >
               <UserPlus size={16} />
               Add your first student
@@ -371,9 +371,9 @@ function StudentCard({
     .toUpperCase();
 
   return (
-    <article className="relative grid min-w-0 grid-cols-[88px_minmax(0,1fr)] overflow-hidden rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#18304d] via-[#112239] to-[#0b1422] shadow-[0_12px_35px_rgba(0,0,0,0.16)] sm:grid-cols-[150px_minmax(0,1fr)] sm:rounded-[26px] lg:grid-cols-[175px_minmax(0,1fr)]">
+    <article className="relative grid min-h-[200px] min-w-0 grid-cols-[minmax(0,1fr)_88px] overflow-hidden rounded-[22px] border border-blue-400/[0.12] bg-gradient-to-r from-[#101e30]/95 via-[#0d1828]/90 to-[#0b1422]/85 shadow-[0_16px_40px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:grid-cols-[minmax(0,1fr)_150px] sm:rounded-[26px] lg:grid-cols-[minmax(0,1fr)_185px]">
       {/* Profile image */}
-      <div className="relative min-h-[190px] overflow-hidden bg-[#172943] sm:min-h-[205px]">
+      <div className="relative order-2 h-full min-h-[200px] overflow-hidden bg-[#172943] sm:min-h-[230px]">
         {image ? (
           <img
             src={image}
@@ -389,18 +389,18 @@ function StudentCard({
         )}
 
         {/* Gradient that blends photo into the card */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#112239]/20 to-[#112239]/95" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b1422]/80 via-[#0b1422]/15 to-transparent" />
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#112239]/60 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0b1422]/70 to-transparent" />
 
-        <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full border border-white/15 bg-[#10213a]/75 px-2 py-1 text-[8px] font-semibold text-blue-100 backdrop-blur-md sm:left-3 sm:top-3 sm:text-[9px]">
+        <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full border border-white/15 bg-[#10213a]/75 px-2 py-1 text-[8px] font-semibold text-blue-100 backdrop-blur-md sm:right-3 sm:top-3 sm:text-[9px]">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-300" />
           Student
         </div>
       </div>
 
       {/* Student information */}
-      <div className="relative flex min-w-0 flex-col justify-center p-3 sm:p-4 lg:p-5">
+      <div className="relative order-1 flex min-w-0 flex-col justify-center p-3 sm:p-4 lg:p-5">
         <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-blue-400/[0.10] blur-[60px]" />
 
         <div className="relative min-w-0">
