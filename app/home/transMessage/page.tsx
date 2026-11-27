@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -9,12 +9,18 @@ import {
   ArrowLeft,
   ArrowLeftRight,
   ArrowUpRight,
+  CheckCircle2,
   Clock3,
   HandCoins,
+  Loader2,
   MessageCircle,
+  MoreVertical,
+  Trash2,
 } from "lucide-react";
 
 import Header from "@/components/Header";
+import { fetchProjectForUser } from "@/lib/projectService";
+import { supabase } from "@/lib/supabase-client";
 import useApp from "@/lib/useApp";
 import type { Transaction, TransactionState } from "@/types";
 
@@ -99,7 +105,15 @@ function TransactionMessagesContent() {
   const searchParams = useSearchParams();
   const studentId = searchParams.get("studentId");
   const projectId = searchParams.get("projectId");
-  const { projects } = useApp();
+  const { projects, setProjects, authenticatedId } = useApp();
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [deletingTransactionId, setDeletingTransactionId] =
+    useState<string | null>(null);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [notice, setNotice] = useState<{
+    kind: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const project = projects.find((item) => item.id === projectId);
   const student = project?.students.find(
@@ -148,6 +162,155 @@ function TransactionMessagesContent() {
     );
   }
 
+  function setProjectTransactions(nextTransactions: Transaction[]) {
+    setProjects((currentProjects) =>
+      currentProjects.map((currentProject) =>
+        currentProject.id !== project.id
+          ? currentProject
+          : {
+              ...currentProject,
+              students: currentProject.students.map(
+                (currentStudent) =>
+                  currentStudent.id !== student.id
+                    ? currentStudent
+                    : {
+                        ...currentStudent,
+                        transactions: nextTransactions,
+                      }
+              ),
+            }
+      )
+    );
+  }
+
+  async function refreshProject() {
+    if (!authenticatedId) {
+      throw new Error("Sign in again before deleting transactions.");
+    }
+
+    const refreshedProject = await fetchProjectForUser(
+      authenticatedId,
+      project.id
+    );
+
+    if (!refreshedProject) {
+      throw new Error("The project could not be refreshed.");
+    }
+
+    setProjects((currentProjects) =>
+      currentProjects.map((currentProject) =>
+        currentProject.id === refreshedProject.id
+          ? refreshedProject
+          : currentProject
+      )
+    );
+  }
+
+  async function deleteTransaction(transactionId: string) {
+    if (deletingTransactionId || isDeletingAll) return;
+
+    setDeletingTransactionId(transactionId);
+    setOpenMenuId(null);
+    setNotice(null);
+    let deleted = false;
+
+    try {
+      const { data, error } = await supabase
+        .from("transactions")
+        .delete()
+        .eq("id", transactionId)
+        .eq("student_id", student.id)
+        .select("id");
+
+      if (error) throw error;
+      if (!data?.length) {
+        throw new Error("The transaction could not be deleted.");
+      }
+
+      deleted = true;
+      await refreshProject();
+      setNotice({
+        kind: "success",
+        message: "Transaction deleted and project refreshed.",
+      });
+    } catch (error) {
+      console.error("Unable to delete and refresh transaction data.", error);
+
+      if (deleted) {
+        setProjectTransactions(
+          (student.transactions ?? []).filter(
+            (transaction) => transaction.id !== transactionId
+          )
+        );
+        setNotice({
+          kind: "success",
+          message:
+            "Transaction deleted. The project refresh failed, so the history was updated locally.",
+        });
+      } else {
+        setNotice({
+          kind: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "The transaction could not be deleted.",
+        });
+      }
+    } finally {
+      setDeletingTransactionId(null);
+    }
+  }
+
+  async function deleteAllTransactions() {
+    if (deletingTransactionId || isDeletingAll) return;
+
+    setIsDeletingAll(true);
+    setOpenMenuId(null);
+    setNotice(null);
+    let deleted = false;
+
+    try {
+      const { data, error } = await supabase
+        .from("transactions")
+        .delete()
+        .eq("student_id", student.id)
+        .select("id");
+
+      if (error) throw error;
+      if (!data?.length) {
+        throw new Error("No transactions were deleted.");
+      }
+
+      deleted = true;
+      await refreshProject();
+      setNotice({
+        kind: "success",
+        message: `Deleted ${data.length} transactions and refreshed the project.`,
+      });
+    } catch (error) {
+      console.error("Unable to delete and refresh all transaction data.", error);
+
+      if (deleted) {
+        setProjectTransactions([]);
+        setNotice({
+          kind: "success",
+          message:
+            "Transactions deleted. The project refresh failed, so the history was cleared locally.",
+        });
+      } else {
+        setNotice({
+          kind: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "The transactions could not be deleted.",
+        });
+      }
+    } finally {
+      setIsDeletingAll(false);
+    }
+  }
+
   return (
     <div className="min-h-dvh bg-[#05070D] text-white">
       <Header />
@@ -179,10 +342,49 @@ function TransactionMessagesContent() {
               </p>
             </div>
 
-            <div className="hidden size-11 shrink-0 items-center justify-center rounded-2xl border border-blue-400/15 bg-blue-500/[0.08] text-blue-300 sm:flex">
-              <Clock3 size={19} />
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              {transactions.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => void deleteAllTransactions()}
+                  disabled={
+                    Boolean(deletingTransactionId) || isDeletingAll
+                  }
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-red-400/15 bg-red-500/[0.07] px-3 py-2 text-[11px] font-semibold text-red-300 transition hover:bg-red-500/[0.14] disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Delete all transactions for this student"
+                >
+                  {isDeletingAll ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={14} />
+                  )}
+                  <span>{isDeletingAll ? "Deleting" : "Delete all"}</span>
+                </button>
+              )}
+              <div className="hidden size-11 shrink-0 items-center justify-center rounded-2xl border border-blue-400/15 bg-blue-500/[0.08] text-blue-300 sm:flex">
+                <Clock3 size={19} />
+              </div>
             </div>
           </header>
+
+          {notice && (
+            <div
+              role={notice.kind === "error" ? "alert" : "status"}
+              aria-live="polite"
+              className={`flex items-start gap-3 rounded-2xl border p-4 text-sm ${
+                notice.kind === "error"
+                  ? "border-red-400/20 bg-red-500/[0.07] text-red-300"
+                  : "border-emerald-400/20 bg-emerald-500/[0.07] text-emerald-300"
+              }`}
+            >
+              {notice.kind === "error" ? (
+                <AlertCircle size={18} className="mt-0.5 shrink-0" />
+              ) : (
+                <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
+              )}
+              <p>{notice.message}</p>
+            </div>
+          )}
 
           {transactions.length === 0 ? (
             <section className="rounded-3xl border border-white/[0.08] bg-[#0B1220] px-5 py-14 text-center">
@@ -256,24 +458,82 @@ function TransactionMessagesContent() {
                           </div>
 
                           <div className="flex flex-col items-end gap-2">
-                            {amount !== null && (
-                              <p
-                                className={`text-sm font-bold ${
-                                  isDeposit
-                                    ? "text-emerald-300"
+                            <div className="flex items-center gap-2">
+                              {amount !== null && (
+                                <p
+                                  className={`text-sm font-bold ${
+                                    isDeposit
+                                      ? "text-emerald-300"
+                                      : isWithdrawal
+                                        ? "text-indigo-300"
+                                        : "text-white"
+                                  }`}
+                                >
+                                  {isDeposit
+                                    ? "+"
                                     : isWithdrawal
-                                      ? "text-indigo-300"
-                                      : "text-white"
-                                }`}
-                              >
-                                {isDeposit
-                                  ? "+"
-                                  : isWithdrawal
-                                    ? "-"
-                                    : ""}
-                                {money(Math.abs(amount))}
-                              </p>
-                            )}
+                                      ? "-"
+                                      : ""}
+                                  {money(Math.abs(amount))}
+                                </p>
+                              )}
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setOpenMenuId((openId) =>
+                                      openId === transaction.id
+                                        ? null
+                                        : transaction.id
+                                    )
+                                  }
+                                  disabled={
+                                    Boolean(deletingTransactionId) ||
+                                    isDeletingAll
+                                  }
+                                  aria-label="Transaction actions"
+                                  aria-expanded={
+                                    openMenuId === transaction.id
+                                  }
+                                  className="flex size-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-white/[0.06] hover:text-white disabled:opacity-50"
+                                >
+                                  <MoreVertical size={18} />
+                                </button>
+
+                                {openMenuId === transaction.id && (
+                                  <div className="absolute right-0 top-full z-30 mt-1 min-w-36 rounded-xl border border-white/[0.1] bg-[#101827] p-1.5 shadow-xl shadow-black/40">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        void deleteTransaction(
+                                          transaction.id
+                                        )
+                                      }
+                                      disabled={
+                                        Boolean(
+                                          deletingTransactionId
+                                        ) || isDeletingAll
+                                      }
+                                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-red-300 transition hover:bg-red-500/10 disabled:opacity-50"
+                                    >
+                                      {deletingTransactionId ===
+                                      transaction.id ? (
+                                        <Loader2
+                                          size={14}
+                                          className="animate-spin"
+                                        />
+                                      ) : (
+                                        <Trash2 size={14} />
+                                      )}
+                                      {deletingTransactionId ===
+                                      transaction.id
+                                        ? "Deleting"
+                                        : "Delete"}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                             <span
                               className={`rounded-full border px-2.5 py-1 text-[10px] font-medium capitalize ${statusClass}`}
                             >

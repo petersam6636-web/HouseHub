@@ -74,14 +74,11 @@ function isCountableExpense(transaction: Transaction) {
 
 function getProjectExpenses(project: ProjectWithRelations) {
   return project.students.reduce((total, student) => {
-    const studentExpenses = student.transactions.reduce(
-      (expenseTotal, transaction) => {
-        if (!isCountableExpense(transaction)) {
-          return expenseTotal;
-        }
-
-        return expenseTotal + (transaction.amount ?? 0);
-      },
+    const studentExpenses = (student.transactions ?? []).reduce(
+      (expenseTotal, transaction) =>
+        isCountableExpense(transaction)
+          ? expenseTotal + (transaction.amount ?? 0)
+          : expenseTotal,
       0
     );
 
@@ -146,7 +143,7 @@ function BalanceDonut({
         viewBox="0 0 100 100"
         className="relative h-full w-full -rotate-90"
         role="img"
-        aria-label={`Project balance ${formatMoney(balance)}. Expenses ${formatMoney(expenses)}.`}
+        aria-label={`Project balance ${formatMoney(Math.abs(balance))}. Expenses ${formatMoney(expenses)}.`}
       >
         <circle
           cx="50"
@@ -180,7 +177,7 @@ function BalanceDonut({
             cy="50"
             r={radius}
             fill="none"
-            stroke="#2563EB"
+            stroke="#EF4444"
             strokeWidth="8"
             strokeLinecap="butt"
             strokeDasharray={`${expenseSegmentLength} ${circumference}`}
@@ -196,12 +193,10 @@ function BalanceDonut({
         </span>
 
         <span
-          className={`mt-1 max-w-[112px] truncate text-center text-sm font-bold tracking-tight ${
-            balance < 0 ? "text-rose-400" : "text-white"
-          }`}
-          title={formatMoney(balance)}
+          className="mt-1 max-w-[112px] truncate text-center text-sm font-bold tracking-tight text-white"
+          title={formatMoney(Math.abs(balance))}
         >
-          {formatMoney(balance)}
+          {formatMoney(Math.abs(balance))}
         </span>
 
         <span className="mt-1 text-[9px] text-slate-500">
@@ -365,7 +360,7 @@ function ProjectCard({
 
               <div className="mt-1 flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
                   <span className="text-[9px] text-slate-500">
                     Expenses
                   </span>
@@ -395,9 +390,9 @@ function ProjectCard({
 
                 <p
                   className="truncate text-lg font-bold tracking-tight text-white"
-                  title={formatMoney(balance)}
+                  title={formatMoney(Math.abs(balance))}
                 >
-                  {formatMoney(balance)}
+                  {formatMoney(Math.abs(balance))}
                 </p>
               </div>
 
@@ -405,7 +400,7 @@ function ProjectCard({
 
               <div>
                 <div className="mb-1.5 flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/[0.09] text-blue-400">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/[0.09] text-red-400">
                     <TrendingDown size={14} />
                   </div>
 
@@ -415,7 +410,7 @@ function ProjectCard({
                 </div>
 
                 <p
-                  className="truncate text-lg font-bold tracking-tight text-white"
+                  className="truncate text-lg font-bold tracking-tight text-red-400"
                   title={formatMoney(expenses)}
                 >
                   {formatMoney(expenses)}
