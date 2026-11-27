@@ -14,11 +14,11 @@ import {
 } from "lucide-react";
 
 import Header from "@/components/Header";
-import { useApp } from "@/lib/useApp";
+import useApp from "@/lib/useApp";
 import type { StudentDetailsWithRelations } from "@/types";
 
 import StudentDashboardOverview from "./StudentDashboardOverview";
-import StudentCharts from "./StudentCharts";
+import StudentCharts from "./StudentChart";
 
 function initials(name: string) {
   return name
