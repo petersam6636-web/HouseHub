@@ -155,7 +155,7 @@ function Field({
 
 function StudentIllustration() {
   return (
-    <div className="relative mx-auto h-full w-full max-w-[205px]">
+    <div className="relative mx-auto h-full w-full max-w-[615px]">
       <div className="pointer-events-none absolute inset-8 rounded-full bg-blue-600/20 blur-[70px]" />
 
       <div className="relative flex h-full scale-[0.9] flex-col justify-center gap-2 rounded-[1.75rem] border border-blue-400/[0.16] bg-gradient-to-br from-[#111E33]/90 via-[#0B1220]/85 to-[#080D17]/90 p-3 shadow-[0_25px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
@@ -1269,7 +1269,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </div>
           </div>
 
-          <div className="md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[520px] md:items-stretch">
+          <div className="md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[540px] md:items-stretch">
             <section className="flex min-w-0 flex-col p-4 sm:p-5 md:h-full md:min-h-0 md:p-5">
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#070D16]/65">
                 <form
@@ -1333,7 +1333,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
             </section>
 
             <aside className="relative hidden min-w-0 items-center justify-center px-5 py-5 md:flex md:h-[508px] md:self-center">
-              <div ref={previewRef} className="h-full w-full max-w-[205px]">
+              <div ref={previewRef} className="h-full w-full max-w-[615px]">
                 <StudentIllustration />
               </div>
             </aside>

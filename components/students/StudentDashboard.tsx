@@ -6,11 +6,16 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
+  BriefcaseBusiness,
+  MessageCircle,
+  MessageSquareText,
+  Package,
   GraduationCap,
   MapPin,
   UserRound,
   Activity,
   CalendarDays,
+  Wallet,
 } from "lucide-react";
 
 import Header from "@/components/Header";
@@ -108,7 +113,7 @@ function StudentDashboardContent() {
     <div className="min-h-dvh bg-[#060d18] text-white">
       <Header />
 
-      <main className="mx-auto w-full max-w-[1500px] space-y-5 px-3 py-5 sm:px-5 sm:py-7 lg:px-8">
+      <main className="mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:px-5 sm:py-7 lg:px-8">
         {/* Top navigation */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
@@ -194,26 +199,75 @@ function StudentDashboardContent() {
           </div>
         </section>
 
+        <div className="flex justify-center">
+          <div className="grid w-full max-w-3xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            <Link
+              href={`/home/${projectId}/transactions?id=${projectId}`}
+              className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-400/[0.12] bg-indigo-500/[0.08] text-indigo-300 transition-colors group-hover:bg-indigo-500/[0.14]">
+                <Wallet size={20} />
+              </div>
+              <span className="text-[10px] font-medium text-slate-400 group-hover:text-indigo-300">
+                Transactions
+              </span>
+            </Link>
+
+            <Link
+              href={`/home/${projectId}/jobs?id=${projectId}`}
+              className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/[0.12] bg-cyan-500/[0.08] text-cyan-300 transition-colors group-hover:bg-cyan-500/[0.14]">
+                <BriefcaseBusiness size={20} />
+              </div>
+              <span className="text-[10px] font-medium text-slate-400 group-hover:text-cyan-300">
+                Jobs
+              </span>
+            </Link>
+
+            <Link
+              href={`/home/${projectId}/products?id=${projectId}`}
+              className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-400/[0.12] bg-amber-500/[0.08] text-amber-300 transition-colors group-hover:bg-amber-500/[0.14]">
+                <Package size={20} />
+              </div>
+              <span className="text-[10px] font-medium text-slate-400 group-hover:text-amber-300">
+                Products
+              </span>
+            </Link>
+
+            <Link
+              href={`/home/${projectId}/chat?id=${projectId}`}
+              className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-400/[0.12] bg-sky-500/[0.08] text-sky-300 transition-colors group-hover:bg-sky-500/[0.14]">
+                <MessageCircle size={20} />
+              </div>
+              <span className="text-[10px] font-medium text-slate-400 group-hover:text-sky-300">
+                Chat
+              </span>
+            </Link>
+
+            <Link
+              href={`/home/${projectId}/feedback?id=${projectId}`}
+              className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/[0.12] bg-violet-500/[0.08] text-violet-300 transition-colors group-hover:bg-violet-500/[0.14]">
+                <MessageSquareText size={20} />
+              </div>
+              <span className="text-[10px] font-medium text-slate-400 group-hover:text-violet-300">
+                Feedback
+              </span>
+            </Link>
+          </div>
+        </div>
+
         {/* Student overview */}
         <StudentDashboardOverview student={student} />
 
         {/* Charts */}
         <section className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-2xl border border-blue-400/15 bg-blue-500/10 text-blue-400">
-              <Activity size={18} />
-            </div>
-
-            <div>
-              <h2 className="text-lg font-bold tracking-tight text-white">
-                Student analytics
-              </h2>
-              <p className="mt-1 text-xs text-slate-500">
-                A visual summary of the student's recorded activity
-              </p>
-            </div>
-          </div>
-
           <StudentCharts transactions={student.transactions} />
         </section>
 

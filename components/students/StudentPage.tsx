@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -19,6 +19,9 @@ import {
   Search,
   ShieldAlert,
   Globe,
+  MoreVertical,
+  Trash2,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -30,8 +33,10 @@ import type {
 import useApp from "@/lib/useApp";
 import {
   fetchProjectForUser,
+  fetchProjectsForUser,
   getErrorMessage,
 } from "@/lib/projectService";
+import { supabase } from "@/lib/supabase-client";
 
 const EMPTY_STUDENTS: StudentDetailsWithRelations[] = [];
 
@@ -257,7 +262,8 @@ export default function StudentsPage() {
           Back to dashboard
         </Link>
 
-        <div className="w-full max-w-[560px]">
+        <div className="relative w-full max-w-[560px]">
+          <ProjectDeletionControls project={project} />
           <section className="relative overflow-hidden rounded-[28px] border border-blue-400/[0.11] bg-gradient-to-br from-[#102440] via-[#0A192D] to-[#061020] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:rounded-[32px] sm:p-8">
             <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-400/[0.16] blur-[80px]" />
 
@@ -317,8 +323,8 @@ export default function StudentsPage() {
         </Link>
 
         {/* Project heading */}
-        <section className="flex min-h-[180px] flex-col items-start justify-start gap-4 rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#102440] via-[#0A192D] to-[#061020] p-6 sm:min-h-[200px] sm:p-8">
-          <div className="flex min-w-0 items-center gap-3">
+        <section className="relative flex min-h-[180px] flex-col items-start justify-start gap-4 rounded-[22px] border border-blue-400/[0.10] bg-gradient-to-r from-[#102440] via-[#0A192D] to-[#061020] p-6 sm:min-h-[200px] sm:p-8">
+          <div className="flex min-w-0 max-w-[calc(100%-3rem)] items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10">
               <Users size={18} className="text-blue-300" />
             </div>
@@ -338,6 +344,8 @@ export default function StudentsPage() {
               </p>
             </div>
           </div>
+
+          <ProjectDeletionControls project={project} />
 
           <Link
             href={registerHref}
@@ -389,7 +397,7 @@ export default function StudentsPage() {
             </p>
           </section>
         ) : (
-          <section className="grid grid-cols-1 gap-4">
+          <section className="grid grid-cols-1 gap-4 xl:gap-5">
             {filteredStudents.map((student) => (
               <StudentCard
                 key={student.id}
@@ -399,7 +407,211 @@ export default function StudentsPage() {
           </section>
         )}
       </div>
+
     </main>
+  );
+}
+
+function ProjectDeletionControls({
+  project,
+}: {
+  project: ProjectWithRelations;
+}) {
+  const router = useRouter();
+  const { authenticatedId, setProjects } = useApp();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [confirmation, setConfirmation] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  async function handleDeleteProject() {
+    if (
+      !authenticatedId ||
+      confirmation !== "delete my project" ||
+      isDeleting
+    ) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setErrorMessage(null);
+    let projectDeleted = false;
+
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .delete()
+        .eq("id", project.id)
+        .eq("user_id", authenticatedId)
+        .select("id");
+
+      if (error) throw error;
+      if (!data?.length) {
+        throw new Error("The project could not be deleted.");
+      }
+
+      projectDeleted = true;
+      const remainingProjects = await fetchProjectsForUser(authenticatedId);
+      setProjects(remainingProjects);
+      router.replace("/home/project");
+    } catch (error) {
+      console.error(
+        projectDeleted
+          ? "Project was deleted, but the project list could not be refreshed."
+          : "Unable to delete project.",
+        error
+      );
+
+      if (projectDeleted) {
+        setProjects((currentProjects) =>
+          currentProjects.filter((item) => item.id !== project.id)
+        );
+        router.replace("/home/project");
+      } else {
+        setErrorMessage(
+          getErrorMessage(error, "Unable to delete project.")
+        );
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="absolute right-5 top-5 z-20">
+        <button
+          type="button"
+          aria-label="Project actions"
+          aria-haspopup="menu"
+          aria-expanded={isMenuOpen}
+          onClick={() => setIsMenuOpen((isOpen) => !isOpen)}
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-slate-400 transition hover:border-white/[0.14] hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50"
+        >
+          <MoreVertical size={18} />
+        </button>
+
+        {isMenuOpen && (
+          <div
+            role="menu"
+            className="absolute right-0 top-11 z-20 w-44 rounded-xl border border-white/[0.09] bg-[#0B1729] p-1.5 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
+          >
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setIsMenuOpen(false);
+                setConfirmation("");
+                setErrorMessage(null);
+                setIsDialogOpen(true);
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-medium text-rose-300 transition hover:bg-rose-500/[0.10] hover:text-rose-200"
+            >
+              <Trash2 size={14} />
+              Delete project
+            </button>
+          </div>
+        )}
+      </div>
+
+      {isDialogOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isDeleting) {
+              setIsDialogOpen(false);
+            }
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-project-title"
+            className="w-full max-w-md rounded-2xl border border-white/[0.09] bg-[#0B1729] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.6)] sm:p-6"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-rose-400/15 bg-rose-500/[0.09] text-rose-300">
+                  <Trash2 size={17} />
+                </div>
+                <div>
+                  <h2
+                    id="delete-project-title"
+                    className="text-sm font-semibold"
+                  >
+                    Delete project
+                  </h2>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                    This will permanently delete this project and its
+                    associated data.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-label="Close delete confirmation"
+                disabled={isDeleting}
+                onClick={() => setIsDialogOpen(false)}
+                className="rounded-lg p-1.5 text-slate-500 transition hover:bg-white/[0.05] hover:text-white disabled:opacity-50"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <label
+              htmlFor="delete-project-confirmation"
+              className="mt-5 block text-xs text-slate-300"
+            >
+              Type{" "}
+              <span className="font-semibold text-white">
+                delete my project
+              </span>{" "}
+              to confirm.
+            </label>
+            <input
+              id="delete-project-confirmation"
+              autoComplete="off"
+              value={confirmation}
+              onChange={(event) => {
+                setConfirmation(event.target.value);
+                setErrorMessage(null);
+              }}
+              disabled={isDeleting}
+              className="mt-2 h-10 w-full rounded-lg border border-white/[0.10] bg-[#071426] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-rose-400/40 focus:ring-2 focus:ring-rose-400/10 disabled:opacity-60"
+            />
+
+            {errorMessage && (
+              <p role="alert" className="mt-2 text-xs text-rose-300">
+                {errorMessage}
+              </p>
+            )}
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setIsDialogOpen(false)}
+                className="h-9 rounded-lg border border-white/[0.09] px-3 text-xs font-medium text-slate-300 transition hover:bg-white/[0.05] hover:text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={
+                  confirmation !== "delete my project" || isDeleting
+                }
+                onClick={() => void handleDeleteProject()}
+                className="h-9 rounded-lg bg-rose-500/90 px-3.5 text-xs font-semibold text-white transition hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {isDeleting ? "Deleting..." : "Delete project"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+    </>
   );
 }
 

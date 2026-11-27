@@ -386,7 +386,7 @@ export default function CreateProject() {
         <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-300/[0.12] bg-gradient-to-br from-[#101A2B]/95 via-[#090F19]/95 to-[#070B12]/95 shadow-[0_28px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl ">
           <div className="pointer-events-none absolute -right-32 -top-32 hidden h-96 w-96 rounded-full bg-blue-500/[0.07] blur-[100px] md:block" />
            <div className=" w-full mt-2 text-center mb-3">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
+              <div className="mb-3 mt-2 inline-flex items-center gap-2 rounded-full border border-blue-400/[0.13] bg-blue-500/[0.06] px-3 py-1.5">
                 <Sparkles size={12} className="text-blue-400" />
                 <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-300">
                   HouseHub setup
