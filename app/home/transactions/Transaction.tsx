@@ -665,6 +665,37 @@ export default function StudentTransactionsPage() {
             </div>
           </section>
 
+          {/* Secure transaction actions */}
+          <section className="mx-auto w-full max-w-sm">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => openTransaction("deposit")}
+                className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/[0.12] bg-emerald-500/[0.08] text-emerald-300 transition-colors group-hover:bg-emerald-500/[0.14]">
+                  <ArrowDownLeft size={20} />
+                </span>
+                <span className="text-[10px] font-medium text-slate-400 group-hover:text-emerald-300">
+                  Deposit money
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => openTransaction("withdraw")}
+                className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-400/[0.12] bg-indigo-500/[0.08] text-indigo-300 transition-colors group-hover:bg-indigo-500/[0.14]">
+                  <ArrowUpRight size={20} />
+                </span>
+                <span className="text-[10px] font-medium text-slate-400 group-hover:text-indigo-300">
+                  Withdraw money
+                </span>
+              </button>
+            </div>
+          </section>
+
           {/* Success message */}
           {success && (
             <div className="flex items-center gap-3 rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4 text-sm text-blue-300">
@@ -707,56 +738,6 @@ export default function StudentTransactionsPage() {
                   </p>
                 </div>
               </div>
-            </div>
-          </section>
-
-          {/* Secure transaction actions */}
-          <section className="mx-auto w-full max-w-3xl">
-            <div className="mb-4 text-center">
-              <h2 className="text-lg font-bold text-white">
-                Manage student funds
-              </h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Choose an action to securely manage this student&apos;s balance.
-              </p>
-            </div>
-
-            <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
-              <button
-                type="button"
-                onClick={() => openTransaction("deposit")}
-                className="group flex min-h-[72px] flex-1 items-center justify-center gap-3 rounded-2xl border border-blue-500/25 bg-blue-600 px-6 py-4 text-center transition duration-200 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-950/30 active:translate-y-0"
-              >
-                <span className="flex size-10 items-center justify-center rounded-xl bg-white/15 text-white">
-                  <ArrowDownLeft size={21} />
-                </span>
-                <span className="text-left">
-                  <span className="block text-sm font-bold text-white">
-                    Deposit money
-                  </span>
-                  <span className="mt-1 block text-xs text-blue-100/80">
-                    Add funds to the balance
-                  </span>
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => openTransaction("withdraw")}
-                className="group flex min-h-[72px] flex-1 items-center justify-center gap-3 rounded-2xl border border-white/[0.09] bg-[#0B1220] px-6 py-4 text-center transition duration-200 hover:-translate-y-0.5 hover:border-blue-500/40 hover:bg-[#101B2D] active:translate-y-0"
-              >
-                <span className="flex size-10 items-center justify-center rounded-xl border border-white/[0.08] bg-[#080D18] text-blue-300 transition group-hover:border-blue-500/30">
-                  <ArrowUpRight size={21} />
-                </span>
-                <span className="text-left">
-                  <span className="block text-sm font-bold text-white">
-                    Withdraw money
-                  </span>
-                  <span className="mt-1 block text-xs text-slate-400">
-                    Withdraw from available funds
-                  </span>
-                </span>
-              </button>
             </div>
           </section>
 
