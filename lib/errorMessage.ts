@@ -7,10 +7,6 @@ export function getErrorMessage(error: unknown, fallback: string): string {
     return getText(error) ?? fallback;
   }
 
-  if (error instanceof Error) {
-    return getText(error.message) ?? fallback;
-  }
-
   if (typeof error !== "object" || error === null) {
     return fallback;
   }
@@ -18,16 +14,18 @@ export function getErrorMessage(error: unknown, fallback: string): string {
   const message = "message" in error ? getText(error.message) : null;
   const details = "details" in error ? getText(error.details) : null;
   const hint = "hint" in error ? getText(error.hint) : null;
+  const code = "code" in error ? getText(error.code) : null;
+  const statusCode = "statusCode" in error ? getText(error.statusCode) : null;
 
-  if (message) {
-    return [
-      message,
-      details ? `Details: ${details}` : null,
-      hint ? `Hint: ${hint}` : null,
-    ]
-      .filter(Boolean)
-      .join(" ");
-  }
+  const diagnostic = [
+    message,
+    code ? `Code: ${code}` : null,
+    statusCode ? `Status: ${statusCode}` : null,
+    details ? `Details: ${details}` : null,
+    hint ? `Hint: ${hint}` : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  return details ?? hint ?? fallback;
+  return diagnostic || fallback;
 }

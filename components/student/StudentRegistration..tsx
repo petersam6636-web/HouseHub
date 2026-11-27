@@ -29,6 +29,7 @@ import {
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { supabase } from "@/lib/supabase-client";
+import { getErrorMessage } from "@/lib/errorMessage";
 
 type Toast = {
   type: "success" | "error";
@@ -57,6 +58,8 @@ type StudentImageField =
 
 type StudentImages = Record<StudentImageField, File | null>;
 type StudentPreviewUrls = Record<StudentImageField, string | null>;
+
+const STUDENT_IMAGE_BUCKET = "logos";
 
 const initialFormData: StudentFormData = {
   full_name: "",
@@ -483,7 +486,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     const path = `students/${projectId}/${userId}/${field}-${crypto.randomUUID()}.${extension}`;
 
     const { error } = await supabase.storage
-      .from("logos")
+      .from(STUDENT_IMAGE_BUCKET)
       .upload(path, file, {
         cacheControl: "3600",
         contentType: file.type,
@@ -493,7 +496,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     if (error) throw error;
 
     const { data } = supabase.storage
-      .from("logos")
+      .from(STUDENT_IMAGE_BUCKET)
       .getPublicUrl(path);
 
     return {
@@ -612,22 +615,48 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
       router.replace(`/home/${projectId}`);
     } catch (error) {
-      if (uploadedPaths.length > 0) {
-        const { error: cleanupError } = await supabase.storage
-          .from("logos")
-          .remove(uploadedPaths);
+      let cleanupErrorMessage: string | null = null;
 
-        if (cleanupError) {
-          console.error("Unable to clean up uploaded student images.", cleanupError);
+      if (uploadedPaths.length > 0) {
+        try {
+          const { error: cleanupError } = await supabase.storage
+            .from(STUDENT_IMAGE_BUCKET)
+            .remove(uploadedPaths);
+
+          if (cleanupError) {
+            console.error(
+              "Unable to clean up uploaded student images.",
+              cleanupError
+            );
+            cleanupErrorMessage = getErrorMessage(
+              cleanupError,
+              "Unable to clean up uploaded student images."
+            );
+          }
+        } catch (cleanupError) {
+          console.error(
+            "Unable to clean up uploaded student images.",
+            cleanupError
+          );
+          cleanupErrorMessage = getErrorMessage(
+            cleanupError,
+            "Unable to clean up uploaded student images."
+          );
         }
       }
 
+      console.error("Unable to register student.", error);
+
+      const registrationErrorMessage = getErrorMessage(
+        error,
+        "Unable to register this student. Please try again."
+      );
+
       setToast({
         type: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Unable to register this student. Please try again.",
+        message: cleanupErrorMessage
+          ? `${registrationErrorMessage} Image cleanup also failed: ${cleanupErrorMessage}`
+          : registrationErrorMessage,
       });
     } finally {
       setIsSubmitting(false);
