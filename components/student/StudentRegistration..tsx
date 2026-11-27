@@ -11,7 +11,6 @@ import {
   AlertCircle,
   Check,
   CheckCircle2,
-  CircleHelp,
   FileBadge,
   GraduationCap,
   LoaderCircle,
@@ -25,7 +24,6 @@ import {
   Mail,
   Hash,
   Phone,
-  CalendarDays,
   ClipboardCheck,
 } from "lucide-react";
 import { gsap } from "gsap";
@@ -58,6 +56,7 @@ type StudentImageField =
   | "birth_cer_image";
 
 type StudentImages = Record<StudentImageField, File | null>;
+type StudentPreviewUrls = Record<StudentImageField, string | null>;
 
 const initialFormData: StudentFormData = {
   full_name: "",
@@ -75,6 +74,12 @@ const initialFormData: StudentFormData = {
 };
 
 const initialImages: StudentImages = {
+  profile_image: null,
+  NHI_image: null,
+  birth_cer_image: null,
+};
+
+const initialPreviews: StudentPreviewUrls = {
   profile_image: null,
   NHI_image: null,
   birth_cer_image: null,
@@ -287,36 +292,19 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
   const [formData, setFormData] =
     useState<StudentFormData>(initialFormData);
   const [images, setImages] = useState<StudentImages>(initialImages);
-  const [previews, setPreviews] = useState<StudentImages>(initialImages);
+  const [previews, setPreviews] =
+    useState<StudentPreviewUrls>(initialPreviews);
+  const previewUrlsRef = useRef(new Set<string>());
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
 
   useEffect(() => {
-    const nextPreviews: StudentImages = {
-      profile_image: null,
-      NHI_image: null,
-      birth_cer_image: null,
-    };
-
-    const urls: string[] = [];
-
-    (Object.keys(images) as StudentImageField[]).forEach((field) => {
-      const file = images[field];
-
-      if (file) {
-        const url = URL.createObjectURL(file);
-        nextPreviews[field] = file;
-        urls.push(url);
-      }
-    });
-
-    setPreviews(nextPreviews);
-
     return () => {
-      urls.forEach((url) => URL.revokeObjectURL(url));
+      previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      previewUrlsRef.current.clear();
     };
-  }, [images]);
+  }, []);
 
   useEffect(() => {
     if (!toast) return;
@@ -405,10 +393,22 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
       return;
     }
 
+    const previewUrl = URL.createObjectURL(file);
+    const previousPreviewUrl = previews[field];
+    if (previousPreviewUrl) {
+      URL.revokeObjectURL(previousPreviewUrl);
+      previewUrlsRef.current.delete(previousPreviewUrl);
+    }
+    previewUrlsRef.current.add(previewUrl);
+
     setToast(null);
     setImages((previous) => ({
       ...previous,
       [field]: file,
+    }));
+    setPreviews((previous) => ({
+      ...previous,
+      [field]: previewUrl,
     }));
   };
 
@@ -639,7 +639,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
     required = false
   ) => {
     const file = images[field];
-    const preview = file ? URL.createObjectURL(file) : null;
+    const preview = previews[field];
 
     return (
       <Field label={label} optional={!required}>
@@ -689,7 +689,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               Student identity
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Start with the student's basic personal information.
+              Start with the student&apos;s basic personal information.
             </p>
           </div>
 
@@ -706,7 +706,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               onChange={(event) =>
                 updateField("full_name", event.target.value)
               }
-              placeholder="Enter student's full name"
+              placeholder="Enter student&apos;s full name"
               className={inputClass}
             />
           </Field>
@@ -769,7 +769,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               Account details
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Add the student's contact details and transaction security password.
+              Add the student&apos;s contact details and transaction security password.
             </p>
           </div>
 
@@ -835,7 +835,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               Identification documents
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Provide the student's identification details and documents.
+              Provide the student&apos;s identification details and documents.
             </p>
           </div>
 
@@ -881,30 +881,30 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               Parent & guardian
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Keep each parent's name and contact information together.
+              Keep each parent&apos;s name and contact information together.
             </p>
           </div>
 
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
             <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-slate-200">
               <UserRound size={14} className="text-blue-300" />
-              Mother's information
+              Mother&apos;s information
             </div>
 
             <div className="space-y-3">
-              <Field label="Mother's full name">
+              <Field label="Mother&apos;s full name">
                 <input
                   required
                   value={formData.mother_name}
                   onChange={(event) =>
                     updateField("mother_name", event.target.value)
                   }
-                  placeholder="Enter mother's name"
+                  placeholder="Enter mother&apos;s name"
                   className={inputClass}
                 />
               </Field>
 
-              <Field label="Mother's contact">
+              <Field label="Mother&apos;s contact">
                 <input
                   required
                   type="tel"
@@ -922,23 +922,23 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
             <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-slate-200">
               <UserRound size={14} className="text-blue-300" />
-              Father's information
+              Father&apos;s information
             </div>
 
             <div className="space-y-3">
-              <Field label="Father's full name">
+              <Field label="Father&apos;s full name">
                 <input
                   required
                   value={formData.father_name}
                   onChange={(event) =>
                     updateField("father_name", event.target.value)
                   }
-                  placeholder="Enter father's name"
+                  placeholder="Enter father&apos;s name"
                   className={inputClass}
                 />
               </Field>
 
-              <Field label="Father's contact">
+              <Field label="Father&apos;s contact">
                 <input
                   required
                   type="tel"
