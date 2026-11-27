@@ -173,8 +173,8 @@ export type StudentDetailsWithRelations = {
   index_number: string | null;
   email_address: string | null;
 
-  NHI_image: string | null;
-  NHI_number: string;
+  nhi_image: string | null;
+  nhi_number: string;
 
   birth_cer_image: string;
 

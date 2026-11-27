@@ -30,6 +30,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { supabase } from "@/lib/supabase-client";
 import { getErrorMessage } from "@/lib/errorMessage";
+import useApp from "@/lib/useApp";
 
 type Toast = {
   type: "success" | "error";
@@ -40,7 +41,7 @@ type StudentFormData = {
   full_name: string;
   index_number: string;
   email_address: string;
-  NHI_number: string;
+  nhi_number: string;
   mother_name: string;
   father_name: string;
   mother_contact: string;
@@ -53,7 +54,7 @@ type StudentFormData = {
 
 type StudentImageField =
   | "profile_image"
-  | "NHI_image"
+  | "nhi_image"
   | "birth_cer_image";
 
 type StudentImages = Record<StudentImageField, File | null>;
@@ -65,7 +66,7 @@ const initialFormData: StudentFormData = {
   full_name: "",
   index_number: "",
   email_address: "",
-  NHI_number: "",
+  nhi_number: "",
   mother_name: "",
   father_name: "",
   mother_contact: "",
@@ -78,13 +79,13 @@ const initialFormData: StudentFormData = {
 
 const initialImages: StudentImages = {
   profile_image: null,
-  NHI_image: null,
+  nhi_image: null,
   birth_cer_image: null,
 };
 
 const initialPreviews: StudentPreviewUrls = {
   profile_image: null,
-  NHI_image: null,
+  nhi_image: null,
   birth_cer_image: null,
 };
 
@@ -286,6 +287,7 @@ function StudentIllustration() {
 
 function StudentRegisterForm({ projectId }: { projectId: string }) {
   const router = useRouter();
+  const { setProjects } = useApp();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const formContentRef = useRef<HTMLDivElement>(null);
@@ -432,7 +434,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
     if (step === 2) {
       return (
-        formData.NHI_number.trim().length > 0 &&
+        formData.nhi_number.trim().length > 0 &&
         images.birth_cer_image !== null
       );
     }
@@ -555,10 +557,10 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
         profileImage = result.url;
       }
 
-      if (images.NHI_image) {
+      if (images.nhi_image) {
         const result = await uploadImage(
-          images.NHI_image,
-          "NHI_image",
+          images.nhi_image,
+          "nhi_image",
           user.id
         );
         uploadedPaths.push(result.path);
@@ -584,8 +586,8 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
           index_number: formData.index_number.trim() || null,
           email_address: formData.email_address.trim() || null,
 
-          NHI_image: nhiImage,
-          NHI_number: formData.NHI_number.trim(),
+          nhi_image: nhiImage,
+          nhi_number: formData.nhi_number.trim(),
           birth_cer_image: birthCertificateImage,
 
           mother_name: formData.mother_name.trim(),
@@ -613,7 +615,10 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
 
       await new Promise((resolve) => window.setTimeout(resolve, 900));
 
-      router.replace(`/home/${projectId}`);
+      setProjects((currentProjects) =>
+        currentProjects.filter((project) => project.id !== projectId)
+      );
+      router.replace(`/home/${projectId}/students?id=${projectId}`);
     } catch (error) {
       let cleanupErrorMessage: string | null = null;
 
@@ -873,9 +878,9 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
           <Field label="NHI number">
             <input
               required
-              value={formData.NHI_number}
+              value={formData.nhi_number}
               onChange={(event) =>
-                updateField("NHI_number", event.target.value)
+                updateField("nhi_number", event.target.value)
               }
               placeholder="Enter NHI number"
               className={inputClass}
@@ -883,7 +888,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
           </Field>
 
           {imageUpload(
-            "NHI_image",
+            "nhi_image",
             "NHI card image",
             "Upload the student's NHI card"
           )}
@@ -1030,7 +1035,7 @@ function StudentRegisterForm({ projectId }: { projectId: string }) {
               ["Email", formData.email_address || "Not provided"],
               ["Gender", formData.gender],
               ["Location", formData.location],
-              ["NHI number", formData.NHI_number],
+              ["NHI number", formData.nhi_number],
               ["Mother", formData.mother_name],
               ["Father", formData.father_name],
               ["Emergency contact", formData.emergency_number],
