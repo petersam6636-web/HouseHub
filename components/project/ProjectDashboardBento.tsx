@@ -102,20 +102,19 @@ function CardHeading({
 
 
 
+
 function Metric({
   label,
   value,
   icon: Icon,
   accent = "blue",
   detail,
-  href,
 }: {
   label: string;
   value: string | number;
   icon: ElementType;
   accent?: "blue" | "cyan" | "indigo";
   detail?: string;
-  href: string;
 }) {
   const accentClasses = {
     blue: "bg-blue-500/[0.10] text-blue-400 border-blue-400/[0.12]",
@@ -124,111 +123,31 @@ function Metric({
   };
 
   return (
-    <Link
-      href={href}
-      aria-label={`View ${label.toLowerCase()}`}
-      className="
-        group relative block min-w-0 cursor-pointer rounded-[24px]
-        outline-none
-        focus-visible:ring-2 focus-visible:ring-blue-500/70
-        focus-visible:ring-offset-2 focus-visible:ring-offset-[#050b14]
-        transition duration-700
-        ease-[cubic-bezier(0.16,1,0.3,1)]
-        hover:-translate-y-1.5
-        active:translate-y-0
-        motion-reduce:transform-none
-        motion-reduce:transition-none
-      "
-    >
-      {/* Soft blue glow behind the card */}
-      <div
-        className="
-          pointer-events-none absolute -inset-1 rounded-[28px]
-          bg-blue-500/[0.08] opacity-0 blur-xl
-          transition duration-700
-          ease-[cubic-bezier(0.16,1,0.3,1)]
-          group-hover:opacity-100
-          motion-reduce:transition-none
-        "
-      />
+    <Card className="relative h-full overflow-hidden">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-medium text-slate-400">
+            {label}
+          </p>
 
-      <Card
-        className="
-          relative h-full overflow-hidden
-          border border-white/[0.06]
-          transition-[background-color,border-color,box-shadow]
-          duration-700
-          ease-[cubic-bezier(0.16,1,0.3,1)]
-          group-hover:border-blue-400/25
-          group-hover:shadow-[0_16px_50px_rgba(37,99,235,0.12)]
-          group-active:shadow-none
-          motion-reduce:transition-none
-        "
-      >
-        {/* Subtle blue highlight that fades in on hover */}
-        <div
-          className="
-            pointer-events-none absolute inset-0
-            bg-gradient-to-br from-blue-500/[0.07]
-            via-transparent to-transparent
-            opacity-0
-            transition-opacity duration-700
-            ease-[cubic-bezier(0.16,1,0.3,1)]
-            group-hover:opacity-100
-            motion-reduce:transition-none
-          "
-        />
+          <p className="mt-3 break-words text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            {value}
+          </p>
 
-        <div className="relative flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p
-              className="
-                text-[11px] font-medium text-slate-400
-                transition-colors duration-700
-                ease-[cubic-bezier(0.16,1,0.3,1)]
-                group-hover:text-blue-200
-              "
-            >
-              {label}
+          {detail && (
+            <p className="mt-2 text-[10px] leading-4 text-slate-500">
+              {detail}
             </p>
-
-            <p className="mt-3 break-words text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              {value}
-            </p>
-
-            {detail && (
-              <p className="mt-2 text-[10px] leading-4 text-slate-500">
-                {detail}
-              </p>
-            )}
-          </div>
-
-          <div
-            className={`
-              flex h-10 w-10 shrink-0 items-center justify-center
-              rounded-xl border
-              transition-[transform,background-color,border-color]
-              duration-700
-              ease-[cubic-bezier(0.16,1,0.3,1)]
-              group-hover:scale-110
-              group-hover:-translate-y-1
-              group-hover:border-blue-400/30
-              ${accentClasses[accent]}
-            `}
-          >
-            <Icon
-              size={18}
-              className="
-                transition-transform duration-700
-                ease-[cubic-bezier(0.16,1,0.3,1)]
-                group-hover:rotate-6
-                group-hover:scale-110
-              "
-            />
-          </div>
+          )}
         </div>
-      </Card>
-    </Link>
+
+        <div
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${accentClasses[accent]}`}
+        >
+          <Icon size={18} />
+        </div>
+      </div>
+    </Card>
   );
 }
 
@@ -390,66 +309,96 @@ export default function ProjectDashboardBento({ project }: Props) {
   return (
     <div className="mt-6 space-y-4 sm:mt-7">
       {/* Section heading */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <Activity size={15} className="text-blue-400" />
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-300">
-              Dashboard analytics
-            </p>
-          </div>
 
-          <h2 className="mt-2 text-xl font-bold tracking-tight text-white sm:text-2xl">
-            Project insights
-          </h2>
-
-          <p className="mt-1 text-xs text-slate-500">
-            A complete overview of your school project.
-          </p>
-        </div>
-
-        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-400/[0.12] bg-blue-500/[0.06] px-3 py-2 text-[10px] font-medium text-blue-300">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-          Live project data
-        </div>
+{/* Dashboard navigation */}
+<div className="flex justify-center">
+  <div className="grid w-full max-w-xl grid-cols-4 gap-3">
+    <Link
+      href={`/home/${projectId}/students?id=${projectId}`}
+      className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+    >
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/[0.12] bg-blue-500/[0.08] text-blue-400 transition-colors group-hover:bg-blue-500/[0.14]">
+        <Users size={20} />
       </div>
+      <span className="text-[10px] font-medium text-slate-400 group-hover:text-blue-300">
+        Students
+      </span>
+    </Link>
+
+    <Link
+      href={`/home/${projectId}/jobs?id=${projectId}`}
+      className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+    >
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/[0.12] bg-cyan-500/[0.08] text-cyan-300 transition-colors group-hover:bg-cyan-500/[0.14]">
+        <BriefcaseBusiness size={20} />
+      </div>
+      <span className="text-[10px] font-medium text-slate-400 group-hover:text-cyan-300">
+        Jobs
+      </span>
+    </Link>
+
+    <Link
+      href={`/home/${projectId}/transactions?id=${projectId}`}
+      className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+    >
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-400/[0.12] bg-indigo-500/[0.08] text-indigo-300 transition-colors group-hover:bg-indigo-500/[0.14]">
+        <Wallet size={20} />
+      </div>
+      <span className="text-[10px] font-medium text-slate-400 group-hover:text-indigo-300">
+        Transactions
+      </span>
+    </Link>
+
+    <Link
+      href={`/home/${projectId}/records?id=${projectId}`}
+      className="group flex flex-col items-center gap-2 rounded-2xl py-3 text-center outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+    >
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/[0.12] bg-blue-500/[0.08] text-blue-400 transition-colors group-hover:bg-blue-500/[0.14]">
+        <Layers3 size={20} />
+      </div>
+      <span className="text-[10px] font-medium text-slate-400 group-hover:text-blue-300">
+        Records
+      </span>
+    </Link>
+  </div>
+</div>
+
+{/* Primary metrics */}
+<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+  <Metric
+    label="Total students"
+    value={number(students.length)}
+    icon={Users}
+    detail={`${number(maleStudents)} male · ${number(femaleStudents)} female`}
+  />
+
+  <Metric
+    label="Total jobs"
+    value={number(totalJobs)}
+    icon={BriefcaseBusiness}
+    accent="cyan"
+    detail={`${number(dailyJobs.length)} daily · ${number(partTimeJobs.length)} part-time`}
+  />
+
+  <Metric
+    label="Total transactions"
+    value={number(transactions.length)}
+    icon={Wallet}
+    accent="indigo"
+    detail={`${number(completedTransactions.length)} completed`}
+  />
+
+  <Metric
+    label="Related records"
+    value={number(relatedRecords)}
+    icon={Layers3}
+    detail="All student-related records"
+  />
+</div>
+
 
       {/* Primary metrics */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-        <Metric
-          label="Total students"
-          value={number(students.length)}
-          icon={Users}
-          detail={`${number(maleStudents)} male · ${number(femaleStudents)} female`}
-          href={`/home/${projectId}/students?id=${projectId}`}
-        />
 
-        <Metric
-          label="Total jobs"
-          value={number(totalJobs)}
-          icon={BriefcaseBusiness}
-          accent="cyan"
-          detail={`${number(dailyJobs.length)} daily · ${number(partTimeJobs.length)} part-time`}
-          href={`/home/${projectId}/jobs?id=${projectId}`}
-        />
-
-        <Metric
-          label="Total transactions"
-          value={number(transactions.length)}
-          icon={Wallet}
-          accent="indigo"
-          detail={`${number(completedTransactions.length)} completed`}
-          href={`/home/${projectId}/transactions?id=${projectId}`}
-        />
-
-        <Metric
-          label="Related records"
-          value={number(relatedRecords)}
-          icon={Layers3}
-          detail="All student-related records"
-          href={`/home/${projectId}/records?id=${projectId}`}
-        />
-      </div>
 
       {/* Main Bento layout */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
