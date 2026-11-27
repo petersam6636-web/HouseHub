@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ContextFile from "@/lib/ContextFile";
 
@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     icon: "/househub_logo.png",
     apple: "/househub_logo.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#05070D",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
