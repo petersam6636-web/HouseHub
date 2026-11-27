@@ -50,6 +50,9 @@ function StudentDashboardContent() {
 
   const studentId = searchParams.get("id");
   const projectId = searchParams.get("projectId");
+  const studentsHref = projectId
+    ? `/home/students?id=${encodeURIComponent(projectId)}`
+    : "/home/students";
 
   const { projects } = useApp();
 
@@ -83,7 +86,7 @@ function StudentDashboardContent() {
             </p>
 
             <Link
-              href="/home/students"
+              href={studentsHref}
               className="mt-5 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
             >
               <ArrowLeft size={15} />
@@ -117,7 +120,7 @@ function StudentDashboardContent() {
             </p>
 
             <Link
-              href="/home/students"
+              href={studentsHref}
               className="mt-5 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
             >
               <ArrowLeft size={15} />
@@ -145,7 +148,7 @@ function StudentDashboardContent() {
         {/* Back button and school name */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
-            href="/home/students"
+            href={studentsHref}
             className="inline-flex items-center gap-2 rounded-xl border border-white/[0.07] bg-[#0b1424] px-3.5 py-2.5 text-xs font-medium text-slate-300 transition hover:border-blue-400/30 hover:text-white"
           >
             <ArrowLeft size={15} />
