@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
   ArrowRight,
@@ -343,7 +344,7 @@ export default function StudentsPage() {
             </p>
           </section>
         ) : (
-          <section className="grid grid-cols-1 gap-3.5">
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {filteredStudents.map((student) => (
               <StudentCard key={student.id} student={student} />
             ))}
@@ -371,14 +372,16 @@ function StudentCard({
     .toUpperCase();
 
   return (
-    <article className="relative grid min-h-[200px] min-w-0 grid-cols-[minmax(0,1fr)_88px] overflow-hidden rounded-[22px] border border-blue-400/[0.12] bg-gradient-to-r from-[#101e30]/95 via-[#0d1828]/90 to-[#0b1422]/85 shadow-[0_16px_40px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:grid-cols-[minmax(0,1fr)_150px] sm:rounded-[26px] lg:grid-cols-[minmax(0,1fr)_185px]">
-      {/* Profile image */}
-      <div className="relative order-2 h-full min-h-[200px] overflow-hidden bg-[#172943] sm:min-h-[230px]">
+    <article className="group relative flex min-h-[500px] min-w-0 flex-col overflow-hidden rounded-[28px] border border-white/[0.09] bg-gradient-to-br from-[#152238]/95 via-[#101a2b]/95 to-[#0b1220]/95 shadow-[0_18px_48px_rgba(0,0,0,0.3)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-blue-400/20 hover:shadow-[0_24px_60px_rgba(0,0,0,0.38)]">
+      <div className="relative h-[260px] shrink-0 overflow-hidden bg-[#172943] sm:h-[280px]">
         {image ? (
-          <img
+          <Image
             src={image}
             alt={`${student.full_name ?? "Student"} profile`}
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            fill
+            sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
+            unoptimized
+            className="object-cover object-center transition duration-500 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#3976b8] via-[#204875] to-[#112239]">
@@ -388,40 +391,45 @@ function StudentCard({
           </div>
         )}
 
-        {/* Gradient that blends photo into the card */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b1422]/80 via-[#0b1422]/15 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b1220]/10 via-transparent to-[#0b1220]/95" />
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0b1422]/70 to-transparent" />
-
-        <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full border border-white/15 bg-[#10213a]/75 px-2 py-1 text-[8px] font-semibold text-blue-100 backdrop-blur-md sm:right-3 sm:top-3 sm:text-[9px]">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-300" />
+        <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#0b1422]/65 px-3 py-1.5 text-[9px] font-semibold text-blue-100 shadow-lg backdrop-blur-xl">
+          <GraduationCap size={13} className="text-blue-300" />
           Student
         </div>
       </div>
 
-      {/* Student information */}
-      <div className="relative order-1 flex min-w-0 flex-col justify-center p-3 sm:p-4 lg:p-5">
-        <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-blue-400/[0.10] blur-[60px]" />
+      <div className="relative -mt-7 flex flex-1 flex-col rounded-t-[26px] border-t border-white/[0.08] bg-gradient-to-br from-[#152238]/95 via-[#101a2b]/95 to-[#0b1220]/95 px-5 pb-5 pt-4 backdrop-blur-2xl">
+        <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-blue-500/[0.10] blur-[60px]" />
 
         <div className="relative min-w-0">
-          <p className="text-[8px] font-bold uppercase tracking-[0.16em] text-blue-300 sm:text-[9px]">
-            Student profile
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-blue-300">
+                Student profile
+              </p>
 
-          <h2 className="mt-1 break-words text-base font-extrabold leading-tight tracking-tight text-white sm:text-xl">
-            {student.full_name || "Unnamed student"}
-          </h2>
+              <h2 className="mt-1 break-words text-lg font-extrabold leading-tight tracking-tight text-white">
+                {student.full_name || "Unnamed student"}
+              </h2>
+            </div>
 
-          <div className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-lg border border-blue-300/15 bg-blue-400/[0.08] px-2 py-1">
-            <GraduationCap size={11} className="shrink-0 text-blue-300" />
-            <span className="truncate text-[9px] font-semibold text-blue-100 sm:text-[10px]">
-              {student.index_number || "Index number not added"}
+            <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-300/15 bg-blue-400/[0.08] text-blue-300">
+              <GraduationCap size={17} />
+            </div>
+          </div>
+
+          <div className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-lg border border-blue-300/15 bg-blue-400/[0.08] px-2.5 py-1.5">
+            <span className="text-[9px] font-semibold uppercase tracking-wide text-blue-200/75">
+              Index
+            </span>
+            <span className="truncate text-[10px] font-semibold text-blue-100">
+              {student.index_number || "Not added"}
             </span>
           </div>
         </div>
 
-        {/* Essential information */}
-        <div className="relative mt-3 grid min-w-0 grid-cols-1 gap-x-4 gap-y-2.5 sm:mt-4 sm:grid-cols-2 sm:gap-y-3">
+        <div className="relative mt-5 grid min-w-0 grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
           {student.email_address && (
             <StudentInfo
               icon={<Mail size={13} />}
@@ -455,6 +463,17 @@ function StudentCard({
             />
           )}
         </div>
+
+        {student.email_address && (
+          <a
+            href={`mailto:${student.email_address}`}
+            className="relative mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-[0_8px_24px_rgba(37,99,235,0.24)] transition hover:bg-blue-500"
+          >
+            <Mail size={14} />
+            Email student
+            <ArrowRight size={14} />
+          </a>
+        )}
       </div>
     </article>
   );
