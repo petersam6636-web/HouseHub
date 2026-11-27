@@ -682,7 +682,7 @@ export default function StudentDashboardOverview({
   return (
     <div className="space-y-5">
       {/* Four student metrics */}
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
         <MetricCard
           title="Current Balance"
           value={formatCurrency(currentBalance)}

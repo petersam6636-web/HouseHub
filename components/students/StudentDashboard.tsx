@@ -140,7 +140,7 @@ function StudentDashboardContent() {
     <div className="min-h-dvh bg-[#060d18] text-white">
       <Header />
 
-      <main className="mx-auto w-full max-w-[1500px] space-y-5 px-3 py-5 sm:px-5 sm:py-7 lg:px-8">
+      <main className="mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:px-5 sm:py-7 lg:px-8">
 
         {/* Back button and school name */}
         <div className="flex flex-wrap items-center justify-between gap-3">
