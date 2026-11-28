@@ -16,6 +16,7 @@ import {
   MessageCircle,
   MoreVertical,
   Trash2,
+  X,
 } from "lucide-react";
 
 import Header from "@/components/Header";
@@ -23,6 +24,10 @@ import { fetchProjectForUser } from "@/lib/projectService";
 import { supabase } from "@/lib/supabase-client";
 import useApp from "@/lib/useApp";
 import type { Transaction, TransactionState } from "@/types";
+
+type DeleteConfirmation =
+  | { kind: "single"; transactionId: string }
+  | { kind: "all" };
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-GH", {
@@ -110,6 +115,9 @@ function TransactionMessagesContent() {
   const [deletingTransactionId, setDeletingTransactionId] =
     useState<string | null>(null);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] =
+    useState<DeleteConfirmation | null>(null);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [notice, setNotice] = useState<{
     kind: "success" | "error";
     message: string;
@@ -311,6 +319,23 @@ function TransactionMessagesContent() {
     }
   }
 
+  async function confirmDelete() {
+    if (!deleteConfirmation || isConfirmingDelete) return;
+
+    setIsConfirmingDelete(true);
+
+    try {
+      if (deleteConfirmation.kind === "all") {
+        await deleteAllTransactions();
+      } else {
+        await deleteTransaction(deleteConfirmation.transactionId);
+      }
+    } finally {
+      setDeleteConfirmation(null);
+      setIsConfirmingDelete(false);
+    }
+  }
+
   return (
     <div className="min-h-dvh bg-[#05070D] text-white">
       <Header />
@@ -346,7 +371,10 @@ function TransactionMessagesContent() {
               {transactions.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => void deleteAllTransactions()}
+                  onClick={() => {
+                    setDeleteConfirmation({ kind: "all" });
+                    setNotice(null);
+                  }}
                   disabled={
                     Boolean(deletingTransactionId) || isDeletingAll
                   }
@@ -505,9 +533,14 @@ function TransactionMessagesContent() {
                                     <button
                                       type="button"
                                       onClick={() =>
-                                        void deleteTransaction(
-                                          transaction.id
-                                        )
+                                        {
+                                          setOpenMenuId(null);
+                                          setDeleteConfirmation({
+                                            kind: "single",
+                                            transactionId: transaction.id,
+                                          });
+                                          setNotice(null);
+                                        }
                                       }
                                       disabled={
                                         Boolean(
@@ -563,6 +596,81 @@ function TransactionMessagesContent() {
           )}
         </div>
       </main>
+
+      {deleteConfirmation && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-blue-950/75 p-4 backdrop-blur-md"
+          onMouseDown={(event) => {
+            if (
+              event.target === event.currentTarget &&
+              !isConfirmingDelete
+            ) {
+              setDeleteConfirmation(null);
+            }
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-transactions-title"
+            className="w-full max-w-md rounded-3xl border border-blue-400/20 bg-[#0B1220] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.65)] sm:p-6"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl border border-red-400/20 bg-red-500/10 text-red-300">
+                  <Trash2 size={19} />
+                </div>
+                <div>
+                  <h2
+                    id="delete-transactions-title"
+                    className="text-base font-semibold"
+                  >
+                    {deleteConfirmation.kind === "all"
+                      ? "Delete all transactions?"
+                      : "Delete this transaction?"}
+                  </h2>
+                  <p className="mt-1.5 text-sm leading-6 text-slate-400">
+                    {deleteConfirmation.kind === "all"
+                      ? `This will remove all ${transactions.length} transaction records for ${student.full_name}. The student's balance will remain unchanged.`
+                      : `This will remove this transaction record for ${student.full_name}. The student's balance will remain unchanged.`}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-label="Close delete confirmation"
+                disabled={isConfirmingDelete}
+                onClick={() => setDeleteConfirmation(null)}
+                className="rounded-lg p-1.5 text-slate-500 transition hover:bg-white/[0.06] hover:text-white disabled:opacity-50"
+              >
+                <X size={17} />
+              </button>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={isConfirmingDelete}
+                onClick={() => setDeleteConfirmation(null)}
+                className="h-10 rounded-xl border border-blue-400/20 bg-blue-500/[0.08] px-4 text-sm font-medium text-blue-200 transition hover:bg-blue-500/[0.14] disabled:opacity-50"
+              >
+                No, keep it
+              </button>
+              <button
+                type="button"
+                disabled={isConfirmingDelete}
+                onClick={() => void confirmDelete()}
+                className="inline-flex h-10 items-center gap-2 rounded-xl bg-red-600 px-4 text-sm font-semibold text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isConfirmingDelete && (
+                  <Loader2 size={15} className="animate-spin" />
+                )}
+                {isConfirmingDelete ? "Deleting..." : "Yes, delete"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

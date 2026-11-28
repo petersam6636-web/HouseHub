@@ -107,6 +107,11 @@ function BalanceDonut({
     0,
     balanceLength - chartGap
   );
+  const formattedBalance = formatMoney(Math.abs(balance));
+  const balanceFontSize = Math.min(
+    14,
+    Math.max(9, 112 / (formattedBalance.length * 0.62))
+  );
 
   return (
     <div className="relative h-[150px] w-[150px] shrink-0">
@@ -168,10 +173,11 @@ function BalanceDonut({
         </span>
 
         <span
-          className="mt-1 max-w-[112px] truncate text-center text-sm font-bold tracking-tight text-white"
-          title={formatMoney(Math.abs(balance))}
+          className="mt-1 max-w-[112px] truncate text-center font-bold tracking-tight text-white"
+          style={{ fontSize: `${balanceFontSize}px` }}
+          title={formattedBalance}
         >
-          {formatMoney(Math.abs(balance))}
+          {formattedBalance}
         </span>
 
         <span className="mt-1 text-[9px] text-slate-500">
