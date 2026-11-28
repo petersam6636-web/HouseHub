@@ -98,14 +98,14 @@ function BalanceDonut({
   const expenseLength = circumference * expenseRatio;
   const balanceLength = circumference - expenseLength;
   const chartGap =
-    expenseLength > 0 && balanceLength > 0 ? 2.5 : 0;
+    expenseLength > 0 && balanceLength > 0 ? 2.7 : 0;
   const expenseSegmentLength = Math.max(
     0,
-    expenseLength - chartGap / 2
+    expenseLength - chartGap
   );
   const balanceSegmentLength = Math.max(
     0,
-    balanceLength - chartGap / 2
+    balanceLength - chartGap
   );
 
   return (
@@ -155,6 +155,7 @@ function BalanceDonut({
             strokeWidth="8"
             strokeLinecap="butt"
             strokeDasharray={`${expenseSegmentLength} ${circumference}`}
+            strokeDashoffset={-(chartGap / 2)}
             className="transition-all duration-1000 ease-out"
           />
         )}
