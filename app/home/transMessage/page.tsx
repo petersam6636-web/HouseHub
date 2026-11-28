@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -122,6 +122,16 @@ function TransactionMessagesContent() {
     kind: "success" | "error";
     message: string;
   } | null>(null);
+
+  useEffect(() => {
+    if (notice?.kind !== "success") return;
+
+    const timeout = window.setTimeout(() => {
+      setNotice(null);
+    }, 1600);
+
+    return () => window.clearTimeout(timeout);
+  }, [notice]);
 
   const project = projects.find((item) => item.id === projectId);
   const student = project?.students.find(
@@ -597,7 +607,7 @@ function TransactionMessagesContent() {
 
       {deleteConfirmation && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-blue-950/75 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
           onMouseDown={(event) => {
             if (
               event.target === event.currentTarget &&
@@ -611,7 +621,7 @@ function TransactionMessagesContent() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-transactions-title"
-            className="w-full max-w-md rounded-3xl border border-blue-400/20 bg-[#0B1220] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.65)] sm:p-6"
+            className="w-full max-w-md rounded-3xl border border-white/[0.09] bg-[#0B1729] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.65)] sm:p-6"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3">
