@@ -532,16 +532,14 @@ function TransactionMessagesContent() {
                                   <div className="absolute right-0 top-full z-30 mt-1 min-w-36 rounded-xl border border-white/[0.1] bg-[#101827] p-1.5 shadow-xl shadow-black/40">
                                     <button
                                       type="button"
-                                      onClick={() =>
-                                        {
-                                          setOpenMenuId(null);
-                                          setDeleteConfirmation({
-                                            kind: "single",
-                                            transactionId: transaction.id,
-                                          });
-                                          setNotice(null);
-                                        }
-                                      }
+                                      onClick={() => {
+                                        setOpenMenuId(null);
+                                        setDeleteConfirmation({
+                                          kind: "single",
+                                          transactionId: transaction.id,
+                                        });
+                                        setNotice(null);
+                                      }}
                                       disabled={
                                         Boolean(
                                           deletingTransactionId
